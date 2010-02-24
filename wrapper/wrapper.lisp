@@ -301,23 +301,24 @@ is replaced with replacement."
 	    (mapcar #'(lambda (x) (string-trim (list (car desigs) (cdr desigs)) x)) (flatten out))
 	    (flatten out)))))
 
-(defun collapse (lst collapseFn)
-  (if (not collapseFn)
-      lst
-      (progn
-	(mklst lst)
-	(if lst 
-	    (if (meListp (car lst))
-		(let ((tempLst) (out))
-		  (while (if lst (car lst))
-		    (setf tempLst nil)
-		    (dotimes (i (length lst))
-		      (push-to-end (car (nth i lst)) tempLst)
-		      (setf (nth i lst) (cdr (nth i lst))))
-		    (push-to-end (funcall collapseFn tempLst) out))
-		  out)
-		(funcall collapseFn lst))))))
+(defun collapse (lst-source collapseFn)
+    (if (not collapseFn)
+	lst-source
+	(let ((lst (copy-tree lst-source)))
+	  (if (and lst (melistp lst) (meListp (car lst)))
+	      (let ((tempLst) (out))
+		(while (if lst (car lst))
+		  (setf tempLst nil)
+		  (dotimes (i (length lst))
+		    (push-to-end (car (nth i lst)) tempLst)
+		    (setf (nth i lst) (cdr (nth i lst))))
+		  (push-to-end (funcall collapseFn tempLst) out))
+		out)
+	      (funcall collapseFn lst)))))
   
+(defun transpose (lst)
+  (collapse lst #'(lambda (x) x)))
+
 (defun remap-string (str hash &key (lambdas nil) (collapseFn "'mean") (inside-brackets nil) (key nil))
   (if inside-brackets
       ;remaps an expression surrounded by brackets by calling the hash table on each of the words in the expression
@@ -543,6 +544,7 @@ is replaced with replacement."
 				     (assert 
 				      (key-present word hash) nil "key ~a not currently present in hash table" word)))
 		  :collapseFn collapseFn)))
+	;(format t "~a~%" val)
 	(push-to-end (cons key (eval (read-from-string val))) out)))))
 	    
 ;adds a list of elements (key . value) to the hash table 'hash' specified by 'keys'
