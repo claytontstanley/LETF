@@ -46,6 +46,26 @@
                    (t (rec (car lis) (rec (cdr lis) acc))))))
     (rec lis nil)))
 
+(defun collapse (lst-source collapseFn)
+    (if (not collapseFn)
+	lst-source
+	(let ((lst (copy-tree lst-source)))
+	  (if (and lst (melistp lst) (meListp (car lst)))
+	      (let ((tempLst) (out))
+		(dotimes (i (- (length lst) 1))
+		  (assert (equal (length (nth i lst)) (length (nth (+ 1 i) lst)))))
+		(while (if lst (car lst))
+		  (setf tempLst nil)
+		  (dotimes (i (length lst))
+		    (push-to-end (car (nth i lst)) tempLst)
+		    (setf (nth i lst) (cdr (nth i lst))))
+		  (push-to-end (funcall collapseFn tempLst) out))
+		out)
+	      (funcall collapseFn lst)))))
+
+(defun transpose (lst)
+  (collapse lst #'(lambda (x) x)))
+
 (defun replace-all (string part replacement &key (test #'char=))
 "Returns a new string in which all the occurences of the part 
 is replaced with replacement."
@@ -109,27 +129,13 @@ is replaced with replacement."
       (values data (read-sequence data s)))))
 
 (defun throwOutYerNils (&rest lsts)
-  (labels ((nilIT (lst)
-	     (if lst 
-		 (if (member nil lst)
-		     (dotimes (i (length lst)) (setf (nth i lst) nil))))
-	     lst))
+  (let ((out))
     (if (meListp (car lsts))
-	(let ((out) (column))
-	  (dotimes (i (- (length lsts) 1))
-	    (assert (equal (length (nth i lsts)) (length (nth (+ 1 i) lsts)))))
-	  (dotimes (i (length lsts)) (push nil out))
-	  (while (if lsts (car lsts))
-	    (setf column (nilIT (mapcar #'(lambda (x) (car x)) lsts)))
-	    (if (not (member nil column))
-		(dotimes (i (length lsts))
-		  (push (nth i column) (nth i out))))
-	    (dotimes (i (length lsts))
-	      (setf (nth i lsts) (cdr (nth i lsts)))))
-	  (dotimes (i (length out))
-	    (setf (nth i out) (reverse (nth i out))))
-	  (apply 'values out))
-	(apply 'values (nilIT lsts)))))
+	(dolist (column (transpose lsts) (setf out (transpose out)))
+	  (if (not (member nil column))
+	      (push-to-end column out)))
+	(if (not (member nil lsts)) (setf out lsts)))
+    (apply 'values (if out out (mapcar #'(lambda (x) (declare (ignore x)) nil) lsts)))))
 
 (defmacro inLST (left right fName throwOutYerNils)
   `(if ,left (if (melistp (car ,left))
@@ -138,17 +144,23 @@ is replaced with replacement."
 		     (push-to-end (,fName itm ,right :throwOutYerNils ,throwOutYerNils) out))
 		   (return-from ,fName (flatten out))))))
 
+(defmacro inLSTs (left right fName throwOutYerNils)
+  `(progn
+     (inLST ,left ,right ,fName ,throwOutYerNils)
+     (inLST ,right ,left ,fName ,throwOutYerNils)))
+
+(defmacro assertEqualLengths (l1 l2)
+  `(assert (equal (length ,l1) (length ,l2))
+	   nil "length ~d not equal to length ~d" (length ,l1) (length ,l2)))
+  
 (defun MAD (l1 l2 &key (throwOutYerNils nil))
-  (inLST l1 l2 MAD throwOutYerNils)
-  (inLST l2 l1 MAD throwOutYerNils)
-  (assert (equal (length l1) (length l2))
-	  nil "l1 length ~d not equal to l2 length ~d" (length l1) (length l2))
+  (inLSTs l1 l2 MAD throwOutYerNils)
+  (assertEqualLengths l1 l2)
   (if throwOutYerNils (multiple-value-setq (l1 l2) (throwOutYerNils l1 l2)))
   (if l1 (/ (apply '+ (mapcar (lambda (x y) (abs (- x y))) l1 l2)) (length l1))))
 
 (defun correl (l1 l2 &key (throwOutYerNils nil))
-  (inLST l1 l2 correl throwOutYerNils)
-  (inLST l2 l1 correl throwOutYerNils)
+  (inLSTs l1 l2 correl throwOutYerNils)
   (labels ((std (lst)
 	     (assert (> (length lst) 1)
 		     nil "must have at least 2 numbers to calculation std; only supplied ~d" (length lst))
@@ -157,8 +169,7 @@ is replaced with replacement."
 	       (apply '+ (funcall #'(lambda (x) (mapcar (lambda (y) (* (- y x) (- y x))) lst))
 				  (/ (apply '+ lst) (length lst))))
 	       (- (length lst) 1)))))
-    (assert (equal (length l1) (length l2))
-	    nil "l1 length ~d not equal to l2 length ~d" (length l1) (length l2))
+    (assertEqualLengths l1 l2)
     (ignore-errors
       (if throwOutYerNils (multiple-value-setq (l1 l2) (throwOutYerNils l1 l2)))
       (let ((out
@@ -177,10 +188,8 @@ is replaced with replacement."
 	out))))
 
 (defun RMSE (l1 l2 &key (throwOutYerNils nil))
-  (inLST l1 l2 RMSE throwOutYerNils)
-  (inLST l2 l1 RMSE throwOutYerNils)
-  (assert (equal (length l1) (length l2))
-	  nil "l1 length ~d not equal to l2 length ~d" (length l1) (length l2))
+  (inLSTs l1 l2 RMSE throwOutYerNils)
+  (assertEqualLengths l1 l2)
   (if throwOutYerNils (multiple-value-setq (l1 l2) (throwOutYerNils l1 l2)))
   (if l1 (sqrt (/ (apply '+ (mapcar (lambda (x y) (* (- x y) (- x y))) l1 l2)) (length l1)))))
 
@@ -300,24 +309,6 @@ is replaced with replacement."
 	(if (not include-brackets)
 	    (mapcar #'(lambda (x) (string-trim (list (car desigs) (cdr desigs)) x)) (flatten out))
 	    (flatten out)))))
-
-(defun collapse (lst-source collapseFn)
-    (if (not collapseFn)
-	lst-source
-	(let ((lst (copy-tree lst-source)))
-	  (if (and lst (melistp lst) (meListp (car lst)))
-	      (let ((tempLst) (out))
-		(while (if lst (car lst))
-		  (setf tempLst nil)
-		  (dotimes (i (length lst))
-		    (push-to-end (car (nth i lst)) tempLst)
-		    (setf (nth i lst) (cdr (nth i lst))))
-		  (push-to-end (funcall collapseFn tempLst) out))
-		out)
-	      (funcall collapseFn lst)))))
-  
-(defun transpose (lst)
-  (collapse lst #'(lambda (x) x)))
 
 (defun remap-string (str hash &key (lambdas nil) (collapseFn "'mean") (inside-brackets nil) (key nil))
   (if inside-brackets
@@ -526,8 +517,7 @@ is replaced with replacement."
 		 nil "~d matching lines with lhs=~a; only 1 line allowed" 
 		 (length it)
 		 (make-sentence keys))
-	 (first it))
-       it))
+	 (first it))))
       	  
 ;returns the list of elements (key . value) from the hash table 'hash' specified by 'keys'
 ;will evaluate each value before putting it in the list
@@ -588,18 +578,13 @@ is replaced with replacement."
 
 (defmethod add-dependent-element ((hash hash-table) &optional (configFileStr nil) (lhs nil) (lambdas nil))
   (mklst lambdas)
-  (let ((lines) (words) (shortIt!))
-    (setf lines (if (melistP lhs) (list (cdr lhs)) (get-matching-lines configFileStr lhs)))
+  (let ((line) (words) (shortIt!))
+    (setf line (if (melistp lhs) (cdr lhs) (get-matching-line configFileStr lhs)))
     (setf lhs (if (melistP lhs) (car lhs) lhs))
-    (if lines
+    (if line
 	(progn
-	  (assert (equal (length lines) 1)
-		  nil "~d matching lines in config file with lhs=~a; should only be 1 matching line"
-		  (length lines) lhs)
-	  (add-elements
-	   hash
-	   `(,(subseq lhs 0 (- (length lhs) 1)) . ,(first lines)))
-	  (setf words (lump-brackets (first lines)))
+	  (add-elements hash (cons (subseq lhs 0 (- (length lhs) 1)) line))
+	  (setf words (lump-brackets line))
 	  (dolist (word words)
 	    (if (and (equal (char word 0) #\[) (equal (char word (- (length word) 1)) #\]))
 		(dolist (item (get-words (string-trim "[]" word)))
@@ -760,7 +745,7 @@ is replaced with replacement."
 	     (let ((hash (make-hash-table :test 'equalp)))
                ;the analogous 'add-cell-elements for the dvs isn't called here, because these 
                ;elements will be added during run-time, as the model is producing results
-	       (add-dependent-elements hash configFileStr "DV=")
+	       (add-dependent-elements hash configFileStr (list "DV=" "SDV="))
 	       hash))
 	   (get-IV-keys (configFileStr)
 	     (let ((out))
@@ -770,7 +755,7 @@ is replaced with replacement."
 	       out))
 	   (get-DV-keys (configFileStr)
 	     (let ((words) (out))
-	       (dolist (line (get-matching-lines configFileStr "dv=") out)
+	       (dolist (line (get-matching-lines configFileStr (list "dv=" "sdv=")) out)
 		 (setf words (get-words line))
 		 (assert (> (length words) 0)
 			 nil "no rhs on lhs=dv=; at least 1 word required")
@@ -793,14 +778,14 @@ is replaced with replacement."
 		 (setf words (get-words line #\;))
 		 (setf tmpLn (make-sentence (rest words) #\Newline))
 		 (assert (equal (length (rest words)) 
-				(length (get-matching-lines tmpLn (list "DV=" "ApplyTo="))))
+				(length (get-matching-lines tmpLn (list "DV=" "SDV=" "ApplyTo="))))
 			 nil "line ~a not valid" line)
 		 (mod-collapseHash 
 		  hash
 		  (let ((hsh (make-hash-table :test 'equalp)))
 		    (add-dependent-element hsh configFileStr (cons "collapseFn=" (first words)))
 		    (remap-string (concatenate 'string "[" "collapseFn" "]") hsh))
-		  :DVKeys (get-words (bracket-expand (get-matching-line tmpLn "DV=") t))
+		  :DVKeys (get-words (bracket-expand (get-matching-line tmpLn (list "DV=" "SDV=")) t))
 		  :ApplyToKeys (get-words (bracket-expand (get-matching-line tmpLn "ApplyTo=") t)))))))
     (let ((session) (runProcess) (run) (lines) (line-index) (count) (iteration) (iterations)
 	  (DVHash) (IVHash) (DVKeys) (IVKeys) (modelProgram) (cellKeys)
