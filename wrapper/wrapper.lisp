@@ -27,10 +27,6 @@
   `(let ((it ,test-form))
      (if it ,then-form ,else-form)))
 
-(defmacro awhen (test-form &body body)
-  `(aif ,test-form
-     (progn ,@body)))
-
 (defmacro mklst (item)
   `(if ,item (if (not (listp ,item)) (setf ,item (list ,item)))))
 
@@ -135,7 +131,8 @@ is replaced with replacement."
 	  (if (not (member nil column))
 	      (push-to-end column out)))
 	(if (not (member nil lsts)) (setf out lsts)))
-    (apply 'values (if out out (mapcar #'(lambda (x) (declare (ignore x)) nil) lsts)))))
+    (apply 'values (if out out (make-sequence 'list (length lsts) :initial-element nil)))))
+
 
 (defmacro inLST (left right fName throwOutYerNils)
   `(if ,left (if (melistp (car ,left))
@@ -300,7 +297,7 @@ is replaced with replacement."
 		str (length open-brackets) (- (length close-brackets) 1))
 	(if open-brackets
 	    (assert 
-	     (apply '< (flatten (mapcar #'(lambda (open close) (list open close)) open-brackets (rest close-brackets))))
+	     (apply '< (flatten (transpose (list open-brackets (rest close-brackets)))))
 	     nil "for string ~a, at least one bracket pair is nested within another bracket pair, which is not allowed" str))
 	(dotimes (i (length open-brackets))
 	  (push-to-end (get-words (subseq str (+ 1 (nth i close-brackets)) (nth i open-brackets))) out)
@@ -468,10 +465,7 @@ is replaced with replacement."
 		    (dotimes (i (length (find-in-string str #\:)) (push-to-end (rest cit) out))
 		      (setf cit (get-words (nth i colon-words)))
 		      (setf prev (car (last cit)))						    
-		      (push-to-end (if (equal i 0) 
-				       (reverse (rest (reverse cit))) 
-				       (rest (reverse (rest (reverse cit)))))
-				   out)
+		      (push-to-end (if (equal i 0) (butlast cit) (rest (butlast cit))) out)
 		      (setf cit (get-words (nth (+ 1 i) colon-words)))
 		      (setf next (first cit))
 		      (setf wordPrev (subseq prev 0 (first (num-indeces prev "fromRight"))))
@@ -569,12 +563,7 @@ is replaced with replacement."
     (assert (equal (length cell-keys) (length cell-values))
 	    nil "number of cell keys (~d) does not equal number of cell values (~d)"
 	    (length cell-keys) (length cell-values))
-    (add-elements 
-     hash
-     (mapcar
-      #'(lambda (x y) (cons x y))
-      cell-keys
-      cell-values))))
+    (add-elements hash (mapcar #'cons cell-keys cell-values))))
 
 (defmethod add-dependent-element ((hash hash-table) &optional (configFileStr nil) (lhs nil) (lambdas nil))
   (mklst lambdas)
@@ -794,7 +783,7 @@ is replaced with replacement."
 	  (configFileStr) (workFileStr) (runsPerProcess) (short-circuit-p) (configFileLnLST) (configFileWdLST))
       (setf configFileStr (restructure (file-string configFilePath)))
       (setf configFileLnLST (get-lines configFileStr))
-      (setf configFileWdLST (mapcar #'(lambda (x) (get-words x)) configFileLnLST))
+      (setf configFileWdLST (mapcar #'get-words configFileLnLST))
       (setf workFileStr (file-string workFilePath))
       (setf runsPerProcess (aif (get-matching-line configFileWdLST "runsPerProcess=")
 				(read-from-string (get-word it))
