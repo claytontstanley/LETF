@@ -42,26 +42,35 @@
                    (t (rec (car lis) (rec (cdr lis) acc))))))
     (rec lis nil)))
 
-(defun collapse (lst-source collapseFn)
-    (if (not collapseFn)
-	lst-source
-	(let ((lst (copy-tree lst-source)))
-	  (if (and lst (melistp lst) (meListp (car lst)))
-	      (let ((tempLst) (out))
-		(dotimes (i (- (length lst) 1))
-		  (assert (equal (length (nth i lst)) (length (nth (+ 1 i) lst)))))
-		(while (if lst (car lst))
-		  (setf tempLst nil)
-		  (dotimes (i (length lst))
-		    (push-to-end (car (nth i lst)) tempLst)
-		    (setf (nth i lst) (cdr (nth i lst))))
-		  (push-to-end (funcall collapseFn tempLst) out))
-		out)
-	      (funcall collapseFn lst)))))
+(defun all-equal (lst &key (test 'equal))
+  (mklst lst)
+  (dotimes (i (- (length lst) 1) t)
+    (if (not (funcall test (nth i lst) (nth (+ 1 i) lst)))
+	(return-from all-equal nil))))
 
-(defun transpose (lst)
-  (collapse lst #'(lambda (x) x)))
+(defun transpose (lst-source)
+  (let ((lst (copy-tree lst-source)))
+    (if (and lst (melistp lst) (melistp (car lst)))
+	(let ((templst) (out))
+	  (assert (all-equal (mapcar #'length lst)))
+	  (while (if lst (car lst))
+	    (setf templst nil)
+	    (dotimes (i (length lst))
+	      (push-to-end (car (nth i lst)) templst)
+	      (setf (nth i lst) (cdr (nth i lst))))
+	    (push-to-end templst out))
+	  out)
+	lst)))
 
+(defun collapse (lst collapseFn)
+  (if (not collapseFn)
+      lst
+      (if (and lst (melistp lst) (melistp (car lst)))
+	  (let ((out))
+	    (dolist (column (transpose lst) out)
+	      (push-to-end (funcall collapseFn column) out)))
+	  (funcall collapseFn lst))))
+	  
 (defun replace-all (string part replacement &key (test #'char=))
 "Returns a new string in which all the occurences of the part 
 is replaced with replacement."
@@ -406,31 +415,29 @@ is replaced with replacement."
 		   (push-to-end (format nil "~a" lst) out))
 	       (make-sentence (flatten out)))))
     (let ((traversed (make-hash-table :test 'equalp)))
-      (loop for value being the hash-values of hash
-	 using (hash-key key)
-	 do
-	   (if (and (not (key-present key traversed)) (not (necessaries key hash)))
-	       (remap-string
-		(concatenate 'string "[" key "]") hash
-		:lambdas
-		(cons "post"
-		      #'(lambda (word hash val)
-			  (if (not (key-present word traversed))
-			      (let ((newVal))
-				(setf (gethash word traversed) t)
-				(ignore-errors
-				  (multiple-value-bind (evaledVal lngth) (read-from-string val)
-				    (if (equal lngth (length val))
-					(setf newVal (toString (eval evaledVal))))))
-				(if (and newVal 
-					 (not (equal (- (length val) 
-							(length (find-in-string val (list #\space #\tab))))
-						     (- (length newVal) 
-							(length (find-in-string newVal (list #\Space #\tab)))))))
-				    (progn
+      (loop for key being the hash-keys of hash
+	 do (if (and (not (key-present key traversed)) (not (necessaries key hash)))
+		(remap-string
+		 (concatenate 'string "[" key "]") hash
+		 :lambdas
+		 (cons "post"
+		       #'(lambda (word hash val)
+			   (if (not (key-present word traversed))
+			       (let ((newVal))
+				 (setf (gethash word traversed) t)
+				 (ignore-errors
+				   (multiple-value-bind (evaledVal lngth) (read-from-string val)
+				     (if (equal lngth (length val))
+					 (setf newVal (toString (eval evaledVal))))))
+				 (if (and newVal 
+					  (not (equal (- (length val) 
+							 (length (find-in-string val (list #\space #\tab))))
+						      (- (length newVal) 
+							 (length (find-in-string newVal (list #\Space #\tab)))))))
+				     (progn
 				      ;(format t "~a -> ~a -> ~a~%" (gethash word hash) val newVal)
-				      (setf (gethash word hash) newVal)
-				      "shortIt!"))))))))))))
+				       (setf (gethash word hash) newVal)
+				       "shortIt!"))))))))))))
 
 (defun bracket-expand (str &optional (inside-brackets nil))
   (labels ((num-indeces (str direction)
@@ -520,13 +527,12 @@ is replaced with replacement."
   (let ((out))
     (dolist (key keys out)
       (let ((val (remap-string
-		  (concatenate 'string "[" key "]") 
-		  hash
-		  :lambdas (cons "pre" 
-				 #'(lambda (word hash val)
-				     (declare (ignore val))
-				     (assert 
-				      (key-present word hash) nil "key ~a not currently present in hash table" word)))
+		  (concatenate 'string "[" key "]") hash
+		  :lambdas (cons 
+			    "pre" 
+			    #'(lambda (word hash val)
+				(declare (ignore val))
+				(assert (key-present word hash) nil "key ~a not currently present in hash table" word)))
 		  :collapseFn collapseFn)))
 	;(format t "~a~%" val)
 	(push-to-end (cons key (eval (read-from-string val))) out)))))
@@ -675,19 +681,10 @@ is replaced with replacement."
       ;pass over all of the elements in the hash table, and
       ;if an element is a list and if all slots in that list are equal, then collapse the list
       (progn
-	(maphash 
-	 #'(lambda (key value)
-	     (labels ((all-equal (value)
-			(let ((str))
-			  (if (meListp value)
-			      (progn
-				(setf str (first value))
-				(dolist (item value t)
-				  (if (not (equalp str item))
-				      (return-from all-equal nil))))))))
-	       (if (all-equal value) 
-		   (setf (gethash key (collection obj)) (first value)))))
-	 (copy-hash (collection obj)))
+	(loop for key being the hash-keys of (collection obj)	
+	   using (hash-value val)
+	   do (if (and (melistp val) (all-equal val :test #'equalp))
+		  (setf (gethash key (collection obj)) (first val))))
 	(print-collector obj))))
 
 (defmethod collect ((obj collector-class) (DVHash hash-table))
