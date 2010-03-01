@@ -938,7 +938,7 @@ is replaced with replacement."
 	     (setf line nil)
 	     (incf runCount)
 	     (setf elements (get-elements (IVKeys run) (IVHash run)))
-	     (setf elementCount 0)
+	     (setf elementCount 0) 
 	     (dolist (element elements)
 	       (incf elementCount)
 	       (setf line (concatenate 'string line (format nil "~a=~a" (car element) (cdr element))))
