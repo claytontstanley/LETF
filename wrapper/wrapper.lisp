@@ -221,62 +221,46 @@ is replaced with replacement."
   (if throwOutYerNils (setf lst (throwOutYerNils lst)))
   (if lst (/ (sum lst) (length lst))))
 
-;this function takes a string as input, and outputs a list with every line 
-;in the string as an item in the list; analogous to 'cellstr in matlab
-(defun get-lines (str &optional (lineDesignators (list #\Newline #\Return #\LineFeed)))
-  (mklst lineDesignators)
-  (assert lineDesignators)
-  ;iterative routine; I chose not to use tail recursion due to speed/memory issues
-  (if (> (length str) 0) 
-      (if (not (find-in-string (char str (- (length str) 1)) lineDesignators))
-	  (setf str (concatenate 'string str (format nil "~a" (first lineDesignators))))))
-  (let ((newLines (find-in-string str lineDesignators))
-	(out nil))
-    ;go through each line in the string, and push the line onto out
-    (dotimes (i (length newLines) out)
-      (let* ((newLinePast (if (equal i 0) -1 (nth (- i 1) newLines)))
-	     (newLineCurrent (nth i newLines))
-	     (curLine (string-trim (list #\Space #\Tab) (subseq str (+ 1 newLinePast) newLineCurrent))))
-	(unless (equal (length curLine) 0)
-	  (push-to-end (format nil "~a" curLine) out))))))
-
 ;returns a list of the words in str
-(defun get-words (str &optional (spaceDesignators (list #\Space #\Tab)))
-  (let ((out) (start) (end) (in-the-white))
+(defun get-words (str &key (spaceDesignators (list #\Space #\Tab)) (includeSpaceDesignators nil))
+  (if str (setf str (string-trim (list #\Space #\Tab) str))) ;yes, these should be hardcoded to space and tab
+  (let ((out) (start) (in-the-white))
     (mklst spaceDesignators)
     (assert spaceDesignators)
-    (dolist (line (get-lines str) out)
-      (setf start 0
-	    end 0
-	    in-the-white t)
-      (dotimes (i (length line) (if (not in-the-white) (push-to-end (subseq line start (length line)) out)))
-	(if (find-in-string (char line i) spaceDesignators)
-	    (progn
-	      (setf end i)
-	      (if (not in-the-white)
-		  (progn
-		    (setf in-the-white t)
-		    (push-to-end (subseq line start end) out)))
-	      (setf start i))
-	    (progn
-	      (setf end i)
-	      (if in-the-white
-		  (progn
-		    (setf start i)
-		    (setf in-the-white nil)))))))))
+    (if (equal (length str) 0) (return-from get-words nil))
+    (setf start 0)
+    (setf in-the-white (find-in-string (char str 0) spaceDesignators))
+    (dotimes (i (length str) (if (not in-the-white) (push-to-end (subseq str start (length str)) out) out))
+      (if (find-in-string (char str i) spaceDesignators)
+	  (progn
+	    (if (not in-the-white)
+		(progn
+		  (push-to-end (subseq str start i) out)
+		  (setf in-the-white t)
+		  (setf start i)))
+	    (if includeSpaceDesignators (push-to-end (format nil "~a" (char str i)) out)))
+	(progn
+	  (if in-the-white
+	      (progn
+		(setf in-the-white nil)
+		(setf start i))))))))
 
-(defun get-word (str &optional (spaceDesignators (list #\Space #\Tab)))
+(defun get-word (str &key (spaceDesignators (list #\Space #\Tab)) (includeSpaceDesignators nil))
   (mklst spaceDesignators)
   (assert spaceDesignators)
-  (aif (get-words str spaceDesignators)
+  (aif (get-words str :spaceDesignators spaceDesignators :includeSpaceDesignators includeSpaceDesignators)
        (progn
-	 (assert (equal (length it) 1)
-		 nil "~d words in string; only 1 word allowed" (length it))
-	 (first it))
-       it))
+	 (assert (equal (length it) 1) nil "~d words in string; only 1 word allowed" (length it))
+	 (first it))))
+
+(defun get-lines (str &key (lineDesignators (list #\Newline #\Return #\LineFeed)) (includeLineDesignators nil))
+  (let ((out))
+    (dolist (line (get-words str :spaceDesignators lineDesignators :includeSpaceDesignators includeLineDesignators) (reverse out))
+      (push (string-trim (list #\Space #\Tab) line) out))))
 
 ;takes a list of strings, and returns a single string with single whitespaces between each word
-(defun make-sentence (lst &optional (spaceDesignator #\Space))
+(defun make-sentence (lst &key (spaceDesignator #\Space))
+  (setf spaceDesignator (format nil "~a" spaceDesignator))
   (mklst lst)
   (if lst
       (let ((out))
@@ -287,34 +271,22 @@ is replaced with replacement."
 ;like get-words, returns a list of the words in str
 ;however, here all words that are within brackets are lumped together as one word (i.e., item) in the list
 ;if there are no brackets in str, then lump-brackets is equivalent to get-words
-(defun lump-brackets (str &optional (desigs (cons #\[ #\])) (include-brackets t))
-  (if (not desigs) 
-      (get-words str)
-      (let ((open-brackets) (close-brackets) (out))
-	(if (equal (car desigs) (cdr desigs))
-	    (let ((temp-brackets (find-in-string str (car desigs)))
-		  (cnt -1)) 
-	      (setf close-brackets (cons -1 nil))
-	      (while (< (incf cnt) (length temp-brackets))
-		(if (equal (mod cnt 2) 0)
-		    (push-to-end (nth cnt temp-brackets) open-brackets)
-		    (push-to-end (nth cnt temp-brackets) close-brackets))))
-	    (setf open-brackets (find-in-string str (car desigs))
-		  close-brackets (cons -1 (find-in-string str (cdr desigs)))))
-	(assert (equal (length open-brackets) (- (length close-brackets) 1))
-		nil "for string ~a, ~d number of open brackets not equal to ~d number of close brackets" 
-		str (length open-brackets) (- (length close-brackets) 1))
-	(if open-brackets
-	    (assert 
-	     (apply '< (flatten (transpose (list open-brackets (rest close-brackets)))))
-	     nil "for string ~a, at least one bracket pair is nested within another bracket pair, which is not allowed" str))
-	(dotimes (i (length open-brackets))
-	  (push-to-end (get-words (subseq str (+ 1 (nth i close-brackets)) (nth i open-brackets))) out)
-	  (push-to-end (subseq str (nth i open-brackets) (+ 1 (nth (+ 1 i) close-brackets))) out))
-	(push-to-end (get-words (subseq str (+ 1 (car (last close-brackets))) (length str))) out)
-	(if (not include-brackets)
-	    (mapcar #'(lambda (x) (string-trim (list (car desigs) (cdr desigs)) x)) (flatten out))
-	    (flatten out)))))
+(defun lump-brackets (str &key (desigs (cons #\[ #\])) (include-brackets t))
+  (if (not desigs) (return-from lump-brackets (get-words str)))
+  (assert (equal (length (flatten desigs)) 2))
+  (let ((out) (in-bracket) (lump))
+    (dolist (word (get-words str :spaceDesignators (flatten desigs) :includeSpaceDesignators t))
+      (if (not in-bracket) (setf lump nil))
+      (if (find-in-string (format nil "~a~a" (car desigs) (cdr desigs)) (char word 0))
+	  (progn
+	    (assert (find-in-string (format nil "~a" (if in-bracket (cdr desigs) (car desigs))) (char word 0))
+		    nil "something is wrong with string ~a, possibly one bracket pair is nested within another bracket pair, which is not allowed" str)
+	    (setf in-bracket (not in-bracket))
+	    (if include-brackets (push-to-end word lump)))
+	  (if in-bracket (push-to-end word lump)))
+      (if (not in-bracket) (push-to-end (if lump (make-sentence lump :spaceDesignator "") (get-words word)) out)))
+    (assert (not in-bracket) nil "something is wrong with string ~a, possibly a stray bracket somewhere" str)
+    (flatten out)))
 
 (defun remap-string (str hash &key (lambdas nil) (collapseFn "'mean") (inside-brackets nil) (key nil))
   (if inside-brackets
@@ -467,7 +439,7 @@ is replaced with replacement."
 		 out))
 	      (if (not (find-in-string str #\:))
 		  (push-to-end str out)
-		  (let ((colon-words (get-words str #\:))
+		  (let ((colon-words (get-words str :spaceDesignators #\:))
 			(prev) (next) (wordPrev) (numPrev) (wordNext) (numNext) (cit))
 		    (dotimes (i (length (find-in-string str #\:)) (push-to-end (rest cit) out))
 		      (setf cit (get-words (nth i colon-words)))
@@ -607,11 +579,23 @@ is replaced with replacement."
 (defclass session-class ()
   ((runs :accessor runs :initarg :runs :initform nil)))
 
+(defclass process-output-str-class ()
+  ((str :accessor str :initarg :str :initform nil)
+   (quot :accessor quot :initarg :quot :initform 0)
+   (quota :accessor quota :initarg :quota :initform 200)))
+
+(defmethod collect ((obj process-output-str-class) str)
+  (push-to-end str (str obj))
+  (if (equal (quot obj) (quota obj))
+      (setf (str obj) (rest (str obj)))
+      (incf (quot obj))))
+
 (defclass runProcess-class ()
   ((runs :accessor runs :initarg :runs :initform nil)
    (process :accessor process :initarg :process :initform nil)
    (modelProgram :accessor modelProgram :initarg :modelProgram :initform nil)
-   (platform :accessor platform :initarg :platform :initform nil)))
+   (platform :accessor platform :initarg :platform :initform nil)
+   (process-output-str :accessor process-output-str :initarg :process-output-str :initform (make-instance 'process-output-str-class))))
 
 (defclass number5-runProcess-class (runProcess-class)
   ((sleepTime :accessor sleepTime :initarg :sleepTime :initform .2)))
@@ -626,7 +610,8 @@ is replaced with replacement."
    (DVKeys :accessor DVKeys :initarg :DVKeys :initform nil)
    (cellKeys :accessor cellKeys :initarg :cellKeys :initform nil)
    (sleepTime :accessor sleepTime :initarg :sleepTime :initform 0)
-   (collector :accessor collector :initarg :collector :initform nil)))
+   (collector :accessor collector :initarg :collector :initform nil)
+   (runProcess :accessor runProcess :initarg :runProcess :initform nil)))
 
 (defclass number5-run-class (run-class)
   ())
@@ -761,8 +746,8 @@ is replaced with replacement."
 					       (append (necessaries DVKey DVHash) (availables DVKey DVHash))))
 		 (push-to-end (cons DVKey tmpHash) hashLST))
 	       (dolist (line (get-matching-lines configFileStr "collapseFn=") hash)
-		 (setf words (get-words line #\;))
-		 (setf tmpLn (make-sentence (rest words) #\Newline))
+		 (setf words (get-words line :spaceDesignators (list #\; #\&)))
+		 (setf tmpLn (make-sentence (rest words) :spaceDesignator #\Newline))
 		 (assert (equal (length (rest words)) 
 				(length (get-matching-lines tmpLn (list "DV=" "SDV=" "ApplyTo="))))
 			 nil "line ~a not valid" line)
@@ -799,8 +784,8 @@ is replaced with replacement."
 
       (setf modelProgram
 	    (aif (get-matching-line configFileLnLST "modelProgram=")
-		 (lump-brackets (replace-all it "$1" platform :test #'equalp) (cons #\" #\") nil)
-		 (lump-brackets "'run-model" (cons #\" #\") nil)))
+		 (lump-brackets (replace-all it "$1" platform :test #'equalp) :desigs (cons #\" #\") :include-brackets nil)
+		 (lump-brackets "'run-model" :desigs (cons #\" #\") :include-brackets nil)))
       (setf short-circuit-p (or 
 			     (equal (subseq (first modelProgram) 0 1) "#")
 			     (equal (subseq (first modelProgram) 0 1) "'")))
@@ -839,7 +824,8 @@ is replaced with replacement."
 		       :IVKeys IVKeys
 		       :DVKeys DVKeys
 		       :cellKeys cellKeys
-		       :collector collector))
+		       :collector collector
+		       :runProcess runProcess))
 	    ;push the run object onto the runProcess object
 	    (push-to-end run (runs runProcess))
 	    (incf count)
@@ -881,19 +867,31 @@ is replaced with replacement."
   (let ((currentDVs) (line))
     (while (listen (process-output process))
       (setf line (read-line (process-output process) nil))
+      (collect (process-output-str (runProcess obj)) line)
       (aif (line2element line) (push-to-end it currentDVs)))
     (assert (or (append appetizers currentDVs) (equalp (format nil "~a" (process-status process)) "running")) nil 
-	    "model process unexpectedly quit...")
+	    "model process unexpectedly quit... ~%~%here are the last ~a lines of the current process that were printed to stdout before the error~%~a" 
+	    (quot (process-output-str (runProcess obj))) 
+	    (make-sentence (str (process-output-str (runProcess obj))) :spaceDesignator #\Newline))
     (append appetizers currentDVs)))
 
 (defmethod get-DVs ((obj johnny5-run-class) &optional (process nil) (appetizers nil))
   (mklst appetizers)  
-  (let ((currentDVs) 
+  (let ((currentDVs) (fstr) (error-p)
 	(tbl (make-hash-table :test 'equalp)))
     (mapc #'(lambda (x) (setf (gethash (car x) tbl) (cdr x))) (get-elements (IVKeys obj) (IVHash obj)))
-    (dolist (line (get-lines (with-output-to-string (*standard-output*) (funcall process tbl))))
+    (setf fstr (make-array '(0) :element-type 'base-char
+			     :fill-pointer 0 :adjustable t))
+    (handler-case (with-output-to-string (*standard-output* fstr) (funcall process tbl))
+      (error (condition) (setf error-p condition)))
+    (dolist (line (get-lines fstr))
+      (collect (process-output-str (runProcess obj)) line)
       (aif (line2element line) (push-to-end it currentDVs)))
-    (append appetizers currentDVs))) 
+    (assert (not error-p) nil
+	    "model unexpectedly quit... ~%~%here are the last ~a lines that were printed to stdout before the error~%~a~%~%here's the error~%~a~%" 
+	    (quot (process-output-str (runProcess obj))) 	    
+	    (make-sentence (str (process-output-str (runProcess obj))) :spaceDesignator #\Newline) error-p)
+    (append appetizers currentDVs)))
 	     			 
 (defmethod wrapper-execute ((obj run-class) &optional (process nil) (appetizers nil))
   (mklst appetizers)
