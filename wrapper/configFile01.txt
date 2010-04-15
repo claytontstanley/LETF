@@ -1,10 +1,13 @@
-#modelProgram= "$1/sbcl" --core $1/sbcl.core --noinform --noprint --disable-debugger --load model.lisp
-modelProgram= 'run-model
+modelProgram= "$1/sbcl" --core $1/sbcl.core --noinform --noprint --disable-debugger --load model.lisp
+#modelProgram= 'run-model
 
+#file2load= mm-class.lisp
 #file2load= $1/actr6/load-act-r-6.lisp
 file2load=modelShortCircuited.lisp
 
-runsPerProcess=inf
+#sessionBuilder= 'build-mm-session
+
+runsPerProcess=50
 collapseQuota=10
 iterations=1
 #collapseFn=		#'(lambda (x) #|(format t "~a~%" (length x))|#		\
@@ -21,16 +24,29 @@ collapseEvalAt=end
 
 Constant=num-runs 15.0
 Constant=environ-wait 8.0
-IV=blend-temperature .01 .99
+IV=blend-temperature2 .01 .99
 IV=bll .01 .99
 IV=ans .01 .99
+
+
+t1= [num-runs]
+t2=[environ-wait]
+blend-temperature=[blend-temperature2]
+t4=[bll]
+t5=[ans]
+
+input= t1
+input= t2
+input= blend-temperature
+
 
 Obsrt1=1.1
 #obsrt2=2.2
 obsrt2temp=(collapse (list (list 2.2) (list 2.2)) 'mean)
 obsrt2temp2=(nth 0 [obsrt2temp]) (nth 0 [obsrt2temp])
 obsrt2=(+ [obsrt2temp2])
-obsrt3=3.3
+#obsrt3=3.3
+obsrt3=[t1]
 obsrt4=4.4
 obsrt5=5.5
 #ModRT=(list [rt1:2 rt3:5])

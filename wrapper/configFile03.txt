@@ -1,7 +1,9 @@
-
-#file2load= $1/actr6/load-act-r-6.lisp
+#modelProgram= "$1/sbcl" --core $1/sbcl.core --noinform --noprint --disable-debugger --load model.lisp
+file2load= $1/actr6/load-act-r-6.lisp
 file2load=modelShortCircuited.lisp
+runsPerProcess=inf
 
+iterations=1
 collapseQuota=10
 collapseFn=#'(lambda (x) (mean x :throwOutYerNils t))
 

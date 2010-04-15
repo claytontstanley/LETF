@@ -14,3 +14,7 @@
 				    xs))
 		(reduce #'+ (mapcar #'(lambda (yi) (square (- yi y-bar)))
 				    ys)))))))
+
+
+(defun fooPOW ()
+  (list 1.2 2.2 3.3 4.4 5.5))
