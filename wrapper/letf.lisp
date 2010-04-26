@@ -1,7 +1,24 @@
-(setf *read-default-float-format* 'double-float) ;time to get serious...
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;  -*- mode: LISP; Syntax: COMMON-LISP;  Base: 10 -*-
+;;; 
+;;; Author      : Clayton Stanley
+;;; Address     : Air Force Research Laboratory
+;;;             : Mesa, AZ 85212 USA
+;;;             : clayton.stanley@wpafb.af.mil
+;;; Filename    : LETF.lisp
+;;; Version     : 1.0
+;;; 
+;;; Description : A Lisp-Based Exploratory Testing Framework for Computational Cognitive Models
+;;; 
+;;; Bugs        : ???
+;;;
+;;; ----- History -----
+;;;
+;;; 2010.04.22  : Creation.
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(setf *read-default-float-format* 'double-float) 
 
-; This function returns the command line parameters, accounting for differences across several
-; lisp implementations.
+; returns the command line parameters
 (defun my-command-line ()
   (or 
    #+SBCL *posix-argv*
@@ -9,7 +26,7 @@
    #+CMU extensions:*command-line-strings*
    nil))
 
-; This function returns the nth command line argument from right to left (note that this is the
+; returns the nth command line argument from right to left (note that this is the
 ; reverse of normal). 
 (defun get-arg ( from-right )
 	(incf from-right)
@@ -27,11 +44,12 @@
   `(let ((it ,test-form))
      (if it ,then-form ,else-form)))
 
-(defmacro mklst (item)
-  `(if ,item (if (not (listp ,item)) (setf ,item (list ,item)))))
+(defmacro awhen (test-form &body body)
+  `(aif ,test-form
+     (progn ,@body)))
 
-(defun meListp (lst)
-  (if lst (listp lst)))
+(defmacro mklst (item)
+  `(if (not (listp ,item)) (setf ,item (list ,item))))
 
 (defun flatten (lis)
   "Takes a nested list and makes in into a single-level list"
@@ -42,30 +60,20 @@
                    (t (rec (car lis) (rec (cdr lis) acc))))))
     (rec lis nil)))
 
-(defun all-equal (lst &key (test 'equal))
-  (mklst lst)
-  (dotimes (i (- (length lst) 1) t)
-    (if (not (funcall test (nth i lst) (nth (+ 1 i) lst)))
-	(return-from all-equal nil))))
-
-(defun transpose (lst-source)
-  (let ((lst (copy-tree lst-source)))
-    (if (and lst (melistp lst) (melistp (car lst)))
-	(let ((templst) (out))
-	  (assert (all-equal (mapcar #'length lst)))
-	  (while (if lst (car lst))
-	    (setf templst nil)
-	    (dotimes (i (length lst))
-	      (push-to-end (car (nth i lst)) templst)
-	      (setf (nth i lst) (cdr (nth i lst))))
-	    (push-to-end templst out))
-	  out)
-	lst)))
+(defun transpose (lst)
+  (if (and lst (consp lst) (consp (car lst)))
+      (let ((templst) (out))
+	(assert (equal (length (remove-duplicates (mapcar #'length lst) :test 'equal)) 1))
+	(dotimes (j (length (car lst)) out)
+	  (setf templst nil)
+	  (dotimes (i (length lst) (push-to-end templst out))
+	    (push-to-end (nth j (nth i lst)) templst))))
+      lst))
 
 (defun collapse (lst collapseFn)
   (if (not collapseFn)
       lst
-      (if (and lst (melistp lst) (melistp (car lst)))
+      (if (and lst (consp lst) (consp (car lst)))
 	  (let ((out))
 	    (dolist (column (transpose lst) out)
 	      (push-to-end (funcall collapseFn column) out)))
@@ -139,7 +147,7 @@ is replaced with replacement."
 
 (defun throwOutYerNils (&rest lsts)
   (let ((out))
-    (if (meListp (car lsts))
+    (if (consp (car lsts))
 	(dolist (column (transpose lsts) (setf out (transpose out)))
 	  (if (not (member nil column))
 	      (push-to-end column out)))
@@ -147,7 +155,7 @@ is replaced with replacement."
     (apply 'values (if out out (make-sequence 'list (length lsts) :initial-element nil)))))
 
 (defmacro inLST (left right fName throwOutYerNils)
-  `(if ,left (if (melistp (car ,left))
+  `(if ,left (if (consp (car ,left))
 		 (let ((out))
 		   (dolist (itm ,left)
 		     (push-to-end (,fName itm ,right :throwOutYerNils ,throwOutYerNils) out))
@@ -295,7 +303,7 @@ is replaced with replacement."
       ;expression and the hash table; useful if you want to collect something other than what is returned by this 
       ;function see 'necessaries' or 'get-elements', or 'eval-hash' for examples 
       (let ((out) (shortIt!) (val))
-	(if lambdas (if (not (melistp (car lambdas))) (setf lambdas (list lambdas))))
+	(if lambdas (if (not (consp (car lambdas))) (setf lambdas (list lambdas))))
 	(dolist (word (get-words str) (make-sentence out))
 	  (setf shortIt! nil)
 	  (dolist (lm lambdas) 
@@ -316,7 +324,7 @@ is replaced with replacement."
       ;for each part that is surrounded by brackets, call remap-string with inside-brackets flagged to convert
       ;the bracketed expression to actual values
       (let ((out))
-	(if (meListp str)
+	(if (consp str)
 	    (progn
 	      (dolist (item str)
 		(push-to-end 
@@ -376,7 +384,7 @@ is replaced with replacement."
 (defmethod eval-hash ((hash hash-table))
   (labels ((toString (lst)
 	     (let ((out))
-	       (if (melistp lst)
+	       (if (consp lst)
 		   (progn
 		     (push-to-end "(list" out)
 		     (dolist (item lst)
@@ -468,8 +476,8 @@ is replaced with replacement."
 		     (return-from index= (length key)))))))
     (mklst keys)
     (let ((words) (out))
-      (dolist (line (if (melistp str) str (get-lines str)) out)
-	(setf words (if (melistp line) line (get-words line)))
+      (dolist (line (if (consp str) str (get-lines str)) out)
+	(setf words (if (consp line) line (get-words line)))
 	(if words
 	    (aif (index= words keys) 
 		 (push-to-end 
@@ -506,7 +514,7 @@ is replaced with replacement."
 ;adds a list of elements (key . value) to the hash table 'hash' specified by 'keys'
 ;will not evaluate each value before putting it in the hash table
 (defmethod add-elements ((hash hash-table) &optional (elements nil))
-  (if elements (if (not (meListp (car elements))) (setf elements (list elements))))
+  (if elements (if (not (consp (car elements))) (setf elements (list elements))))
   (dolist (element elements)
     (if (key-present (car element) hash)
 	(assert (equalp (gethash (car element) hash) (cdr element))
@@ -536,8 +544,8 @@ is replaced with replacement."
 (defmethod add-dependent-element ((hash hash-table) &optional (configFileStr nil) (lhs nil) (lambdas nil))
   (mklst lambdas)
   (let ((line) (words) (shortIt!))
-    (setf line (if (melistp lhs) (cdr lhs) (get-matching-line configFileStr lhs)))
-    (setf lhs (if (melistP lhs) (car lhs) lhs))
+    (setf line (if (consp lhs) (cdr lhs) (get-matching-line configFileStr lhs)))
+    (setf lhs (if (consp lhs) (car lhs) lhs))
     (when line
       (add-elements hash (cons (subseq lhs 0 (- (length lhs) 1)) line))
       (setf words (lump-brackets line))
@@ -614,7 +622,7 @@ is replaced with replacement."
       ;if an element is a list and if all slots in that list are equal, then collapse the list
     (loop for key being the hash-keys of (collection obj)	
        using (hash-value val)
-       do (if (and (melistp val) (all-equal val :test #'equalp))
+       do (if (if (consp val) (equal 1 (length (remove-duplicates val :test 'equalp))))
 	      (setf (gethash key (collection obj)) (first val))))
     (let ((elements (get-elements (keys obj) (collection obj) (collapseHash obj))))
       (print-collector obj)
@@ -859,9 +867,11 @@ is replaced with replacement."
   (let ((currentDVs) (fstr) (error-p)
 	(tbl (make-hash-table :test 'equalp)))
     (mapc #'(lambda (x) (setf (gethash (car x) tbl) (cdr x))) (get-elements (IVKeys obj) (IVHash obj)))
-    (setf fstr (make-array '(0) :element-type 'base-char
-			     :fill-pointer 0 :adjustable t))
-    (handler-case (with-output-to-string (*standard-output* fstr) (funcall process tbl))
+    (setf fstr (make-array '(0) :element-type 'base-char :fill-pointer 0 :adjustable t))
+    (handler-case 
+	(with-output-to-string (*standard-output* fstr) 
+	  (with-output-to-string (*error-output* fstr)
+	    (funcall process tbl)))
       (error (condition) (setf error-p condition)))
     (dolist (line (get-lines fstr))
       (collect (process-output-str (runProcess obj)) (list (cons "str" line)))
@@ -931,7 +941,7 @@ is replaced with replacement."
 	    (rest (modelProgram obj))
 	    (list (get-IV-string obj))
 	    (list (platform obj)))
-	   :output :stream :wait nil)))
+	   :output :stream :error :output :wait nil)))
   (assert (equalp (format nil "~a" (process-status (process obj))) "running") nil "model process failed to start correctly")
   ;then execute each run
   (let ((leftovers))
@@ -999,10 +1009,15 @@ is replaced with replacement."
 (dolist (line (get-matching-lines (restructure (file-string (get-arg 1))) "file2load="))
   (load (format nil "~a" (replace-all line "$1" (get-word (get-arg 2)) :test #'equalp))))
 ;run it!
-(wrapper-execute 
- (funcall (aif (get-matching-line (restructure (file-string (get-arg 1))) "sessionBuilder=")
-	       (eval (read-from-string (make-sentence it)))
-	       (eval (read-from-string (make-sentence (list "'build-hpc-session")))))))
+(let ((configFile (restructure (file-string (get-arg 1)))))
+  (aif (get-matching-line configFile "albumBuilder=")
+       (funcall (eval (read-from-string (get-word it))))
+       (wrapper-execute 
+	(funcall 
+	 (eval 
+	  (read-from-string 
+	   (get-word (aif (get-matching-line configFile "sessionBuilder=")  it "'build-hpc-session"))))))))
 ;kill it!	    
 (quit)
+
 
