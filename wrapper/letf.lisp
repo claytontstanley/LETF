@@ -578,7 +578,8 @@ is replaced with replacement."
    (workFilePath :accessor workFilePath :initarg :workFilePath :initform nil)))
 
 (defclass session-class ()
-  ((runs :accessor runs :initarg :runs :initform nil)))
+  ((runProcesses :accessor runProcesses :initarg :runProcesses :initform nil)
+   (quota :accessor quota :initarg :quota :initform nil)))
 
 (defclass base-collector-class ()
   ((quota :accessor quota :initarg :quota :initform 1)
@@ -587,9 +588,15 @@ is replaced with replacement."
 
 (defmethod collect ((obj base-collector-class) (lst list))
   (assert (not (> (quot obj) (quota obj))))
+  (if lst (if (not (consp (car lst))) (setf lst (list lst))))
   (dolist (item lst)
     (push-to-end (cdr item) (gethash (car item) (collection obj))))
   (incf (quot obj)))
+
+(defmethod collect ((obj base-collector-class) (DVHash hash-table))
+  (let ((out))
+    (maphash #'(lambda (key value) (push-to-end (cons key value) out)) DVHash)
+    (collect obj out)))
 
 (defmethod print-collector ((obj base-collector-class)) ())
 
@@ -599,20 +606,30 @@ is replaced with replacement."
 (defclass process-output-str-class (base-collector-class)
   ((error-p :accessor error-p :initarg :error-p :initform nil)))
 
-(defmethod initialize-instance :after ((obj process-output-str-class) &key)
-  (setf (quota obj) 200))
-
 (defmethod collect :after ((obj process-output-str-class) (lst list))
   (declare (ignore lst))
   (when (> (quot obj) (quota obj))
     (setf (gethash "str" (collection obj)) (rest (gethash "str" (collection obj))))
     (decf (quot obj))))
 
+(defclass session-collector-class (base-collector-class)
+  ((collectors :accessor collectors :initarg :collectors :initform nil)))
+
+(defmethod collect :after ((obj session-collector-class) (lst list))
+  (declare (ignore lst))
+  (if (equal (quota obj) (quot obj))
+      (print-collector obj)))
+
 (defclass collector-class (base-collector-class)
   ((collapseHash :accessor collapseHash :initarg :collapseHash :initform nil)
    (keys :accessor keys :initarg :keys :initform nil)
    (cellElements :accessor cellElements :initarg :cellElements :initform nil)
+   (run-collectors :accessor run-collectors :initarg :run-collectors :initform nil)
    (session-collector :accessor session-collector :initarg :session-collector :initform nil)))
+
+(defmethod initialize-instance :after ((obj collector-class) &key)
+  (assert (session-collector obj))
+  (push-to-end obj (collectors (session-collector obj))))
 
 (defmethod collect :after ((obj collector-class) (lst list))
   (declare (ignore lst))
@@ -628,20 +645,23 @@ is replaced with replacement."
       (print-collector obj)
       (collect (session-collector obj) elements))))
 
-(defmethod collect ((obj collector-class) (DVHash hash-table))
-  (let ((out))
-    (maphash #'(lambda (key value) (push-to-end (cons key value) out)) DVHash)
-    (collect obj out)))
+(defclass run-collector-class (base-collector-class)
+  ((runs :accessor runs :initarg :runs :initform nil)
+   (collector :accessor collector :initarg :collector :initform nil)))
 
-(defclass session-collector-class (base-collector-class) ())
+(defmethod initialize-instance :after ((obj run-collector-class) &key)
+  (assert (collector obj))
+  (push-to-end obj (run-collectors (collector obj))))
 
-(defmethod collect :after ((obj session-collector-class) (lst list))
-  (declare (ignore lst))
-  (if (equal (quota obj) (quot obj))
-      (print-collector obj)))
-
+(defmethod collect :after ((obj run-collector-class) (lst list))
+  (assert (equal (quot obj) 1))
+  (assert (equal (quota obj) 1))
+  (print-collector obj)
+  (collect (collector obj) lst))
+ 
 (defclass runProcess-class ()
   ((runs :accessor runs :initarg :runs :initform nil)
+   (session :accessor session :initarg :session :initform nil)
    (process :accessor process :initarg :process :initform nil)
    (modelProgram :accessor modelProgram :initarg :modelProgram :initform nil)
    (platform :accessor platform :initarg :platform :initform nil)
@@ -658,10 +678,16 @@ is replaced with replacement."
    (DVHash :accessor DVHash :initarg :DVHash :initform nil)
    (IVKeys :accessor IVKeys :initarg :IVKeys :initform nil)
    (DVKeys :accessor DVKeys :initarg :DVKeys :initform nil)
+   (quot :accessor quot :initarg :quot :initform nil)
    (cellKeys :accessor cellKeys :initarg :cellKeys :initform nil)
    (sleepTime :accessor sleepTime :initarg :sleepTime :initform 0)
-   (collector :accessor collector :initarg :collector :initform nil)
+   (run-collector :accessor run-collector :initarg :run-collector :initform nil)
    (runProcess :accessor runProcess :initarg :runProcess :initform nil)))
+
+(defmethod initialize-instance :after ((obj run-class) &key)
+  (assert (run-collector obj))
+  (assert (not (runs (run-collector obj))))
+  (push-to-end obj (runs (run-collector obj))))
 
 (defclass number5-run-class (run-class) ())
 
@@ -697,11 +723,13 @@ is replaced with replacement."
 ;generates the code that generates the session object that will be executed
 ;this macro is configured by extending various pieces of the above
 ;object-oriented hierarchy and sending constructors to those new pieces
+;as inputs to the 'build-session macro call
 (defmacro build-session (&key 
 			 (collector-instance `(make-instance 'collector-class)) 
 			 (work-instance `(make-instance 'work-class))
 			 (session-collector-instance `(make-instance 'session-collector-class))
-			 (process-output-str-instance `(make-instance 'process-output-str-class)))
+			 (process-output-str-instance `(make-instance 'process-output-str-class))
+			 (run-collector-instance `(make-instance 'run-collector-class)))
   (setf collector-instance (append collector-instance
 				    '(:cellElements (get-elements cellKeys IVHash)
 				      :keys DVKeys
@@ -710,17 +738,21 @@ is replaced with replacement."
 				      :session-collector session-collector)))
   (setf work-instance (append work-instance '(:workFilePath (get-arg 0))))
   (setf session-collector-instance (append session-collector-instance '(:quota (* (length (lines work)) iterations))))
+  (setf run-collector-instance (append run-collector-instance '(:quota 1 :collector collector)))
+  (setf process-output-str-instance (append process-output-str-instance '(:quota 200)))
   (let ((session-instance `(make-instance 'session-class))
 	(run-process-instance `(make-instance (if short-circuit-p 'johnny5-runProcess-class 'number5-runProcess-class) 
 					      :modelProgram modelProgram :platform platform
-					      :process-output-str ,process-output-str-instance))
+					      :process-output-str ,process-output-str-instance
+					      :session session))
 	(run-instance `(make-instance (if short-circuit-p 'johnny5-run-class 'number5-run-class)
 				      :IVHash (copy-hash IVHash)
 				      :DVHash (merge-hash DVHash IVHash)
 				      :IVKeys IVKeys
 				      :DVKeys DVKeys
+				      :quot (+ 1 count)
 				      :cellKeys cellKeys
-				      :collector collector
+				      :run-collector ,run-collector-instance
 				      :runProcess runProcess)))
     `(progn
        (labels ((get-IV-hash (configFileStr cell-values)
@@ -825,13 +857,14 @@ is replaced with replacement."
 		 ;if it's time to push the runProcess object onto the session object, do it
 		 (if (not (equal 'inf runsPerProcess)) 
 		     (when (equal (mod count runsPerProcess) 0)
-		       (push-to-end runProcess (runs session))
+		       (push-to-end runProcess (runProcesses session))
 		       (setf runProcess ,run-process-instance))))))
-	   (if (runs runProcess) (push-to-end runProcess (runs session)))
-	   (aif (apply '+ (mapcar #'(lambda (x) (length (runs x))) (runs session)))
-		(assert (equal (* (length (lines work)) iterations quota) it)
+	   (if (runs runProcess) (push-to-end runProcess (runProcesses session)))
+	   (setf (quota session) (* (length (lines work)) iterations quota))
+	   (aif (apply '+ (mapcar #'(lambda (x) (length (runs x))) (runProcesses session)))
+		(assert (equal (quota session) it)
 			nil "number of linesxiterationsxquota in work file (~d) not equal to number of run objects (~d)"
-			(length (lines work)) it))
+			(quota session) it))
 	   session)))))
 
 ;converts an output line of text sent by the model to a dotted pair
@@ -854,7 +887,7 @@ is replaced with replacement."
   (let ((currentDVs) (line))
     (while (listen (process-output process))
       (setf line (read-line (process-output process) nil))
-      (collect (process-output-str (runProcess obj)) (list (cons "str" line)))
+      (collect (process-output-str (runProcess obj)) (cons "str" line))
       (aif (line2element line) (push-to-end it currentDVs)))
     (when (and (not (append appetizers currentDVs)) 
 	     (not (equalp (format nil "~a" (process-status process)) "running")))
@@ -874,7 +907,7 @@ is replaced with replacement."
 	    (funcall process tbl)))
       (error (condition) (setf error-p condition)))
     (dolist (line (get-lines fstr))
-      (collect (process-output-str (runProcess obj)) (list (cons "str" line)))
+      (collect (process-output-str (runProcess obj)) (cons "str" line))
       (aif (line2element line) (push-to-end it currentDVs)))
     (when error-p 
       (setf (error-p (process-output-str (runProcess obj))) error-p)
@@ -897,13 +930,9 @@ is replaced with replacement."
 	(setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'equalp)))
       (sleep (sleepTime obj))
       (setf appetizers nil))
+    (collect (run-collector obj) (DVHash obj))
+    (setf (DVHash obj) nil)
     currentDVs))
-
-(defmethod wrapper-execute :after ((obj run-class) &optional (process nil) (appetizers nil))
-  ;send the evaluated obj out
-  (declare (ignore process appetizers))
-  (collect (collector obj) (DVHash obj))
-  (setf (DVHash obj) nil))
 
 (defmethod wrapper-execute ((obj johnny5-runProcess-class) &optional (process nil) (appetizers nil))
   (assert (not appetizers))
@@ -959,7 +988,7 @@ is replaced with replacement."
   ;execute each runProcess
   (assert (not process))
   (assert (not appetizers))
-  (dolist (runProcess (runs obj))
+  (dolist (runProcess (runProcesses obj))
     (wrapper-execute runProcess process appetizers))
   (assert 
    (equal 1 (apply '* (flatten 
@@ -967,9 +996,11 @@ is replaced with replacement."
 			#'(lambda (runProcess) 
 			    (mapcar 
 			     #'(lambda (run) 
-				 (if (and (equal (quot (collector run)) (quota (collector run)))
-					  (equal (quot (session-collector (collector run))) (quota (session-collector (collector run))))) 
-				     1 0)) (runs runProcess))) (runs obj)))))
+				 (if (and (equal (quot (run-collector run)) (quota (run-collector run)))
+					  (equal (quot (collector (run-collector run))) (quota (collector (run-collector run))))
+					  (equal (quot (session-collector (collector (run-collector run)))) 
+						 (quota (session-collector (collector (run-collector run))))))
+				     1 0)) (runs runProcess))) (runProcesses obj)))))
    nil "not all collectors fully executed"))
 
 ;////////////////////////////////////////////
