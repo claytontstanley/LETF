@@ -51,6 +51,10 @@
 (defmacro mklst (item)
   `(if (not (listp ,item)) (setf ,item (list ,item))))
 
+(defmacro verbose (&rest lst)
+  (mapc #'(lambda (x) (format *error-output* "~a~%" x)) lst)
+  `(progn ,@lst))
+
 (defun flatten (lis)
   "Takes a nested list and makes in into a single-level list"
   (declare (list lis))
@@ -467,25 +471,29 @@ is replaced with replacement."
 ;returns a list of RHS's of lines that start with 'key'
 ;where 'key' is any key in 'keys'
 ;the list will be ordered from left to right in the string
-(defun get-matching-lines (str keys)
-  (labels ((index= (words keys)
-	     (let* ((word (first words))
-		    (wordLength (length word)))
-	       (dolist (key keys nil)
-		 (if (equalp key (subseq word 0 (min wordLength (length key))))
-		     (return-from index= (length key)))))))
-    (mklst keys)
-    (let ((words) (out))
-      (dolist (line (if (consp str) str (get-lines str)) out)
-	(setf words (if (consp line) line (get-words line)))
-	(if words
-	    (aif (index= words keys) 
-		 (push-to-end 
-		  (bracket-expand 
-		   (string-trim 
-		    '(#\Space #\tab) 
-		    (subseq (make-sentence line) it (length (make-sentence line))))) 
-		  out)))))))
+(let ((traversed))
+  (defun get-matching-lines (str keys)
+    (labels ((index= (words keys)
+	       (let* ((word (first words))
+		      (wordLength (length word)))
+		 (dolist (key keys nil)
+		   (if (equalp key (subseq word 0 (min wordLength (length key))))
+		       (return-from index= (length key)))))))
+      (mklst keys)
+      (let ((words) (out) (line) (lines))
+	(setf lines (if (consp str) str (get-lines str)))
+	(dotimes (i (length lines) (values out traversed))
+	  (setf line (nth i lines))
+	  (setf words (if (consp line) line (get-words line)))
+	  (if words
+	      (awhen (index= words keys)
+		     (push-to-end i traversed)
+		     (push-to-end 
+		      (bracket-expand 
+		       (string-trim 
+			'(#\Space #\tab) 
+			(subseq (make-sentence line) it (length (make-sentence line))))) 
+		      out))))))))
 
 (defun get-matching-line (str keys)
   (mklst keys)
@@ -579,7 +587,9 @@ is replaced with replacement."
 
 (defclass session-class ()
   ((runProcesses :accessor runProcesses :initarg :runProcesses :initform nil)
-   (quota :accessor quota :initarg :quota :initform nil)))
+   (quota :accessor quota :initarg :quota :initform nil)
+   (traversed :accessor traversed :initarg :traversed :initform nil)
+   (configFileLnLST :accessor configFileLnLST :initarg :configFileLnLST :initform nil)))
 
 (defclass base-collector-class ()
   ((quota :accessor quota :initarg :quota :initform 1)
@@ -865,6 +875,11 @@ is replaced with replacement."
 		(assert (equal (quota session) it)
 			nil "number of linesxiterationsxquota in work file (~d) not equal to number of run objects (~d)"
 			(quota session) it))
+	   (setf (traversed session)
+		 (multiple-value-bind (trash traversed) (get-matching-lines configFileWdLST nil)
+		   (declare (ignore trash))
+		   (sort (remove-duplicates traversed :test 'equal) '<)))
+	   (setf (configFileLnLST session) configFileLnLST)
 	   session)))))
 
 ;converts an output line of text sent by the model to a dotted pair
@@ -985,6 +1000,23 @@ is replaced with replacement."
 	  nil "model process failed to quit after all DVs have been processed"))
 
 (defmethod wrapper-execute ((obj session-class) &optional (process nil) (appetizers nil))
+  ;print information about the session to the terminal
+  (let ((strm *error-output*))
+    (format strm "~%~%~%~a~%" "uncommented lines in configuration file that were not read by letf:")
+    (format strm "~a~%~%~%~%"
+	    (aif
+	     (make-sentence
+	      (flatten 
+	       (mapcar 
+		(let ((i -1))
+		  #'(lambda (x) 
+		      (if (and (not (member (incf i) (traversed obj)))
+			       (> (length x) 0)
+			       (not (equal (char x 0) #\#))) x)))
+		(configFileLnLST obj)))
+	      :spaceDesignator #\Newline)
+	     it
+	     "none here; yay!")))
   ;execute each runProcess
   (assert (not process))
   (assert (not appetizers))
@@ -1048,6 +1080,7 @@ is replaced with replacement."
 	 (eval 
 	  (read-from-string 
 	   (get-word (aif (get-matching-line configFile "sessionBuilder=")  it "'build-hpc-session"))))))))
+
 ;kill it!	    
 (quit)
 
