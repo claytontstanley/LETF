@@ -55,6 +55,11 @@
   (mapc #'(lambda (x) (format *error-output* "~a~%" x)) lst)
   `(progn ,@lst))
 
+(let ((loaded))
+  (defun load-and-loaded (str)
+    (if str (load str))
+    (push-to-end str loaded)))
+
 (defun flatten (lis)
   "Takes a nested list and makes in into a single-level list"
   (declare (list lis))
@@ -110,7 +115,7 @@ is replaced with replacement."
 	(if (chars= (char strng i) chr) 
 	    (push-to-end i out))))))
 
-(defun print-hash (hash)
+(defun print-hash (hash &key (strm t))
   (labels ((hash-string (hash)
 	     (if (not (hash-table-p hash))
 		 (format nil "~a" hash)
@@ -118,7 +123,7 @@ is replaced with replacement."
 		   (loop for value being the hash-values of hash using (hash-key key) do
 			(setf out (concatenate 'string out (format nil "~%~a -> ~a" key (hash-string value)))))
 		   out))))
-    (format t "~a~%" (string-trim (list #\Newline #\Return #\LineFeed) (hash-string hash)))))
+    (format strm "~a~%" (string-trim (list #\Newline #\Return #\LineFeed) (hash-string hash)))))
 
 (defun key-present (key hash)
   (multiple-value-bind (value flag) (gethash key hash)
@@ -589,7 +594,12 @@ is replaced with replacement."
   ((runProcesses :accessor runProcesses :initarg :runProcesses :initform nil)
    (quota :accessor quota :initarg :quota :initform nil)
    (traversed :accessor traversed :initarg :traversed :initform nil)
-   (configFileLnLST :accessor configFileLnLST :initarg :configFileLnLST :initform nil)))
+   (configFileLnLST :accessor configFileLnLST :initarg :configFileLnLST :initform nil)
+   (statusPrinters :accessor statusPrinters :initarg :statusPrinters :initform nil)
+   (collapseQuota :accessor collapseQuota :initarg :collapseQuota :initform nil)
+   (iterations :accessor iterations :initarg :iterations :initform nil)
+   (lines :accessor lines :initarg :lines :initform nil)
+   (collapseHash :accessor collapseHash :initarg :collapseHash :initform nil)))
 
 (defclass base-collector-class ()
   ((quota :accessor quota :initarg :quota :initform 1)
@@ -795,8 +805,8 @@ is replaced with replacement."
 		    (if (not tmpLST)
 			(return-from get-collapseHash defaultCollapseFn)
 			(if (and (equal (length tmpLST) 1) 
-				 (equal (length (get-words (first tmpLST))) 1))
-			    (return-from get-collapseHash (get-word (first tmpLST)))))
+				 (equal (length (get-words (first tmpLST) :spaceDesignators (list #\; #\&))) 1))
+			    (return-from get-collapseHash (first tmpLST))))
 		    (dolist (DVKey DVKeys (add-elements hash hashLST))
 		      (setf tmpHash (make-hash-table :test 'equalp))
 		      (add-elements tmpHash (mapcar #'(lambda (x) (cons x defaultCollapseFn))
@@ -875,11 +885,17 @@ is replaced with replacement."
 		(assert (equal (quota session) it)
 			nil "number of linesxiterationsxquota in work file (~d) not equal to number of run objects (~d)"
 			(quota session) it))
+	   (setf (configFileLnLST session) configFileLnLST)
+	   (setf (statusPrinters session)
+		 (mapcar (lambda (x) (eval (read-from-string x))) (get-matching-lines configFileWdLST "statusPrinter=")))
+	   (setf (collapseQuota session) quota)
+	   (setf (iterations session) iterations)
+	   (setf (lines session) (length (lines work)))
+	   (setf (collapseHash session) collapseHash)
 	   (setf (traversed session)
 		 (multiple-value-bind (trash traversed) (get-matching-lines configFileWdLST nil)
 		   (declare (ignore trash))
 		   (sort (remove-duplicates traversed :test 'equal) '<)))
-	   (setf (configFileLnLST session) configFileLnLST)
 	   session)))))
 
 ;converts an output line of text sent by the model to a dotted pair
@@ -932,6 +948,7 @@ is replaced with replacement."
 	     			 
 (defmethod wrapper-execute ((obj run-class) &optional (process nil) (appetizers nil))
   (mklst appetizers)
+  (mapc (lambda (x) (ignore-errors (funcall x obj))) (statusPrinters (session (runProcess obj))))
   (let ((necessaryDVs) (currentDVs) (currentDV))
     (while (setf necessaryDVs (necessaries (DVKeys obj) (DVHash obj)))
      ;loop over the current DVs and add them to the DVHash table
@@ -952,6 +969,7 @@ is replaced with replacement."
 (defmethod wrapper-execute ((obj johnny5-runProcess-class) &optional (process nil) (appetizers nil))
   (assert (not appetizers))
   (assert (not process))
+  (mapc (lambda (x) (ignore-errors (funcall x obj))) (statusPrinters (session obj)))
   (let ((leftovers))
     (dolist (run (runs obj) (assert (not leftovers) nil "should not be any leftovers after runProcess object finishes"))
       (setf leftovers (wrapper-execute run (modelProgram obj) leftovers))))
@@ -959,7 +977,8 @@ is replaced with replacement."
   
 (defmethod wrapper-execute ((obj number5-runProcess-class) &optional (process nil) (appetizers nil))
   (assert (not appetizers))
-  (assert (not process)) 
+  (assert (not process))
+  (mapc (lambda (x) (ignore-errors (funcall x obj))) (statusPrinters (session obj)))
    ;launch the process
   (labels 
       ((get-iv-string (obj)
@@ -999,24 +1018,41 @@ is replaced with replacement."
   (assert (equalp (format nil "~a" (process-status (process obj))) "exited")
 	  nil "model process failed to quit after all DVs have been processed"))
 
-(defmethod wrapper-execute ((obj session-class) &optional (process nil) (appetizers nil))
-  ;print information about the session to the terminal
+(defmethod print-unread-lines ((obj session-class))
   (let ((strm *error-output*))
-    (format strm "~%~%~%~a~%" "uncommented lines in configuration file that were not read by letf:")
-    (format strm "~a~%~%~%~%"
+    (format strm "~%~a~%" "uncommented lines in configuration file that were not read by letf:")
+    (format strm "~a~%~%"
 	    (aif
 	     (make-sentence
 	      (flatten 
 	       (mapcar 
-		(let ((i -1))
-		  #'(lambda (x) 
-		      (if (and (not (member (incf i) (traversed obj)))
-			       (> (length x) 0)
-			       (not (equal (char x 0) #\#))) x)))
+		(let ((i -1) (j 0))
+		  #'(lambda (x) ;assumes that traversed is sorted
+		      (if (equal (incf i) (nth j (traversed obj)))
+			(progn (incf j) nil)
+			(if (and (> (length x) 0)
+				 (not (equal (char x 0) #\#))) x))))
 		(configFileLnLST obj)))
 	      :spaceDesignator #\Newline)
 	     it
-	     "none here; yay!")))
+	     "none here; yay!"))))
+
+(defmethod print-session ((obj session-class))
+  (let ((strm *error-output*))
+    (format strm "~%printing session status:~%")
+    (format strm "total calls to entry function: ~a~%" (quota obj))
+    (format strm "number of lines in the work file: ~a~%" (lines obj))
+    (format strm "number of times to run each line in the work file: ~a~%" (iterations obj))
+    (format strm "quota before collapsing: ~a~%" (collapseQuota obj))
+    (format strm "extra lisp files loaded: ~a~%" (make-sentence (load-and-loaded nil)))
+    (if (hash-table-p (collapseHash obj))
+	(format strm "~%collapse hash table: ~%~a~%~%" (print-hash (collapseHash obj) :strm nil))
+	(format strm "collapse function: ~a~%" (collapseHash obj)))
+    (format strm "~%")))
+  
+(defmethod wrapper-execute ((obj session-class) &optional (process nil) (appetizers nil))
+  ;print information about the session to the terminal
+  (mapc (lambda (x) (ignore-errors (funcall x obj))) (statusPrinters obj))
   ;execute each runProcess
   (assert (not process))
   (assert (not appetizers))
@@ -1070,7 +1106,7 @@ is replaced with replacement."
 
 ;load the extra lisp files
 (dolist (line (get-matching-lines (restructure (file-string (get-arg 1))) "file2load="))
-  (load (format nil "~a" (replace-all line "$1" (get-word (get-arg 2)) :test #'equalp))))
+  (load-and-loaded (format nil "~a" (replace-all line "$1" (get-word (get-arg 2)) :test #'equalp))))
 ;run it!
 (let ((configFile (restructure (file-string (get-arg 1)))))
   (aif (get-matching-line configFile "albumBuilder=")
