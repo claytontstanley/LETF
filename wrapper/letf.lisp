@@ -55,11 +55,20 @@
   (mapc #'(lambda (x) (format *error-output* "~a~%" x)) lst)
   `(progn ,@lst))
 
+;loads the file with pathname str
+;keeps track of all the pathnames that have been sent 
+;to this function; returns the list of those names
 (let ((loaded))
   (defun load-and-loaded (str)
-    (if str (load str))
-    (push-to-end str loaded)))
+    (when str 
+      (load str)
+      (push-to-end str loaded))
+    loaded))
 
+;equivalent to #'symbol-function, just safer.
+;converts a symbol to the function that the 
+;symbol points to; if it can't convert the 
+;symbol, it returns the symbol
 (defun symbol-function-safe (x)
   (if (and (equal 'symbol (type-of x))
 	   (fboundp x))
@@ -75,6 +84,7 @@
                    (t (rec (car lis) (rec (cdr lis) acc))))))
     (rec lis nil)))
 
+;converts the rows to columns (and vice versa) in a nested list
 (defun transpose (lst)
   (if (and lst (consp lst) (consp (car lst)))
       (let ((templst) (out))
@@ -85,6 +95,8 @@
 	    (push-to-end (nth j (nth i lst)) templst))))
       lst))
 
+;collapses across a nested list (returning a flat list)
+;by calling collapseFn on each column in the list
 (defun collapse (lst collapseFn)
   (if (not collapseFn)
       lst
@@ -133,6 +145,7 @@ is replaced with replacement."
 		   out))))
     (format strm "~a~%" (string-trim (list #\Newline #\Return #\LineFeed) (hash-string hash :keys keys)))))
 
+;returns if a key is present in the hash table
 (defun key-present (key hash)
   (multiple-value-bind (value flag) (gethash key hash)
     (declare (ignore value))
@@ -146,6 +159,7 @@ is replaced with replacement."
 	out)
       hash))
 
+;copies all of the hash tables in the list lst, and merges them
 (defun merge-hash (&rest lst)
   (let ((out (make-hash-table :test #'equalp)))
     (dolist (hash lst out)
@@ -162,6 +176,7 @@ is replaced with replacement."
            (data (make-string len)))
       (values data (read-sequence data s)))))
 
+;if any column in the nested list is nil, it throws out the column
 (defun throwOutYerNils (&rest lsts)
   (let ((out))
     (if (consp (car lsts))
@@ -171,6 +186,8 @@ is replaced with replacement."
 	(if (not (member nil lsts)) (setf out lsts)))
     (apply #'values (if out out (make-sequence 'list (length lsts) :initial-element nil)))))
 
+;shorthand macro for recursively calling a function across 
+;the lists in the nested lists left and right
 (defmacro inLST (left right fName throwOutYerNils)
   `(if ,left (if (consp (car ,left))
 		 (let ((out))
@@ -269,6 +286,8 @@ is replaced with replacement."
 	    (setf in-the-white nil)
 	    (setf start i))))))
 
+;just like get words, but asserts that only one word can be found. Returns that word, and not
+;a list of words, like #'get-words does
 (defun get-word (str &key (spaceDesignators (list #\Space #\Tab)) (includeSpaceDesignators nil))
   (mklst spaceDesignators)
   (assert spaceDesignators)
@@ -367,6 +386,11 @@ is replaced with replacement."
 	      (setf out (make-sentence out))))
 	out)))
 
+;traverses the 'keys' in the hash table 'hash', and recursively
+;searches the other keys that each 'key' references. During the traversal
+;checks if keys are present not-present, and builds a list of those keys
+;if bool is t, returns the list of keys that are present; if bool is nil,
+;returns the list of keys that aren't present
 (defun traverse (keys hash &key (bool nil))
   (mklst keys)
   (let ((out) (words) (str)
@@ -376,7 +400,7 @@ is replaced with replacement."
       (setf str (remap-string
 		 (concatenate 'string "[" key "]")
 		 hash
-		 :lambdas ;gotta love side effects
+		 :lambdas ;gotta love side effects; these are lexical closures (note how they access 'words)
 		 (cons "pre" 
 		       #'(lambda (word hash val)
 			   (declare (ignore val))
@@ -416,7 +440,7 @@ is replaced with replacement."
 		(concatenate 'string "[" key "]") hash
 		:lambdas
 		(cons "post"
-		      #'(lambda (word hash val)
+		      #'(lambda (word hash val) ;lexical closures (note referencing to 'traversed')
 			  (if (not (key-present word traversed))
 			      (let ((newVal))
 				(setf (gethash word traversed) t)
@@ -433,6 +457,9 @@ is replaced with replacement."
 				  (setf (gethash word hash) newVal)
 				  "shortIt!")))))))))))
 
+;takes an expression, and expands the ':'s (similar to how matlab references arrays)
+;for example: (bracket-expand "hello1:5") -> "hello1 hello2 hello3 hello4 hello5"
+;(bracket-expand "1:5hello") -> "1hello 2hello 3hello 4hello 5hello"
 (defun bracket-expand (str &optional (inside-brackets nil))
   (labels ((num-indeces (str direction)
 	     (assert (or (equalp direction "fromLeft") (equalp direction "fromRight") (equalp direction "both")))
@@ -484,6 +511,9 @@ is replaced with replacement."
 ;returns a list of RHS's of lines that start with 'key'
 ;where 'key' is any key in 'keys'
 ;the list will be ordered from left to right in the string
+;keeps track of the line numbers for all of the lines that have
+;been returned from calling this function, and returns that list
+;of numbers as it's second 'values value
 (let ((traversed))
   (defun get-matching-lines (str keys)
     (labels ((index= (words keys)
@@ -508,6 +538,7 @@ is replaced with replacement."
 			(subseq (make-sentence line) it (length (make-sentence line))))) 
 		      out))))))))
 
+;same as above, just asserts the expectation that only one (or zero) lines should be returned
 (defun get-matching-line (str keys)
   (mklst keys)
   (aif (get-matching-lines str keys)
@@ -561,6 +592,7 @@ is replaced with replacement."
 	    (length cell-keys) (length cell-values))
     (add-elements hash (mapcar #'cons cell-keys cell-values))))
 
+;recursively adds all elements in the config file that are referenced in the 'lhs' line in the config file
 (defgeneric add-dependent-element (hash &optional configFileStr lhs lambdas))
 (defmethod add-dependent-element ((hash hash-table) &optional (configFileStr nil) (lhs nil) (lambdas nil))
   (mklst lambdas)
@@ -579,6 +611,7 @@ is replaced with replacement."
 	      (if (not shortIT!)
 		  (add-dependent-element hash configFileStr (concatenate 'string item "=") lambdas))))))))
 
+;recursively adds all elements in the config file that are referenced in the list of 'lhs' lines in the config file
 (defmethod add-dependent-elements ((hash hash-table) &optional (configFileStr nil) (lhs nil))
   (let ((lines) (words) (keys) (traversed (make-hash-table :test #'equalp)))
     (setf lines (get-matching-lines configFileStr lhs))
@@ -598,6 +631,7 @@ is replaced with replacement."
   ((lines :accessor lines :initarg :lines :initform nil)
    (workFilePath :accessor workFilePath :initarg :workFilePath :initform nil)))
 
+;top-level class for session object that gets executed
 (defclass session-class ()
   ((runProcesses :accessor runProcesses :initarg :runProcesses :initform nil)
    (quota :accessor quota :initarg :quota :initform nil)
@@ -611,6 +645,7 @@ is replaced with replacement."
    (DVHash :accessor DVHash :initarg :DVHash :initform nil)
    (DVKeys :accessor DVKeys :initarg :DVKeys :initform nil)))
 
+;collector class pattern that can be extended to print results from letf in a specific way
 (defclass base-collector-class ()
   ((quota :accessor quota :initarg :quota :initform 1)
    (quot :accessor quot :initarg :quot :initform 0)
@@ -633,6 +668,8 @@ is replaced with replacement."
 (defmethod print-collector :after ((obj base-collector-class))
   (setf (collection obj) nil))
 
+;extendable collector class for printing the last N lines that have been 
+;returned by the model, if the model errors out
 (defclass process-output-str-class (base-collector-class)
   ((error-p :accessor error-p :initarg :error-p :initform nil)))
 
@@ -642,6 +679,8 @@ is replaced with replacement."
     (setf (gethash "str" (collection obj)) (rest (gethash "str" (collection obj))))
     (decf (quot obj))))
 
+;extendable collector class for printing the collected results after the entire
+;session is run
 (defclass session-collector-class (base-collector-class)
   ((collectors :accessor collectors :initarg :collectors :initform nil)))
 
@@ -650,6 +689,8 @@ is replaced with replacement."
   (if (equal (quota obj) (quot obj))
       (print-collector obj)))
 
+;extendable collector class for printing the collected results after each collapseQuota
+;is reached
 (defclass collector-class (base-collector-class)
   ((collapseHash :accessor collapseHash :initarg :collapseHash :initform nil)
    (keys :accessor keys :initarg :keys :initform nil)
@@ -675,6 +716,7 @@ is replaced with replacement."
       (print-collector obj)
       (collect (session-collector obj) elements))))
 
+;extendable collector class for printing the collected results after each call to the entry function
 (defclass run-collector-class (base-collector-class)
   ((runs :accessor runs :initarg :runs :initform nil)
    (collector :accessor collector :initarg :collector :initform nil)))
@@ -689,6 +731,9 @@ is replaced with replacement."
   (print-collector obj)
   (collect (collector obj) lst))
  
+;class for a single process; if we're short-circuiting (i.e., calling a lisp-native model using an entry function)
+;then there will only be 1 instance of this class; if we're launching the model as a separate process, then
+;the number of instances will be (ceiling (total runs / runs per process))
 (defclass runProcess-class ()
   ((runs :accessor runs :initarg :runs :initform nil)
    (session :accessor session :initarg :session :initform nil)
@@ -697,12 +742,15 @@ is replaced with replacement."
    (platform :accessor platform :initarg :platform :initform nil)
    (process-output-str :accessor process-output-str :initarg :process-output-str :initform nil)))
 
+;class for a single process if we're not short circuiting
 (defclass number5-runProcess-class (runProcess-class)
   ((sleepTime :accessor sleepTime :initarg :sleepTime :initform .2)))
 
+;class for a single process if we're short circuiting
 (defclass johnny5-runProcess-class (runProcess-class)
   ((sleepTime :accessor sleepTime :initarg :sleepTime :initform 0)))
 
+;class for a single run
 (defclass run-class ()
   ((IVHash :accessor IVHash :initarg :IVHash :initform nil)
    (DVHash :accessor DVHash :initarg :DVHash :initform nil)
@@ -723,6 +771,8 @@ is replaced with replacement."
 
 (defclass johnny5-run-class (run-class) ())
 
+;reattaches lines that have been separated using the "\" character at the end of a line
+;in the config file
 (defun restructure (str)
   (let ((out) 
 	(lineDesigs (list #\Newline #\Return #\LineFeed))
@@ -737,6 +787,8 @@ is replaced with replacement."
 	(push (char str count) out))
     (coerce (reverse out) 'string)))
 
+;modifies the collapse hash table that keeps track of how letf will collapse each DV when
+;collapseQuota is reached
 (defmethod mod-collapseHash ((hash hash-table) collapseFn &key (DVKeys nil) (ApplyToKeys nil))
   (labels ((keys (hash)
 	     (let ((out))
