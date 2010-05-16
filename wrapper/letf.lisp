@@ -48,12 +48,28 @@
   `(aif ,test-form
      (progn ,@body)))
 
+;; Graham's alambda
+(defmacro alambda (parms &body body)
+  `(labels ((self ,parms ,@body))
+     #'self))
+
 (defmacro mklst (item)
   `(if (not (listp ,item)) (setf ,item (list ,item))))
+
+(defun mkstr (&rest args)
+  (with-output-to-string (s)
+    (dolist (a args) (princ a s))))
 
 (defmacro verbose (&rest lst)
   (mapc #'(lambda (x) (format *error-output* "~a~%" x)) lst)
   `(progn ,@lst))
+
+(defmacro length1 (fun)
+  `(let ((res (multiple-value-call #'list ,fun)))
+     (assert (<= (length (car res)) 1) nil "function ~a returned sequence with length ~d; at most 1 element in sequence allowed"
+	     ,(mkstr fun) (length (car res)))
+     (setf (car res) (caar res))
+     (values-list res)))
 
 ;loads the file with pathname str
 ;keeps track of all the pathnames that have been sent 
@@ -65,6 +81,12 @@
       (push-to-end str loaded))
     loaded))
 
+;returns if a key is present in the hash table
+(defun key-present (key hash)
+  (multiple-value-bind (value flag) (gethash key hash)
+    (declare (ignore value))
+    flag))
+
 ;equivalent to #'symbol-function, just safer.
 ;converts a symbol to the function that the 
 ;symbol points to; if it can't convert the 
@@ -74,6 +96,13 @@
 	   (fboundp x))
       (symbol-function x)
       x))
+
+(defun gethash-ifHash (key hash)
+  (if (hash-table-p hash)
+      (progn
+	(assert (key-present key hash))
+	(gethash key hash))
+      hash))
 
 (defun flatten (lis)
   "Takes a nested list and makes in into a single-level list"
@@ -144,12 +173,6 @@ is replaced with replacement."
 			    (setf out (concatenate 'string out (format nil "~%~a -> ~a" key (hash-string value))))))
 		   out))))
     (format strm "~a~%" (string-trim (list #\Newline #\Return #\LineFeed) (hash-string hash :keys keys)))))
-
-;returns if a key is present in the hash table
-(defun key-present (key hash)
-  (multiple-value-bind (value flag) (gethash key hash)
-    (declare (ignore value))
-    flag))
 
 (defun copy-hash (hash)
   (if (hash-table-p hash)
@@ -287,14 +310,9 @@ is replaced with replacement."
 	    (setf start i))))))
 
 ;just like get words, but asserts that only one word can be found. Returns that word, and not
-;a list of words, like #'get-words does
-(defun get-word (str &key (spaceDesignators (list #\Space #\Tab)) (includeSpaceDesignators nil))
-  (mklst spaceDesignators)
-  (assert spaceDesignators)
-  (aif (get-words str :spaceDesignators spaceDesignators :includeSpaceDesignators includeSpaceDesignators)
-       (progn
-	 (assert (equal (length it) 1) nil "~d words in string; only 1 word allowed" (length it))
-	 (first it))))
+;a list of words, like get-words does
+(defmacro get-word (&rest lst)
+  `(length1 (get-words ,@lst)))
 
 (defun get-lines (str &key (lineDesignators (list #\Newline #\Return #\LineFeed)) (includeLineDesignators nil))
   (let ((out))
@@ -331,95 +349,79 @@ is replaced with replacement."
     (assert (not in-bracket) nil "something is wrong with string ~a, possibly a stray bracket somewhere" str)
     (flatten out)))
 
-(defun remap-string (str hash &key (lambdas nil) (collapseFn "#'mean") (inside-brackets nil) (key nil))
-  (if inside-brackets
-      ;remaps an expression surrounded by brackets by calling the hash table on each of the words in the expression
-      ;each word in the expression should be a key that corresponds to an already-defined element in the hash table
-      ;you can also supply a list of lambda functions to be evaluated, that take, as input, the current word in the 
-      ;expression and the hash table; useful if you want to collect something other than what is returned by this 
-      ;function see 'necessaries' or 'get-elements', or 'eval-hash' for examples 
-      (let ((out) (shortIt!) (val))
-	(if lambdas (if (not (consp (car lambdas))) (setf lambdas (list lambdas))))
-	(dolist (word (get-words str) (make-sentence out))
-	  (setf shortIt! nil)
-	  (dolist (lm lambdas) 
-	    (if (equalp (car lm) "pre") 
-		(if (equalp (funcall (cdr lm) word hash (gethash word hash)) "shortIt!") 
-		    (setf shortIt! t)))) 
-	  (setf val (if shortIt! (gethash word hash) 
-			(remap-string (gethash word hash) hash 
-				      :lambdas lambdas :collapseFn collapseFn 
-				      :inside-brackets nil :key word)))
-	  (setf shortIt! nil)
-	  (dolist (lm lambdas)
-	    (if (equalp (car lm) "post")
-		(if (equalp (funcall (cdr lm) word hash val) "shortIt!")
-		    (setf shortIt! t))))
-	  (push-to-end (if shortIt! (gethash word hash) val) out)))
-      ;remaps an expression, which may or may not have parts that are surrounded by brackets
-      ;for each part that is surrounded by brackets, call remap-string with inside-brackets flagged to convert
-      ;the bracketed expression to actual values
-      (let ((out))
-	(if (consp str)
-	    (progn
-	      (dolist (item str)
-		(push-to-end 
-		 (remap-string item hash :lambdas lambdas :collapseFn collapseFn :inside-brackets nil :key nil)
-		 out))
-	      (setf out (make-sentence 
-			 (append (list "(funcall #'collapse" "(list ") 
-				 out 
-				 (list 
-				  ")" 
-				  (make-sentence (if (hash-table-p collapseFn) 
-						     (gethash key collapseFn) 
-						     collapseFn))
-				  ")")))))
-	    (progn
-	      (dolist (word (lump-brackets str))
-		(push-to-end
-		 (if (and (equal (char word 0) #\[) (equal (char word (- (length word) 1)) #\]))
-		     (remap-string (string-trim "[]" word) hash :lambdas lambdas 
-				   :collapseFn collapseFn :inside-brackets t :key nil)
-		     word)
-		 out))
-	      (setf out (make-sentence out))))
-	out)))
+(defmacro remap-string (&body body)
+  `(alambda (str hash &key (collapseFn "#'mean") (inside-brackets nil) (key nil))
+	    (if inside-brackets
+               ;remaps an expression surrounded by brackets by calling the hash table on each of the words in the expression
+               ;each word in the expression should be a key that corresponds to an already-defined element in the hash table
+               ;you can also supply a list of lambda functions to be evaluated, that take, as input, the current word in the 
+               ;expression and the hash table; useful if you want to collect something other than what is returned by this 
+               ;function see 'necessaries' or 'get-elements', or 'eval-hash' for examples 
+		(let ((out))
+		  (dolist (word (get-words str) (make-sentence out))
+		    ,(if (not body)
+			 `(push-to-end (self (gethash word hash) hash 
+					    :collapseFn collapseFn 
+					    :inside-brackets nil :key word) out)
+			 `(progn ,@body))))
+                ;remaps an expression, which may or may not have parts that are surrounded by brackets
+                ;for each part that is surrounded by brackets, call remap-string with inside-brackets flagged to convert
+                ;the bracketed expression to actual values
+		(let ((out))
+		  (if (consp str)
+		      (progn
+			(dolist (item str)
+			  (push-to-end 
+			   (self item hash :collapseFn collapseFn :inside-brackets nil :key nil)
+			   out))
+			(setf out (make-sentence 
+				   (append (list "(funcall #'collapse" "(list ") 
+					   out (list ")" (make-sentence (gethash-ifHash key collapseFn)) ")")))))
+		      (progn
+			(dolist (word (lump-brackets str))
+			  (push-to-end
+			   (if (and (equal (char word 0) #\[) (equal (char word (- (length word) 1)) #\]))
+			       (self (string-trim "[]" word) hash :collapseFn collapseFn :inside-brackets t :key nil)
+			       word)
+			   out))
+			(setf out (make-sentence out))))
+		  out))))
 
 ;traverses the 'keys' in the hash table 'hash', and recursively
 ;searches the other keys that each 'key' references. During the traversal
 ;checks if keys are present not-present, and builds a list of those keys
 ;if bool is t, returns the list of keys that are present; if bool is nil,
 ;returns the list of keys that aren't present
-(defun traverse (keys hash &key (bool nil))
+(defun traverse (keys hash &key (bool nil) (collapseFn "#'mean"))
   (mklst keys)
-  (let ((out) (words) (str)
-	(traversed (make-hash-table :test #'equalp)))
+  (let ((out2) (words) (str) (traversed (make-hash-table :test #'equalp)))
     (dolist (key keys)
       (setf words nil)
-      (setf str (remap-string
-		 (concatenate 'string "[" key "]")
-		 hash
-		 :lambdas ;gotta love side effects; these are lexical closures (note how they access 'words)
-		 (cons "pre" 
-		       #'(lambda (word hash val)
-			   (declare (ignore val))
-			   (if (key-present word traversed)
-			       "shortIt!"
-			       (progn
-				 (setf (gethash word traversed) t)
-				 (if (equal (key-present word hash) bool) (push-to-end word words))))))))
-      (push-to-end words out))
-    (sort (remove-duplicates (flatten out) :test #'equalp) #'string<)))
+      (setf str (funcall 
+		 (remap-string
+		  (when (not (key-present word traversed))
+		    (if (equal (key-present word hash) bool) (push-to-end word words))		   
+		    (setf (gethash word traversed)
+			  (if (key-present word hash)
+			      (self (gethash word hash) hash
+				    :collapseFn collapseFn
+				    :inside-brackets nil :key word)
+			      word)))
+		  (push-to-end (gethash word traversed) out))
+		 (concatenate 'string "[" key "]") hash :collapseFn collapseFn))
+      (push-to-end words out2))
+    (values
+     (sort (flatten out2) #'string<)
+     (if (equal (length keys) 1) str))))
 
 ;returns the subset of keys that are needed to 'remap' the keys in 'keys' 
 ;that do not currently have values associated with them
-(defun necessaries (keys hash)
-  (traverse keys hash :bool nil))
+(defmacro necessaries (keys hash &rest args)
+  `(traverse ,keys ,hash :bool nil ,@args))
 
 ;...that already have values associated with them
-(defun availables (keys hash)
-  (traverse keys hash :bool t))
+(defmacro availables (keys hash &rest args)
+  `(traverse ,keys ,hash :bool t ,@args))
 
 ;evaluates all the stuff in the hash table that it can, given the current state of the hash table
 (defmethod eval-hash ((hash hash-table))
@@ -435,27 +437,28 @@ is replaced with replacement."
 	       (make-sentence (flatten out)))))
     (let ((traversed (make-hash-table :test #'equalp)))
       (loop for key being the hash-keys of hash do 
-	   (if (and (not (key-present key traversed)) (not (necessaries key hash)))
-	       (remap-string
-		(concatenate 'string "[" key "]") hash
-		:lambdas
-		(cons "post"
-		      #'(lambda (word hash val) ;lexical closures (note referencing to 'traversed')
-			  (if (not (key-present word traversed))
-			      (let ((newVal))
-				(setf (gethash word traversed) t)
-				(ignore-errors
-				  (multiple-value-bind (evaledVal lngth) (read-from-string val)
-				    (if (equal lngth (length val))
-					(setf newVal (toString (eval evaledVal))))))
-				(when (and newVal 
-					   (not (equal (- (length val) 
-							  (length (find-in-string val (list #\space #\tab))))
-						       (- (length newVal) 
-							  (length (find-in-string newVal (list #\Space #\tab)))))))
-				  ;(format t "~a -> ~a -> ~a~%" (gethash word hash) val newVal)
-				  (setf (gethash word hash) newVal)
-				  "shortIt!")))))))))))
+	   (if (not (necessaries key hash))
+	       (funcall (remap-string
+			 (if (not (key-present word traversed))
+			     (let ((newVal) (val))
+			       (setf val (self (gethash word hash) hash 
+					       :collapseFn collapseFn 
+					       :inside-brackets nil :key word))
+			       (setf (gethash word traversed) val)
+			       (ignore-errors
+				 (multiple-value-bind (evaledVal lngth) (read-from-string val)
+				   (if (equal lngth (length val))
+				       (setf newVal (toString (eval evaledVal))))))
+			       (when (and newVal (not (equal (- (length val) 
+								(length (find-in-string val (list #\space #\tab))))
+							     (- (length newVal) 
+								(length (find-in-string newVal (list #\Space #\tab)))))))
+				 ;(format t "~a -> ~a -> ~a~%" (gethash word hash) val newVal)
+                                 ;(format t "~a ~a~%" (incf count) word)
+				 (setf (gethash word hash) newVal)
+				 (setf (gethash word traversed) newVal))))
+			 (push-to-end (gethash word traversed) out))
+			(concatenate 'string "[" key "]") hash))))))
 
 ;takes an expression, and expands the ':'s (similar to how matlab references arrays)
 ;for example: (bracket-expand "hello1:5") -> "hello1 hello2 hello3 hello4 hello5"
@@ -534,34 +537,29 @@ is replaced with replacement."
 		     (push-to-end 
 		      (bracket-expand 
 		       (string-trim 
-			'(#\Space #\tab) 
+			(list #\Space #\tab) 
 			(subseq (make-sentence line) it (length (make-sentence line))))) 
 		      out))))))))
 
 ;same as above, just asserts the expectation that only one (or zero) lines should be returned
-(defun get-matching-line (str keys)
-  (mklst keys)
-  (aif (get-matching-lines str keys)
-       (progn
-	 (assert (equal (length it) 1) 
-		 nil "~d matching lines with lhs=~a; only 1 line allowed" (length it) (make-sentence keys))
-	 (first it))))
-      	  
+(defmacro get-matching-line (&rest lst)
+  `(length1 (get-matching-lines ,@lst)))
+
 ;returns the list of elements (key . value) from the hash table 'hash' specified by 'keys'
 ;will evaluate each value before putting it in the list
-(defun get-elements (keys hash &optional (collapseFn "#'mean"))
+(defun get-elements (keys hash &optional (collapseFns "#'mean"))
   (mklst keys)
-  (let ((out))
-    (dolist (key keys out)
-      (let ((val (remap-string
-		  (concatenate 'string "[" key "]") hash
-		  :lambdas (cons 
-			    "pre" 
-			    #'(lambda (word hash val)
-				(declare (ignore val))
-				(assert (key-present word hash) nil "key ~a not currently present in hash table" word)))
-		  :collapseFn (if (hash-table-p collapseFn) (gethash key collapseFn) collapseFn))))
+  (if (not (consp collapseFns)) (setf collapseFns (make-list (length keys) :initial-element collapseFns)))
+  (let ((out) (key) (collapseFn))
+    (dotimes (i (length keys) out)
+      (setf key (nth i keys))
+      (setf collapseFn (nth i collapseFns))
+      (multiple-value-bind (words val) (necessaries key hash :collapseFn collapseFn)
+	(assert (not words))
 	(push-to-end (cons key (eval (read-from-string val))) out)))))
+
+(defmacro get-element (&rest lst)
+  `(length1 (get-elements ,@lst)))
 
 ;adds a list of elements (key . value) to the hash table 'hash' specified by 'keys'
 ;will not evaluate each value before putting it in the hash table
@@ -594,9 +592,8 @@ is replaced with replacement."
 
 ;recursively adds all elements in the config file that are referenced in the 'lhs' line in the config file
 (defgeneric add-dependent-element (hash &optional configFileStr lhs lambdas))
-(defmethod add-dependent-element ((hash hash-table) &optional (configFileStr nil) (lhs nil) (lambdas nil))
-  (mklst lambdas)
-  (let ((line) (words) (shortIt!))
+(defmethod add-dependent-element ((hash hash-table) &optional (configFileStr nil) (lhs nil) (lm nil))
+  (let ((line) (words))
     (setf line (if (consp lhs) (cdr lhs) (get-matching-line configFileStr lhs)))
     (setf lhs (if (consp lhs) (car lhs) lhs))
     (when line
@@ -605,11 +602,8 @@ is replaced with replacement."
       (dolist (word words)
 	(if (and (equal (char word 0) #\[) (equal (char word (- (length word) 1)) #\]))
 	    (dolist (item (get-words (string-trim "[]" word)))
-	      (setf shortIt! nil)
-	      (dolist (lm lambdas)
-		(if (equalp (funcall lm item) "shortIt!") (setf shortIt! t)))
-	      (if (not shortIT!)
-		  (add-dependent-element hash configFileStr (concatenate 'string item "=") lambdas))))))))
+	      (if (or (not lm) (not (equalp (funcall lm item) "shortIt!")))
+		  (add-dependent-element hash configFileStr (concatenate 'string item "=") lm))))))))
 
 ;recursively adds all elements in the config file that are referenced in the list of 'lhs' lines in the config file
 (defmethod add-dependent-elements ((hash hash-table) &optional (configFileStr nil) (lhs nil))
@@ -643,7 +637,11 @@ is replaced with replacement."
    (lines :accessor lines :initarg :lines :initform nil)
    (collapseHash :accessor collapseHash :initarg :collapseHash :initform nil)
    (DVHash :accessor DVHash :initarg :DVHash :initform nil)
-   (DVKeys :accessor DVKeys :initarg :DVKeys :initform nil)))
+   (DVKeys :accessor DVKeys :initarg :DVKeys :initform nil)
+   (IVKeys :accessor IVKeys :initarg :IVKeys :initform nil)
+   (cellKeys :accessor cellKeys :initarg :cellKeys :initform nil)
+   (modelProgram :accessor modelProgram :initarg :modelProgram :initform nil)
+   (entryFnType :accessor entryFnType :initarg :entryFnType :initform nil)))
 
 ;collector class pattern that can be extended to print results from letf in a specific way
 (defclass base-collector-class ()
@@ -712,7 +710,8 @@ is replaced with replacement."
        using (hash-value val)
        do (if (if (consp val) (equal 1 (length (remove-duplicates val :test #'equalp))))
 	      (setf (gethash key (collection obj)) (first val))))
-    (let ((elements (get-elements (keys obj) (collection obj) (collapseHash obj))))
+    (let ((elements (get-elements (keys obj) (collection obj) 
+				  (mapcar (lambda (x) (gethash-ifHash x (collapseHash obj))) (keys obj)))))
       (print-collector obj)
       (collect (session-collector obj) elements))))
 
@@ -760,7 +759,8 @@ is replaced with replacement."
    (cellKeys :accessor cellKeys :initarg :cellKeys :initform nil)
    (sleepTime :accessor sleepTime :initarg :sleepTime :initform 0)
    (run-collector :accessor run-collector :initarg :run-collector :initform nil)
-   (runProcess :accessor runProcess :initarg :runProcess :initform nil)))
+   (runProcess :accessor runProcess :initarg :runProcess :initform nil)
+   (entryFnType :accessor entryFnType :initarg :entryFnType :initform nil)))
 
 (defmethod initialize-instance :after ((obj run-class) &key)
   (assert (run-collector obj))
@@ -772,7 +772,6 @@ is replaced with replacement."
 (defclass johnny5-run-class (run-class) ())
 
 ;reattaches lines that have been separated using the "\" character at the end of a line
-;in the config file
 (defun restructure (str)
   (let ((out) 
 	(lineDesigs (list #\Newline #\Return #\LineFeed))
@@ -781,7 +780,9 @@ is replaced with replacement."
     (while (< (incf count) (- strLength 1))
       (if (if (find-in-string (char str count) #\\)
 	      (find-in-string (char str (+ count 1)) lineDesigs))
-	  (incf count)
+	  (while (and (< (+ 1 count) (- strLength 1))
+		      (find-in-string (char str (+ 1 count)) lineDesigs))
+	    (incf count))
 	  (push (char str count) out)))
     (if (equal count (- strLength 1))
 	(push (char str count) out))
@@ -801,6 +802,13 @@ is replaced with replacement."
 	(if (not (key-present ApplyToKey (gethash DVKey hash)))
 	    (assert (not DVKeys) nil "ApplyToKey=~a not present in DV=~a collapse hash table" ApplyToKey DVKey)
 	    (setf (gethash ApplyToKey (gethash DVKey hash)) collapseFn))))))
+
+(defmacro upload-to (obj &rest vals)
+  `(progn ,@(mapcar 
+	     (lambda (x) 
+	       (if (consp x)
+		   `(setf (,(car x) ,obj) ,(cadr x))
+		   `(setf (,x ,obj) ,x))) vals)))
 
 ;generates the code that generates the session object that will be executed
 ;this macro is configured by extending various pieces of the above
@@ -829,13 +837,14 @@ is replaced with replacement."
 					      :session session))
 	(run-instance `(make-instance (if short-circuit-p 'johnny5-run-class 'number5-run-class)
 				      :IVHash (copy-hash IVHash)
-				      :DVHash (merge-hash DVHash IVHash)
+				      :DVHash (copy-hash mergedHash)
 				      :IVKeys IVKeys
 				      :DVKeys DVKeys
 				      :quot (+ 1 count)
 				      :cellKeys cellKeys
 				      :run-collector ,run-collector-instance
-				      :runProcess runProcess)))
+				      :runProcess runProcess
+				      :entryFnType entryFnType)))
     `(progn
        (labels ((get-IV-hash (configFileStr cell-values)
 		  (let ((hash (make-hash-table :test #'equalp)))
@@ -883,12 +892,12 @@ is replaced with replacement."
 		       hash
 		       (let ((hsh (make-hash-table :test #'equalp)))
 			 (add-dependent-element hsh configFileStr (cons "collapseFn=" (first words)))
-			 (remap-string (concatenate 'string "[" "collapseFn" "]") hsh))
+			 (funcall (remap-string) (concatenate 'string "[" "collapseFn" "]") hsh))
 		       :DVKeys (get-words (bracket-expand (get-matching-line tmpLn (list "DV=" "SDV=")) t))
 		       :ApplyToKeys (get-words (bracket-expand (get-matching-line tmpLn "ApplyTo=") t)))))))
 	 (let ((session) (runProcess) (line-index) (count) (iteration) (iterations)
-	       (DVHash) (IVHash) (DVKeys) (IVKeys) (modelProgram) (cellKeys)
-	       (quota) (collector) (quot) (collapseHash) (work) (session-collector)
+	       (DVHash) (IVHash) (DVKeys) (IVKeys) (modelProgram) (cellKeys) (mergedHash)
+	       (quota) (collector) (quot) (collapseHash) (work) (session-collector) (entryFnType)
 	       (configFilePath (get-arg 1)) (platform (get-word (get-arg 2)))
 	       (configFileStr) (runsPerProcess) (short-circuit-p) (configFileLnLST) (configFileWdLST))
 	   (setf configFileStr (restructure (file-string configFilePath)))
@@ -911,14 +920,18 @@ is replaced with replacement."
 	   (setf modelProgram (aif (get-matching-line configFileLnLST "modelProgram=")
 				   (lump-brackets (replace-all it "$1" platform :test #'equalp) :desigs (cons #\" #\") :include-brackets nil)
 				   (lump-brackets "'run-model" :desigs (cons #\" #\") :include-brackets nil)))
-	   (setf short-circuit-p (or 
-				  (equal (subseq (first modelProgram) 0 1) "#")
-				  (equal (subseq (first modelProgram) 0 1) "'")
-				  (equal (subseq (first modelProgram) 0 1) "(")))
+	   (setf short-circuit-p (let ((it (subseq (first modelProgram) 0 1)))
+				   (or (equal it "#") (equal it "'") (equal it "("))))
 	   (if short-circuit-p
 	       (setf modelProgram (symbol-function-safe (eval (read-from-string (make-sentence modelProgram))))
 		     runsPerProcess (read-from-string "inf")))
-	   (setf runProcess ,run-process-instance)
+	   (setf entryFnType (if short-circuit-p
+				 (aif (get-matching-line configFileLnLST "entryFnType=")
+				      (read-from-string (get-word it))
+				      'keys)
+				 'process))
+	   (assert (member entryFnType (if short-circuit-p (list 'keys 'hash) (list 'process))) nil "invalid entryFnType ~a" entryFnType)
+   	   (setf runProcess ,run-process-instance)
 	   (setf iterations (aif (get-matching-line configFileWdLST "iterations=")
 				 (eval (read-from-string (get-word it)))
 				 1)	
@@ -928,6 +941,7 @@ is replaced with replacement."
 	   (while (< (incf line-index) (length (lines work)))
 	     (setf iteration -1)
 	     (setf IVHash (get-iv-hash configFileWdLST (nth line-index (lines work))))
+	     (setf mergedHash (merge-hash DVHash IVHash))
 	     (if (equal line-index 0) 
 		 (aif (necessaries IVKeys IVHash)
 		      (assert nil nil "IVs '~a' that are necessary to evaluate the 'input=' lines are not present in the config file" it)))
@@ -942,26 +956,21 @@ is replaced with replacement."
 		     (when (equal (mod count runsPerProcess) 0)
 		       (push-to-end runProcess (runProcesses session))
 		       (setf runProcess ,run-process-instance))))))
-	   (if (runs runProcess) (push-to-end runProcess (runProcesses session)))
-	   (setf (quota session) (* (length (lines work)) iterations quota))
+	   (if (runs runProcess) (push-to-end runProcess (runProcesses session)))		
+	   (upload-to session
+		      (quota (* (length (lines work)) iterations quota))
+		      (statusPrinters (mapcar (lambda (x) (symbol-function-safe (eval (read-from-string x)))) 
+					      (get-matching-lines configFileWdLST "statusPrinter=")))
+		      collapseHash DVHash DVKeys IVKeys cellKeys modelProgram iterations configFileLnLST entryFnType
+		      (collapseQuota quota)
+		      (lines (length (lines work)))
+		      (traversed (multiple-value-bind (trash traversed) (get-matching-lines configFileWdLST nil)
+				     (declare (ignore trash))
+				     (sort (remove-duplicates traversed :test #'equal) #'<))))
 	   (aif (apply #'+ (mapcar #'(lambda (x) (length (runs x))) (runProcesses session)))
 		(assert (equal (quota session) it)
 			nil "number of linesxiterationsxquota in work file (~d) not equal to number of run objects (~d)"
 			(quota session) it))
-	   (setf (configFileLnLST session) configFileLnLST)
-	   (setf (statusPrinters session)
-		 (mapcar (lambda (x) (symbol-function-safe (eval (read-from-string x)))) 
-			 (get-matching-lines configFileWdLST "statusPrinter=")))
-	   (setf (collapseQuota session) quota)
-	   (setf (iterations session) iterations)
-	   (setf (lines session) (length (lines work)))
-	   (setf (collapseHash session) collapseHash)
-	   (setf (DVHash session) DVHash)
-	   (setf (DVKeys session) DVKeys)
-	   (setf (traversed session)
-		 (multiple-value-bind (trash traversed) (get-matching-lines configFileWdLST nil)
-		   (declare (ignore trash))
-		   (sort (remove-duplicates traversed :test #'equal) #'<)))
 	   session)))))
 
 ;converts an output line of text sent by the model to a dotted pair
@@ -994,14 +1003,22 @@ is replaced with replacement."
 
 (defmethod get-DVs ((obj johnny5-run-class) &optional (process nil) (appetizers nil))
   (mklst appetizers)  
-  (let ((currentDVs) (fstr) (error-p)
-	(tbl (make-hash-table :test #'equalp)))
-    (mapc #'(lambda (x) (setf (gethash (car x) tbl) (cdr x))) (get-elements (IVKeys obj) (IVHash obj)))
+  (let ((currentDVs) (fstr) (error-p) (tbl))
+    (cond ((equal (entryFnType obj) 'hash)
+	   (setf tbl (make-hash-table :test #'equalp))
+	   (mapc #'(lambda (x) (setf (gethash (car x) tbl) (cdr x))) (get-elements (IVKeys obj) (IVHash obj)))
+	   (setf tbl (list tbl)))
+	  ((equal (entryFnType obj) 'keys)
+	   (setf tbl (eval (read-from-string
+			    (concatenate 'string "(list "
+					 (make-sentence
+					  (mapcar #'(lambda (x) (format nil ":~a '~a" (car x) (cdr x))) (get-elements (IVKeys obj) (IVHash obj))))
+					 ")"))))))
     (setf fstr (make-array '(0) :element-type 'base-char :fill-pointer 0 :adjustable t))
     (handler-case 
 	(with-output-to-string (*standard-output* fstr) 
 	  (with-output-to-string (*error-output* fstr)
-	    (funcall process tbl)))
+	    (apply process tbl)))
       (error (condition) (setf error-p condition)))
     (dolist (line (get-lines fstr))
       (collect (process-output-str (runProcess obj)) (cons "str" line))
@@ -1133,6 +1150,7 @@ is replaced with replacement."
 	 (((obj session-class))
 	  (let ((strm *error-output*))
 	    (format strm "~%printing session status:~%")
+	    (format strm "#####entry function: ~a~%" (modelProgram obj))
 	    (format strm "#####total calls to entry function: ~a~%" (quota obj))
 	    (format strm "#####number of lines in the work file: ~a~%" (lines obj))
 	    (format strm "#####number of times to run each line in the work file (iterations=): ~a~%" (iterations obj))
@@ -1143,7 +1161,13 @@ is replaced with replacement."
 		(format strm "#####collapse function (collapseFn=): ~a~%" (collapseHash obj)))
 	    (format strm "#####available elements in the DV hash table:~%")
 	    (print-hash (DVHash obj) :keys (availables (DVKeys obj) (DVHash obj)))
-	    (format strm "#####necessary elements for the model to return:~%")
+	    (format strm "#####DVs that will be collected:~%")
+	    (mapc (lambda (x) (format strm "~a~%" x)) (DVKeys obj))
+	    (format strm "#####IVs that will be read from the work file:~%")
+	    (mapc (lambda (x) (format strm "~a~%" x)) (cellKeys obj))
+	    (format strm "#####elements that will be sent to the entry function:~%")
+	    (mapc (lambda (x) (format strm "~a~%" x)) (IVKeys obj))
+	    (format strm "#####necessary elements for the entry function to return:~%")
 	    (mapc (lambda (x) (format strm "~a~%" x)) (necessaries (DVKeys obj) (DVHash obj)))
 	    (format strm "~%"))))
 
@@ -1163,15 +1187,16 @@ is replaced with replacement."
     (if (equal i (- (length (cellElements obj)) 1))
 	(format t "~a~%" (cdr (nth i (cellElements obj))))
 	(format t "~a " (cdr (nth i (cellElements obj))))))
-  (dolist (element (get-elements (keys obj) (collection obj) (collapseHash obj)))
-    (aif (cdr element) (format t "~a: ~a~%" (car element) (coerce it 'double-float)))))
+  (dolist (key (keys obj))
+    (aif (cdr (get-element key (collection obj) (gethash-ifHash key (collapseHash obj))))
+	 (format t "~a: ~a~%" key (coerce it 'double-float)))))
 
 (defclass hpc-process-output-str-class (process-output-str-class) ())
 
 (defmethod print-collector ((obj hpc-process-output-str-class))
-  (format t "model unexpectedly quit... ~%~%here are the last ~a lines that were printed to stdout before the error~%~a~%"
+  (format *error-output* "model unexpectedly quit... ~%~%here are the last ~a lines that were printed to stdout before the error~%~a~%"
 	  (quot obj) (make-sentence (gethash "str" (collection obj)) :spaceDesignator #\Newline))
-  (if (error-p obj) (format t "here's the error~%~a~%" (error-p obj))))
+  (if (error-p obj) (format *error-output* "here's the error~%~a~%" (error-p obj))))
 
 (defun build-hpc-session ()
   (build-session ;this is a macro
