@@ -56,21 +56,19 @@
 (defmacro mklst (item)
   `(if (not (listp ,item)) (setf ,item (list ,item))))
 
-(defun mkstr (&rest args)
-  (with-output-to-string (s)
-    (dolist (a args) (princ a s))))
-
 (defmacro verbose (&rest lst)
   (mapc #'(lambda (x) (format *error-output* "~a~%" x)) lst)
   `(progn ,@lst))
 
-(defmacro length1 (fun)
-  `(let ((res (multiple-value-call #'list ,fun)))
-     (assert (<= (length (car res)) 1) nil "function ~a returned sequence with length ~d; at most 1 element in sequence allowed"
-	     ,(mkstr fun) (length (car res)))
-     (setf (car res) (caar res))
-     (values-list res)))
-
+(defmacro guard (fun &body body)
+  `(let ((it (multiple-value-call #'list ,fun)))
+     ,(if (not body)
+	  `(assert (<= (length (car it)) 1) nil 
+		   "function ~a returned sequence ~a; default guard failed" 
+		   ,(format nil "~a" fun) it)
+	  `(progn ,@body))
+     (values-list it)))
+     
 ;loads the file with pathname str
 ;keeps track of all the pathnames that have been sent 
 ;to this function; returns the list of those names
@@ -183,13 +181,25 @@ is replaced with replacement."
       hash))
 
 ;copies all of the hash tables in the list lst, and merges them
-(defun merge-hash (&rest lst)
-  (let ((out (make-hash-table :test #'equalp)))
-    (dolist (hash lst out)
-      (loop for value being the hash-values of hash using (hash-key key) do 
-	   (if (key-present key out) (assert (equalp (gethash key out) value)))
-	   (if (not (key-present key out))
-	       (setf (gethash key out) (copy-hash value)))))))
+(defun merge-hash (lst &key (toHash))
+  (let* ((fun (lambda (out key value)
+		(if (key-present key out) 
+		    (assert (equalp (gethash key out) value) nil
+			    "'~a' key already present in hash table with value '~a', which is different than the value '~a' that you're trying to add now"
+			    key (gethash key out) value)
+		    (setf (gethash key out) (copy-hash value)))))
+	 (rec (alambda (lst out)
+		       (if lst
+			   (cond ((hash-table-p lst)
+				  (loop for value being the hash-values of lst using (hash-key key) do 
+				       (funcall fun out key value)))
+				 ((or (hash-table-p (car lst)) (consp (car lst)))
+				  (self (car lst) out)
+				  (self (cdr lst) out))
+				 (t (funcall fun out (car lst) (cdr lst)))))))
+	 (out (aif toHash it (make-hash-table :test #'equalp))))
+    (funcall rec lst out)
+    out))
 
 (defun file-string (path)
   "Sucks up an entire file from PATH into a freshly-allocated string,
@@ -312,7 +322,7 @@ is replaced with replacement."
 ;just like get words, but asserts that only one word can be found. Returns that word, and not
 ;a list of words, like get-words does
 (defmacro get-word (&rest lst)
-  `(length1 (get-words ,@lst)))
+  `(car (guard (get-words ,@lst))))
 
 (defun get-lines (str &key (lineDesignators (list #\Newline #\Return #\LineFeed)) (includeLineDesignators nil))
   (let ((out))
@@ -394,25 +404,23 @@ is replaced with replacement."
 ;returns the list of keys that aren't present
 (defun traverse (keys hash &key (bool nil) (collapseFn "#'mean"))
   (mklst keys)
-  (let ((out2) (words) (str) (traversed (make-hash-table :test #'equalp)))
+  (let* ((words) (str) 
+	 (traversed (make-hash-table :test #'equalp))
+	 (fun (remap-string
+	       (when (not (key-present word traversed))
+		 (if (equal (key-present word hash) bool) (push-to-end word words))		   
+		 (setf (gethash word traversed)
+		       (if (key-present word hash)
+			   (self (gethash word hash) hash
+				 :collapseFn collapseFn
+				 :inside-brackets nil :key word)
+			   word)))
+	       (push-to-end (gethash word traversed) out))))
     (dolist (key keys)
-      (setf words nil)
-      (setf str (funcall 
-		 (remap-string
-		  (when (not (key-present word traversed))
-		    (if (equal (key-present word hash) bool) (push-to-end word words))		   
-		    (setf (gethash word traversed)
-			  (if (key-present word hash)
-			      (self (gethash word hash) hash
-				    :collapseFn collapseFn
-				    :inside-brackets nil :key word)
-			      word)))
-		  (push-to-end (gethash word traversed) out))
-		 (concatenate 'string "[" key "]") hash :collapseFn collapseFn))
-      (push-to-end words out2))
-    (values
-     (sort (flatten out2) #'string<)
-     (if (equal (length keys) 1) str))))
+      (push-to-end 
+       (funcall fun (concatenate 'string "[" key "]") hash :collapseFn collapseFn) 
+       str))
+    (values (sort (flatten words) #'string<) str)))
 
 ;returns the subset of keys that are needed to 'remap' the keys in 'keys' 
 ;that do not currently have values associated with them
@@ -435,30 +443,30 @@ is replaced with replacement."
 		     (push-to-end ")" out))
 		   (push-to-end (format nil "~a" lst) out))
 	       (make-sentence (flatten out)))))
-    (let ((traversed (make-hash-table :test #'equalp)))
+    (let* ((traversed (make-hash-table :test #'equalp))
+	   (fun (remap-string
+		 (if (not (key-present word traversed))
+		     (let ((newVal) (val))
+		       (setf val (self (gethash word hash) hash 
+				       :collapseFn collapseFn 
+				       :inside-brackets nil :key word))
+		       (setf (gethash word traversed) val)
+		       (ignore-errors
+			 (multiple-value-bind (evaledVal lngth) (read-from-string val)
+			   (if (equal lngth (length val))
+			       (setf newVal (toString (eval evaledVal))))))
+		       (when (and newVal (not (equal (- (length val) 
+							(length (find-in-string val (list #\space #\tab))))
+						     (- (length newVal) 
+							(length (find-in-string newVal (list #\Space #\tab)))))))
+			 ;(format t "~a -> ~a -> ~a~%" (gethash word hash) val newVal)
+			 ;(format t "~a ~a~%" (incf count) word)
+			 (setf (gethash word hash) newVal)
+			 (setf (gethash word traversed) newVal))))
+		 (push-to-end (gethash word traversed) out))))
       (loop for key being the hash-keys of hash do 
 	   (if (not (necessaries key hash))
-	       (funcall (remap-string
-			 (if (not (key-present word traversed))
-			     (let ((newVal) (val))
-			       (setf val (self (gethash word hash) hash 
-					       :collapseFn collapseFn 
-					       :inside-brackets nil :key word))
-			       (setf (gethash word traversed) val)
-			       (ignore-errors
-				 (multiple-value-bind (evaledVal lngth) (read-from-string val)
-				   (if (equal lngth (length val))
-				       (setf newVal (toString (eval evaledVal))))))
-			       (when (and newVal (not (equal (- (length val) 
-								(length (find-in-string val (list #\space #\tab))))
-							     (- (length newVal) 
-								(length (find-in-string newVal (list #\Space #\tab)))))))
-				 ;(format t "~a -> ~a -> ~a~%" (gethash word hash) val newVal)
-                                 ;(format t "~a ~a~%" (incf count) word)
-				 (setf (gethash word hash) newVal)
-				 (setf (gethash word traversed) newVal))))
-			 (push-to-end (gethash word traversed) out))
-			(concatenate 'string "[" key "]") hash))))))
+	       (funcall fun (concatenate 'string "[" key "]") hash))))))
 
 ;takes an expression, and expands the ':'s (similar to how matlab references arrays)
 ;for example: (bracket-expand "hello1:5") -> "hello1 hello2 hello3 hello4 hello5"
@@ -543,7 +551,7 @@ is replaced with replacement."
 
 ;same as above, just asserts the expectation that only one (or zero) lines should be returned
 (defmacro get-matching-line (&rest lst)
-  `(length1 (get-matching-lines ,@lst)))
+  `(car (guard (get-matching-lines ,@lst))))
 
 ;returns the list of elements (key . value) from the hash table 'hash' specified by 'keys'
 ;will evaluate each value before putting it in the list
@@ -554,33 +562,26 @@ is replaced with replacement."
     (dotimes (i (length keys) out)
       (setf key (nth i keys))
       (setf collapseFn (nth i collapseFns))
-      (multiple-value-bind (words val) (necessaries key hash :collapseFn collapseFn)
-	(assert (not words))
-	(push-to-end (cons key (eval (read-from-string val))) out)))))
+      (multiple-value-bind (words val) 
+	  (guard (necessaries key hash :collapseFn collapseFn)
+		 (assert (equal (length (car it)) 0) nil
+			 "necessaries ~a left over when calling get-elements; not allowed to have any necessaries here" (car it)))
+	(declare (ignore words))
+	(push-to-end (cons key (eval (read-from-string (first val)))) out)))))
 
 (defmacro get-element (&rest lst)
-  `(length1 (get-elements ,@lst)))
-
-;adds a list of elements (key . value) to the hash table 'hash' specified by 'keys'
-;will not evaluate each value before putting it in the hash table
-(defmethod add-elements ((hash hash-table) &optional (elements nil))
-  (if elements (if (not (consp (car elements))) (setf elements (list elements))))
-  (dolist (element elements)
-    (if (key-present (car element) hash)
-	(assert (equalp (gethash (car element) hash) (cdr element))
-		nil "'~a' key already present in hash table with value '~a', which is different than the value '~a' that you're trying to add now"
-		(car element) (gethash (car element) hash) (cdr element))
-	(setf (gethash (car element) hash) (cdr element)))))
+  `(car (guard (get-elements ,@lst))))
 
 ;returns a list of keys (in order) that map to the values found in each line of the work file
 (defun get-cell-keys (str)
-  (let ((lines) (words) (out))
+  (let ((lines) (out))
     (setf lines (get-matching-lines str (list "constant=" "iv=")))
     (dolist (line lines out)
-      (setf words (get-words line))
-      (assert (> (length words) 0)
-	      nil "no rhs for lhs=(either contant= or iv=) in config file")
-      (push-to-end (first words) out))))
+      (push-to-end
+       (car (guard (get-words line) 
+		   (assert (> (length (car it)) 0) nil
+			   "no rhs for lhs=(either constant= or iv=) in config file")))
+       out))))
 
 ;adds all cell elements for a single line in the work file to the hash table
 (defmethod add-cell-elements ((hash hash-table) &optional (configFileStr nil) (cell-values nil))
@@ -588,38 +589,40 @@ is replaced with replacement."
     (assert (equal (length cell-keys) (length cell-values))
 	    nil "number of cell keys (~d) does not equal number of cell values (~d)"
 	    (length cell-keys) (length cell-values))
-    (add-elements hash (mapcar #'cons cell-keys cell-values))))
+    (merge-hash (mapcar #'cons cell-keys cell-values) :toHash hash)))
 
 ;recursively adds all elements in the config file that are referenced in the 'lhs' line in the config file
-(defgeneric add-dependent-element (hash &optional configFileStr lhs lambdas))
-(defmethod add-dependent-element ((hash hash-table) &optional (configFileStr nil) (lhs nil) (lm nil))
-  (let ((line) (words))
-    (setf line (if (consp lhs) (cdr lhs) (get-matching-line configFileStr lhs)))
-    (setf lhs (if (consp lhs) (car lhs) lhs))
-    (when line
-      (add-elements hash (cons (subseq lhs 0 (- (length lhs) 1)) line))
-      (setf words (lump-brackets line))
-      (dolist (word words)
-	(if (and (equal (char word 0) #\[) (equal (char word (- (length word) 1)) #\]))
-	    (dolist (item (get-words (string-trim "[]" word)))
-	      (if (or (not lm) (not (equalp (funcall lm item) "shortIt!")))
-		  (add-dependent-element hash configFileStr (concatenate 'string item "=") lm))))))))
+(defmacro add-dependent-element (&body body)
+  `(alambda (hash &optional (configFileStr nil) (lhs nil))
+	    (let ((line) (words))
+	      (setf line (if (consp lhs) (cdr lhs) (get-matching-line configFileStr lhs)))
+	      (setf lhs (if (consp lhs) (car lhs) lhs))
+	      (when line
+		(merge-hash (cons (subseq lhs 0 (- (length lhs) 1)) line) :toHash hash)
+		(setf words (lump-brackets line))
+		(dolist (word words)
+		  (if (and (equal (char word 0) #\[) (equal (char word (- (length word) 1)) #\]))
+		      (dolist (item (get-words (string-trim "[]" word)))
+			,(if (not body)
+			     `(self hash configFileStr (concatenate 'string item "="))
+			     `(progn ,@body)))))))))
 
 ;recursively adds all elements in the config file that are referenced in the list of 'lhs' lines in the config file
 (defmethod add-dependent-elements ((hash hash-table) &optional (configFileStr nil) (lhs nil))
-  (let ((lines) (words) (keys) (traversed (make-hash-table :test #'equalp)))
-    (setf lines (get-matching-lines configFileStr lhs))
-    (dolist (line lines)
-      (setf words (get-words line))
-      (assert words nil "no rhs for lhs=~a in config file" lhs)
-      (push-to-end (first words) keys))
-    (dolist (key keys)
-      (add-dependent-element 
-       hash 
-       configFileStr 
-       (concatenate 'string key "=")
-       #'(lambda (word) 
-	   (if (key-present word traversed) "shortIt!" (setf (gethash word traversed) t)))))))
+  (let* ((traversed (make-hash-table :test #'equalp))
+	 (fun (add-dependent-element
+	       (when (not (key-present item traversed))
+		 (setf (gethash item traversed) t)
+		 (self hash configFileStr (concatenate 'string item "="))))))
+    (dolist (line (get-matching-lines configFileStr lhs))
+      (funcall fun hash configFileStr 
+	       (concatenate 
+		'string 
+		(car (guard (get-words line) 
+			    ;3 b/c cell reads the dv lines for 3 elements; letf just cares about the 1st element
+			    (assert (<= (length (car it)) 3) 
+				    nil "length of rhs when adding dependent elements must be between 1-3; ~a not valid" (car it))))
+		"=")))))
 
 (defclass work-class ()
   ((lines :accessor lines :initarg :lines :initform nil)
@@ -864,25 +867,26 @@ is replaced with replacement."
 			 (setf out (get-cell-keys configFileStr)))
 		    out))
 		(get-DV-keys (configFileStr)
-		  (let ((words) (out))
+		  (let ((out))
 		    (dolist (line (get-matching-lines configFileStr (list "dv=" "sdv=")) out)
-		      (setf words (get-words line))
-		      (assert (> (length words) 0) nil "no rhs on lhs=dv=; at least 1 word required")
-		      (push-to-end (first words) out))))
+		      (push-to-end
+		       (car (guard (get-words line)
+				   (assert (> (length (car it)) 0) nil "no rhs on lhs=dv=; at least 1 word required")))
+		       out))))
 		(get-collapseHash (DVKeys DVHash configFileStr defaultCollapseFn)
-		  (let ((hash (make-hash-table :test #'equalp))
-			(tmpHash) (hashLST) (words) (tmpLn) (tmpLST))
+		  (let ((hash (make-hash-table :test #'equalp)) 
+			(words) (tmpLn) (tmpLST))
 		    (setf tmpLST (get-matching-lines configFileStr "collapseFn="))
 		    (if (not tmpLST)
 			(return-from get-collapseHash defaultCollapseFn)
 			(if (and (equal (length tmpLST) 1) 
 				 (equal (length (get-words (first tmpLST) :spaceDesignators (list #\; #\&))) 1))
 			    (return-from get-collapseHash (first tmpLST))))
-		    (dolist (DVKey DVKeys (add-elements hash hashLST))
-		      (setf tmpHash (make-hash-table :test #'equalp))
-		      (add-elements tmpHash (mapcar #'(lambda (x) (cons x defaultCollapseFn))
-						    (append (necessaries DVKey DVHash) (availables DVKey DVHash))))
-		      (push-to-end (cons DVKey tmpHash) hashLST))
+		    (dolist (DVKey DVKeys)
+		      (merge-hash 
+		       (cons DVKey (merge-hash (mapcar #'(lambda (x) (cons x defaultCollapseFn))
+						       (append (necessaries DVKey DVHash) (availables DVKey DVHash)))))
+		       :toHash hash))
 		    (dolist (line (get-matching-lines configFileStr "collapseFn=") hash)
 		      (setf words (get-words line :spaceDesignators (list #\; #\&)))
 		      (setf tmpLn (make-sentence (rest words) :spaceDesignator #\Newline))
@@ -891,7 +895,7 @@ is replaced with replacement."
 		      (mod-collapseHash 
 		       hash
 		       (let ((hsh (make-hash-table :test #'equalp)))
-			 (add-dependent-element hsh configFileStr (cons "collapseFn=" (first words)))
+			 (funcall (add-dependent-element) hsh configFileStr (cons "collapseFn=" (first words)))
 			 (funcall (remap-string) (concatenate 'string "[" "collapseFn" "]") hsh))
 		       :DVKeys (get-words (bracket-expand (get-matching-line tmpLn (list "DV=" "SDV=")) t))
 		       :ApplyToKeys (get-words (bracket-expand (get-matching-line tmpLn "ApplyTo=") t)))))))
@@ -941,7 +945,7 @@ is replaced with replacement."
 	   (while (< (incf line-index) (length (lines work)))
 	     (setf iteration -1)
 	     (setf IVHash (get-iv-hash configFileWdLST (nth line-index (lines work))))
-	     (setf mergedHash (merge-hash DVHash IVHash))
+	     (setf mergedHash (merge-hash (list DVHash IVHash)))
 	     (if (equal line-index 0) 
 		 (aif (necessaries IVKeys IVHash)
 		      (assert nil nil "IVs '~a' that are necessary to evaluate the 'input=' lines are not present in the config file" it)))
@@ -1041,7 +1045,7 @@ is replaced with replacement."
 	(setf currentDVs (cdr currentDVs))
 	(assert (member (car currentDV) necessaryDVs :test #'equalp) nil 
 		"sent ~a DV for the next trial, before sending all the DVs for this trial" (car currentDV)) 
-	(add-elements (DVHash obj) currentDV)
+	(merge-hash currentDV :toHash (DVHash obj))
 	(setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'equalp)))
       (sleep (sleepTime obj))
       (setf appetizers nil))
