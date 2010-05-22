@@ -10,9 +10,9 @@
   (with-open-file (out (out obj) :direction :output :if-exists :append :if-does-not-exist :create)
     (dotimes (i (length (cellElements obj)))
       (format out "~a " (cdr (nth i (cellElements obj)))))
-    (dolist (element (get-elements (keys obj) (collection obj) (collapseHash obj)))
-      (aif (cdr element) (format out "~a " (coerce it 'double-float))))
-    (format out "~%")))
+    (dolist (key (keys obj))
+      (aif (cdr (get-element key (collection obj) (gethash-ifhash key (collapseHash obj))))
+	   (format out "~a " (coerce it 'double-float))))))
 
 (defclass mm-process-output-str-class (process-output-str-class) ())
 
