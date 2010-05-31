@@ -18,6 +18,162 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setf *read-default-float-format* 'double-float) 
 
+;////////////////////////////////////////////////////////////
+;////////////////////////////////////////////////////////////
+;everything below is from Doug Hoyte's 'Let over Lambda' book (lol.lisp)
+;some of which is taken from Paul Graham's 'On Lisp' book
+(defmacro aif (test-form then-form &optional else-form)
+  `(let ((it ,test-form))
+     (if it ,then-form ,else-form)))
+
+(defmacro awhen (test-form &body body)
+  `(aif ,test-form
+     (progn ,@body)))
+
+;; Graham's alambda
+(defmacro alambda (parms &body body)
+  `(labels ((self ,parms ,@body))
+     #'self))
+
+(defun flatten (lis)
+  "Takes a nested list and makes in into a single-level list"
+  (declare (list lis))
+  (labels ((rec (lis acc)
+             (cond ((null lis) acc)
+                   ((atom lis) (cons lis acc))
+                   (t (rec (car lis) (rec (cdr lis) acc))))))
+    (rec lis nil)))
+
+(defun mkstr (&rest args)
+  (with-output-to-string (s)
+    (dolist (a args) (princ a s))))
+
+(defun symb (&rest args)
+  (values (intern (apply #'mkstr args))))
+
+(defun g!-symbol-p (s)
+  (and (symbolp s)
+       (> (length (symbol-name s)) 2)
+       (string= (symbol-name s)
+                "G!"
+                :start1 0
+                :end1 2)))
+
+(defmacro defmacro/g! (name args &rest body)
+  (let ((syms (remove-duplicates
+                (remove-if-not #'g!-symbol-p
+                               (flatten body)))))
+    `(defmacro ,name ,args
+       (let ,(mapcar
+               (lambda (s)
+                 `(,s (gensym ,(subseq
+                                 (symbol-name s)
+                                 2))))
+               syms)
+         ,@body))))
+
+(defun o!-symbol-p (s)
+  (and (symbolp s)
+       (> (length (symbol-name s)) 2)
+       (string= (symbol-name s)
+                "O!"
+                :start1 0
+                :end1 2)))
+
+(defun o!-symbol-to-g!-symbol (s)
+  (symb "G!"
+        (subseq (symbol-name s) 2)))
+
+(defmacro defmacro! (name args &rest body)
+  (let* ((os (remove-if-not #'o!-symbol-p args))
+         (gs (mapcar #'o!-symbol-to-g!-symbol os)))
+    `(defmacro/g! ,name ,args
+       `(let ,(mapcar #'list (list ,@gs) (list ,@os))
+          ,(progn ,@body)))))
+
+(defmacro! dlambda (&rest ds)
+  `(lambda (&rest ,g!args)
+     (case (car ,g!args)
+       ,@(mapcar
+           (lambda (d)
+             `(,(if (eq t (car d))
+                  t
+                  (list (car d)))
+               (apply (lambda ,@(cdr d))
+                      ,(if (eq t (car d))
+                         g!args
+                         `(cdr ,g!args)))))
+           ds))))
+
+(defun |#`-reader| (stream sub-char numarg)
+  (declare (ignore sub-char))
+  (unless numarg (setq numarg 1))
+  `(lambda ,(loop for i from 1 to numarg
+                  collect (symb 'a i))
+     ,(funcall
+        (get-macro-character #\`) stream nil)))
+
+(set-dispatch-macro-character
+  #\# #\` #'|#`-reader|)
+
+(defun pandoriclet-get (letargs)
+  `(case sym
+     ,@(mapcar #`((,(car a1)) ,(car a1))
+               letargs)
+     (t (error
+          "Unknown pandoric get: ~a"
+          sym))))
+
+(defun pandoriclet-set (letargs)
+  `(case sym
+     ,@(mapcar #`((,(car a1))
+                   (setq ,(car a1) val))
+               letargs)
+     (t (error
+          "Unknown pandoric set: ~a"
+          sym))))
+
+(declaim (inline get-pandoric))
+
+(defun get-pandoric (box sym)
+  (funcall box :pandoric-get sym))
+
+(defsetf get-pandoric (box sym) (val)
+  `(progn
+     (funcall ,box :pandoric-set ,sym ,val)
+     ,val))
+
+;these two macros are just awesome when you use a lot of lexical closures
+;they are compliments of each other; you use 'plambda
+;when writing your lexical closure (instead of lambda)
+;and then when you want to process variables that the closure has
+;closed over (maybe print their current value, or set
+;their value to something else), you wrap your 
+;section of code with a 'with-pandoric
+(defmacro with-pandoric (syms box &rest body)
+  (let ((g!box (gensym "box")))
+    `(let ((,g!box ,box))
+       (declare (ignorable ,g!box))
+       (symbol-macrolet
+	   (,@(mapcar #`(,a1 (get-pandoric ,g!box ',a1))
+		      syms))
+         ,@body))))
+
+(defmacro plambda (largs pargs &rest body)
+  (let ((pargs (mapcar #'list pargs)))
+    `(let (this self)
+       (setq
+         this (lambda ,largs ,@body)
+         self (dlambda
+                (:pandoric-get (sym)
+                  ,(pandoriclet-get pargs))
+                (:pandoric-set (sym val)
+                  ,(pandoriclet-set pargs))
+                (t (&rest args)
+                  (apply this args)))))))
+;////////////////////////////////////////////////////////////
+;///////////////////////////////////////////end lol.lisp
+
 ; returns the command line parameters
 (defun my-command-line ()
   (or 
@@ -40,19 +196,6 @@
        ((not ,test)) 
      ,@body))
 
-(defmacro aif (test-form then-form &optional else-form)
-  `(let ((it ,test-form))
-     (if it ,then-form ,else-form)))
-
-(defmacro awhen (test-form &body body)
-  `(aif ,test-form
-     (progn ,@body)))
-
-;; Graham's alambda
-(defmacro alambda (parms &body body)
-  `(labels ((self ,parms ,@body))
-     #'self))
-
 (defmacro mklst (item)
   `(if (not (listp ,item)) (setf ,item (list ,item))))
 
@@ -73,11 +216,10 @@
 ;keeps track of all the pathnames that have been sent 
 ;to this function; returns the list of those names
 (let ((loaded))
-  (defun load-and-loaded (str)
-    (when str 
-      (load str)
-      (push-to-end str loaded))
-    loaded))
+  (setf (symbol-function 'load-and-loaded)
+	(plambda (str) (loaded)
+		 (load str)
+		 (push-to-end str loaded))))
 
 ;returns if a key is present in the hash table
 (defun key-present (key hash)
@@ -99,15 +241,6 @@
   (if (hash-table-p hash)
       (guard (gethash key hash) (assert (key-present key hash)))
       hash))
-
-(defun flatten (lis)
-  "Takes a nested list and makes in into a single-level list"
-  (declare (list lis))
-  (labels ((rec (lis acc)
-             (cond ((null lis) acc)
-                   ((atom lis) (cons lis acc))
-                   (t (rec (car lis) (rec (cdr lis) acc))))))
-    (rec lis nil)))
 
 ;converts the rows to columns (and vice versa) in a nested list
 (defun transpose (lst)
@@ -522,10 +655,11 @@ is replaced with replacement."
 ;where 'key' is any key in 'keys'
 ;the list will be ordered from left to right in the string
 ;keeps track of the line numbers for all of the lines that have
-;been returned from calling this function, and returns that list
-;of numbers as it's second 'values value
+;been returned from calling this function
+;you can access the line numbers using the 'with-pandoric macro
 (let ((traversed))
-  (defun get-matching-lines (str keys)
+  (setf (symbol-function 'get-matching-lines) 
+	(plambda (str keys) (traversed)
     (labels ((index= (words keys)
 	       (let* ((word (first words))
 		      (wordLength (length word)))
@@ -535,7 +669,7 @@ is replaced with replacement."
       (mklst keys)
       (let ((words) (out) (line) (lines))
 	(setf lines (if (consp str) str (get-lines str)))
-	(dotimes (i (length lines) (values out traversed))
+	(dotimes (i (length lines) out)
 	  (setf line (nth i lines))
 	  (setf words (if (consp line) line (get-words line)))
 	  (if words
@@ -546,7 +680,7 @@ is replaced with replacement."
 		       (string-trim 
 			(list #\Space #\tab) 
 			(subseq (make-sentence line) it (length (make-sentence line))))) 
-		      out))))))))
+		      out)))))))))
 
 (defun get-first-word-from-matching-lines (str keys)
   (mklst keys)
@@ -935,7 +1069,7 @@ is replaced with replacement."
 		   (when (equal (mod count runsPerProcess) 0)
 		     (push-to-end runProcess (runProcesses session))
 		     (setf runProcess ,run-process-instance))))))
-	 (if (runs runProcess) (push-to-end runProcess (runProcesses session)))		
+	 (if (runs runProcess) (push-to-end runProcess (runProcesses session)))	
 	 (upload-to session
 		    (quota (* (length (lines work)) iterations quota))
 		    (statusPrinters (mapcar (lambda (x) (symbol-function-safe (eval (read-from-string x)))) 
@@ -943,9 +1077,7 @@ is replaced with replacement."
 		    collapseHash DVHash DVKeys IVKeys cellKeys modelProgram iterations configFileLnLST entryFnType
 		    (collapseQuota quota)
 		    (lines (length (lines work)))
-		    (traversed (multiple-value-bind (trash traversed) (get-matching-lines configFileWdLST nil)
-				 (declare (ignore trash))
-				 (sort (remove-duplicates traversed :test #'equal) #'<))))
+		    (traversed (with-pandoric (traversed) #'get-matching-lines (sort (remove-duplicates traversed :test #'equal) #'<))))
 	 (guard (apply #'+ (mapcar #'(lambda (x) (length (runs x))) (runProcesses session)))
 		(assert (equal (quota session) (car it)) nil
 		"number of linesxiterationsxquota in work file (~d) not equal to number of run objects (~d)"	
@@ -1135,7 +1267,8 @@ is replaced with replacement."
 	    (format strm "#####number of lines in the work file: ~a~%" (lines obj))
 	    (format strm "#####number of times to run each line in the work file (iterations=): ~a~%" (iterations obj))
 	    (format strm "#####quota before collapsing (collapseQuota=): ~a~%" (collapseQuota obj))
-	    (format strm "#####extra lisp files loaded (file2load=): ~a~%" (make-sentence (load-and-loaded nil)))
+	    (format strm "#####extra lisp files loaded (file2load=): ~a~%" 
+		    (make-sentence (with-pandoric (loaded) #'load-and-loaded loaded)))
 	    (if (hash-table-p (collapseHash obj))
 		(format strm "#####collapse hash table (collapseFn=): ~%~a" (print-hash (collapseHash obj) :strm nil))
 		(format strm "#####collapse function (collapseFn=): ~a~%" (collapseHash obj)))
