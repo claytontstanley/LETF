@@ -21,7 +21,7 @@
 ;////////////////////////////////////////////////////////////
 ;////////////////////////////////////////////////////////////
 ;everything below is from Doug Hoyte's 'Let over Lambda' book (lol.lisp)
-;some of which is taken from Paul Graham's 'On Lisp' book
+;some of which is originally from Paul Graham's 'On Lisp' book
 (defmacro aif (test-form then-form &optional else-form)
   `(let ((it ,test-form))
      (if it ,then-form ,else-form)))
@@ -61,15 +61,15 @@
 
 (defmacro defmacro/g! (name args &rest body)
   (let ((syms (remove-duplicates
-                (remove-if-not #'g!-symbol-p
-                               (flatten body)))))
+	       (remove-if-not #'g!-symbol-p
+			      (flatten body)))))
     `(defmacro ,name ,args
        (let ,(mapcar
-               (lambda (s)
-                 `(,s (gensym ,(subseq
-                                 (symbol-name s)
-                                 2))))
-               syms)
+	      (lambda (s)
+		`(,s (gensym ,(subseq
+			       (symbol-name s)
+			       2))))
+	      syms)
          ,@body))))
 
 (defun o!-symbol-p (s)
@@ -95,43 +95,43 @@
   `(lambda (&rest ,g!args)
      (case (car ,g!args)
        ,@(mapcar
-           (lambda (d)
-             `(,(if (eq t (car d))
-                  t
-                  (list (car d)))
+	  (lambda (d)
+	    `(,(if (eq t (car d))
+		   t
+		   (list (car d)))
                (apply (lambda ,@(cdr d))
                       ,(if (eq t (car d))
-                         g!args
-                         `(cdr ,g!args)))))
-           ds))))
+			   g!args
+			   `(cdr ,g!args)))))
+	  ds))))
 
 (defun |#`-reader| (stream sub-char numarg)
   (declare (ignore sub-char))
   (unless numarg (setq numarg 1))
   `(lambda ,(loop for i from 1 to numarg
-                  collect (symb 'a i))
+	       collect (symb 'a i))
      ,(funcall
-        (get-macro-character #\`) stream nil)))
+       (get-macro-character #\`) stream nil)))
 
 (set-dispatch-macro-character
-  #\# #\` #'|#`-reader|)
+ #\# #\` #'|#`-reader|)
 
 (defun pandoriclet-get (letargs)
   `(case sym
      ,@(mapcar #`((,(car a1)) ,(car a1))
                letargs)
      (t (error
-          "Unknown pandoric get: ~a"
-          sym))))
+	 "Unknown pandoric get: ~a"
+	 sym))))
 
 (defun pandoriclet-set (letargs)
   `(case sym
      ,@(mapcar #`((,(car a1))
-                   (setq ,(car a1) val))
+		  (setq ,(car a1) val))
                letargs)
      (t (error
-          "Unknown pandoric set: ~a"
-          sym))))
+	 "Unknown pandoric set: ~a"
+	 sym))))
 
 (declaim (inline get-pandoric))
 
@@ -163,30 +163,18 @@
   (let ((pargs (mapcar #'list pargs)))
     `(let (this self)
        (setq
-         this (lambda ,largs ,@body)
-         self (dlambda
-                (:pandoric-get (sym)
-                  ,(pandoriclet-get pargs))
-                (:pandoric-set (sym val)
-                  ,(pandoriclet-set pargs))
-                (t (&rest args)
-                  (apply this args)))))))
+	this (lambda ,largs ,@body)
+	self (dlambda
+	      (:pandoric-get (sym) ,(pandoriclet-get pargs))
+	      (:pandoric-set (sym val) ,(pandoriclet-set pargs))
+	      (t (&rest args) (apply this args)))))))
 ;////////////////////////////////////////////////////////////
 ;///////////////////////////////////////////end lol.lisp
 
-; returns the command line parameters
-(defun my-command-line ()
-  (or 
-   #+SBCL *posix-argv*
-   #+LISPWORKS system:*line-arguments-list*
-   #+CMU extensions:*command-line-strings*
-   nil))
-
-; returns the nth command line argument from right to left (note that this is the
-; reverse of normal). 
-(defun get-arg ( from-right )
-	(incf from-right)
-	(nth (- (length (my-command-line)) from-right ) (my-command-line)))
+;equivalent to writing (concatenate 'string ...), but ~5x faster
+(defmacro! fast-concatenate (&rest lst)
+  `(with-output-to-string (,g!stream)
+     ,@(mapcar (lambda (x) `(write-string ,x ,g!stream)) lst)))
 
 (defmacro push-to-end (item place)
   `(setf ,place (nconc ,place (list ,item))))
@@ -218,8 +206,8 @@
 (let ((loaded))
   (setf (symbol-function 'load-and-loaded)
 	(plambda (str) (loaded)
-		 (load str)
-		 (push-to-end str loaded))))
+	 (push-to-end str loaded)
+	 (load str))))
 
 ;returns if a key is present in the hash table
 (defun key-present (key hash)
@@ -264,7 +252,7 @@
 	      (push-to-end (funcall collapseFn column) out)))
 	  (funcall collapseFn lst))))
 	  
-(defun replace-all (string part replacement &key (test #'char=))
+(defun replace-all (string part replacement &key (test #'char-equal))
 "Returns a new string in which all the occurences of the part 
 is replaced with replacement."
     (with-output-to-string (out)
@@ -281,26 +269,27 @@ is replaced with replacement."
 
 ;returns lst of indeces where any of the characters in list chr is in string strng
 (defun find-in-string (strng chr)
-  (labels ((chars= (chr lst)
-	     (dolist (item lst nil)
-	       (if (equal item chr) (return-from chars= t)))))
-    (mklst chr)
-    (if strng (setf strng (format nil "~a" strng)))
-    (let ((out nil))
-      (dotimes (i (length strng) out)
-	(if (chars= (char strng i) chr) 
-	    (push-to-end i out))))))
-
+  (mklst chr)
+  (if (and strng (not (stringp strng))) 
+      (setf strng (string strng)))
+  (let ((out))
+    (dotimes (i (length strng) (reverse out))
+      (if
+       (block check
+	 (dotimes (j (length chr) nil)
+	   (if (char-equal (nth j chr) (char strng i))
+	       (return-from check t))))
+       (push i out)))))
+       
 (defun print-hash (hash &key (strm t) (keys nil))
   (mklst keys)
   (labels ((hash-string (hash &key (keys nil))
 	     (if (not (hash-table-p hash))
 		 (format nil "~a" hash)
-		 (let ((out))
+		 (with-output-to-string (out)
 		   (loop for value being the hash-values of hash using (hash-key key) do
 			(if (or (not keys) (member key keys :test #'equalp))
-			    (setf out (concatenate 'string out (format nil "~%~a -> ~a" key (hash-string value))))))
-		   out))))
+			    (write-string (fast-concatenate (string #\newline) key " -> " (hash-string value)) out)))))))
     (format strm "~a~%" (string-trim (list #\Newline #\Return #\LineFeed) (hash-string hash :keys keys)))))
 
 (defun copy-hash (hash)
@@ -336,10 +325,11 @@ is replaced with replacement."
 (defun file-string (path)
   "Sucks up an entire file from PATH into a freshly-allocated string,
       returning two values: the string and the number of bytes read."
-  (with-open-file (s path)
-    (let* ((len (file-length s))
-           (data (make-string len)))
-      (values data (read-sequence data s)))))
+  (if path
+      (with-open-file (s path)
+	(let* ((len (file-length s))
+	       (data (make-string len)))
+	  (values data (read-sequence data s))))))
 
 ;if any column in the nested list is nil, it throws out the column
 (defun throwOutYerNils (&rest lsts)
@@ -446,7 +436,7 @@ is replaced with replacement."
 	      (push-to-end (subseq str start i) out)
 	      (setf in-the-white t)
 	      (setf start i))
-	    (if includeSpaceDesignators (push-to-end (format nil "~a" (char str i)) out)))
+	    (if includeSpaceDesignators (push-to-end (string (char str i)) out)))
 	  (when in-the-white
 	    (setf in-the-white nil)
 	    (setf start i))))))
@@ -462,27 +452,32 @@ is replaced with replacement."
       (push (string-trim (list #\Space #\Tab) line) out))))
 
 ;takes a list of strings, and returns a single string with single whitespaces between each word
-(defun make-sentence (lst &key (spaceDesignator #\Space))
-  (setf spaceDesignator (format nil "~a" spaceDesignator))
+(defun make-sentence (lst &key (spaceDesignator " "))
+  (if (not (stringp spaceDesignator))
+      (setf spaceDesignator (string spaceDesignator)))
   (mklst lst)
   (if lst
-      (let ((out))
-	(dotimes (i (length lst) out)
-	  (if (> (length (nth i lst)) 0)
-	      (setf out (concatenate 'string out (format nil "~a" (if out spaceDesignator "")) (nth i lst))))))))
+      (with-output-to-string (out)
+	(let ((flag))
+	  (dolist (item lst)
+	    (when (> (length item) 0)
+	      (if flag
+		  (write-string spaceDesignator out)
+		  (setf flag t))
+	      (write-string item out)))))))
 
 ;like get-words, returns a list of the words in str
 ;however, here all words that are within brackets are lumped together as one word (i.e., item) in the list
 ;if there are no brackets in str, then lump-brackets is equivalent to get-words
-(defun lump-brackets (str &key (desigs (cons #\[ #\])) (include-brackets t))
+(defun lump-brackets (str &key (desigs (list #\[ #\])) (include-brackets t))
   (if (not desigs) (return-from lump-brackets (get-words str)))
-  (assert (equal (length (flatten desigs)) 2))
+  (assert (equal (length desigs) 2))
   (let ((out) (in-bracket) (lump))
-    (dolist (word (get-words str :spaceDesignators (flatten desigs) :includeSpaceDesignators t))
+    (dolist (word (get-words str :spaceDesignators desigs :includeSpaceDesignators t))
       (if (not in-bracket) (setf lump nil))
-      (if (find-in-string (format nil "~a~a" (car desigs) (cdr desigs)) (char word 0))
+      (if (find-in-string (char word 0) desigs)
 	  (progn
-	    (assert (find-in-string (format nil "~a" (if in-bracket (cdr desigs) (car desigs))) (char word 0))
+	    (assert (char-equal (char word 0) (if in-bracket (second desigs) (first desigs)))
 		    nil "something is wrong with string ~a, possibly one bracket pair is nested within another bracket pair, which is not allowed" str)
 	    (setf in-bracket (not in-bracket))
 	    (if include-brackets (push-to-end word lump)))
@@ -550,7 +545,7 @@ is replaced with replacement."
 	       (push-to-end (gethash word traversed) out))))
     (dolist (key keys)
       (push-to-end 
-       (funcall fun (concatenate 'string "[" key "]") hash :collapseFn collapseFn) 
+       (funcall fun (fast-concatenate "[" key "]") hash :collapseFn collapseFn) 
        str))
     (values (sort (flatten words) #'string<) str)))
 
@@ -566,15 +561,13 @@ is replaced with replacement."
 ;evaluates all the stuff in the hash table that it can, given the current state of the hash table
 (defmethod eval-hash ((hash hash-table))
   (labels ((toString (lst)
-	     (let ((out))
-	       (if (consp lst)
-		   (progn
-		     (push-to-end "(list" out)
-		     (dolist (item lst)
-		       (push-to-end (toString item) out))
-		     (push-to-end ")" out))
-		   (push-to-end (format nil "~a" lst) out))
-	       (make-sentence (flatten out)))))
+	     (if (consp lst)
+		 (with-output-to-string (out)
+		   (write-string "(list " out)
+		   (dolist (item lst)
+		     (write-string (toString item) out))
+		   (write-string ") " out))
+		 (format nil "~a " lst))))
     (let* ((traversed (make-hash-table :test #'equalp))
 	   (fun (remap-string
 		 (if (not (key-present word traversed))
@@ -598,35 +591,33 @@ is replaced with replacement."
 		 (push-to-end (gethash word traversed) out))))
       (loop for key being the hash-keys of hash do 
 	   (if (not (necessaries key hash))
-	       (funcall fun (concatenate 'string "[" key "]") hash))))))
+	       (funcall fun (fast-concatenate "[" key "]") hash))))))
 
 ;takes an expression, and expands the ':'s (similar to how matlab references arrays)
 ;for example: (bracket-expand "hello1:5") -> "hello1 hello2 hello3 hello4 hello5"
 ;(bracket-expand "1:5hello") -> "1hello 2hello 3hello 4hello 5hello"
 (defun bracket-expand (str &optional (inside-brackets nil))
   (labels ((num-indeces (str direction)
-	     (assert (or (equalp direction "fromLeft") (equalp direction "fromRight") (equalp direction "both")))
+	     (assert (or (string-equal direction "fromLeft") (string-equal direction "fromRight") (string-equal direction "both")))
 	     (let ((out) (numIndeces) (index -1))
-	       (map 'string #'(lambda (x) 
-				(incf index)
-				(if (numberp (read-from-string (format nil "~a" x)))
-				    (push index numIndeces))
-				x) str)
-	       (if (equalp direction "both") (return-from num-indeces (reverse numIndeces))) 
-	       (if (equalp direction "fromLeft") (setf numIndeces (reverse numIndeces)))
-	       (setf index (if (equalp direction "fromLeft") 0 (- (length str) 1)))
+	       (dotimes (i (length str))
+		 (if (numberp (read-from-string (string (char str i))))
+		     (push i numindeces)))
+	       (if (string-equal direction "both") (return-from num-indeces (reverse numIndeces))) 
+	       (if (string-equal direction "fromLeft") (setf numIndeces (reverse numIndeces)))
+	       (setf index (if (string-equal direction "fromLeft") 0 (- (length str) 1)))
 	       (while (if numIndeces (equal (car numIndeces) index))
 		 (push index out)
-		 (if (equalp direction "fromLeft") (incf index) (decf index))
+		 (if (string-equal direction "fromLeft") (incf index) (decf index))
 		 (setf numindeces (cdr numIndeces)))
-	       (if (equalp direction "fromLeft") (reverse out) out))))
+	       (if (string-equal direction "fromLeft") (reverse out) out))))
     (let ((out))
       (if (> (length str) 0)
 	  (if (not inside-brackets)
 	      (dolist (word (lump-brackets str))
 		(push-to-end
 		 (if (and (equal (char word 0) #\[) (equal (char word (- (length word) 1)) #\]))
-		     (concatenate 'string "[" (bracket-expand (string-trim "[]" word) t) "]")
+		     (fast-concatenate "[" (bracket-expand (string-trim "[]" word) t) "]")
 		     word)
 		 out))
 	      (if (not (find-in-string str #\:))
@@ -647,7 +638,7 @@ is replaced with replacement."
 		      (setf wordNext (subseq next (+ 1 (car (last (num-indeces next "fromLeft")))) (length next)))
 		      (dotimes (j (+ 1 (- numNext numPrev)))
 			(push-to-end 
-			 (concatenate 'string wordPrev (format nil "~a" (+ numPrev j)) wordNext) 
+			 (fast-concatenate wordPrev (write-to-string (+ numPrev j)) wordNext) 
 			 out)))))))
       (make-sentence (flatten out)))))
   
@@ -660,27 +651,25 @@ is replaced with replacement."
 (let ((traversed))
   (setf (symbol-function 'get-matching-lines) 
 	(plambda (str keys) (traversed)
-    (labels ((index= (words keys)
-	       (let* ((word (first words))
-		      (wordLength (length word)))
-		 (dolist (key keys nil)
-		   (if (equalp key (subseq word 0 (min wordLength (length key))))
-		       (return-from index= (length key)))))))
-      (mklst keys)
-      (let ((words) (out) (line) (lines))
-	(setf lines (if (consp str) str (get-lines str)))
-	(dotimes (i (length lines) out)
-	  (setf line (nth i lines))
-	  (setf words (if (consp line) line (get-words line)))
-	  (if words
-	      (awhen (index= words keys)
-		     (push-to-end i traversed)
-		     (push-to-end 
-		      (bracket-expand 
-		       (string-trim 
-			(list #\Space #\tab) 
-			(subseq (make-sentence line) it (length (make-sentence line))))) 
-		      out)))))))))
+	 (mklst keys)
+	 (let ((words) (out) (line) (lines))
+	   (setf lines (if (consp str) str (get-lines str)))
+	   (dotimes (i (length lines) (reverse out))
+	     (setf line (nth i lines))
+	     (setf words (if (consp line) line (get-words line)))
+	     (if words
+		 (awhen 
+		  (block index=
+		    (dolist (key keys nil)
+		      (if (string-equal key (subseq (first words) 0 (min (length (first words)) (length key))))
+			  (return-from index= (length key)))))
+		  (push-to-end i traversed)
+		  (push 
+		   (bracket-expand 
+		    (string-trim 
+		     (list #\Space #\tab) 
+		     (subseq (make-sentence line) it (length (make-sentence line))))) 
+		   out))))))))
 
 (defun get-first-word-from-matching-lines (str keys)
   (mklst keys)
@@ -716,10 +705,9 @@ is replaced with replacement."
 
 ;recursively adds all elements in the config file that are referenced in the 'lhs' line in the config file
 (defmacro add-dependent-element (&body body)
-  `(alambda (hash &optional (configFileStr nil) (lhs nil))
+  `(alambda (hash &optional (configFileStr nil) (lhs nil) (rhs nil))
 	    (let ((line) (words))
-	      (setf line (if (consp lhs) (cdr lhs) (get-matching-line configFileStr lhs)))
-	      (setf lhs (if (consp lhs) (car lhs) lhs))
+	      (setf line (aif rhs it (get-matching-line configFileStr lhs)))
 	      (when line
 		(merge-hash (cons (subseq lhs 0 (- (length lhs) 1)) line) :toHash hash)
 		(setf words (lump-brackets line))
@@ -727,7 +715,7 @@ is replaced with replacement."
 		  (if (and (equal (char word 0) #\[) (equal (char word (- (length word) 1)) #\]))
 		      (dolist (item (get-words (string-trim "[]" word)))
 			,(if (not body)
-			     `(self hash configFileStr (concatenate 'string item "="))
+			     `(self hash configFileStr (fast-concatenate item "="))
 			     `(progn ,@body)))))))))
 
 ;recursively adds all elements in the config file that are referenced in the list of 'lhs' lines in the config file
@@ -736,9 +724,9 @@ is replaced with replacement."
 	 (fun (add-dependent-element
 	       (when (not (key-present item traversed))
 		 (setf (gethash item traversed) t)
-		 (self hash configFileStr (concatenate 'string item "="))))))
+		 (self hash configFileStr (fast-concatenate item "="))))))
     (dolist (word (get-first-word-from-matching-lines configFileStr lhs))
-      (funcall fun hash configFileStr (concatenate 'string word "=")))))
+      (funcall fun hash configFileStr (fast-concatenate word "=")))))
 
 (defclass work-class ()
   ((lines :accessor lines :initarg :lines :initform nil)
@@ -827,7 +815,8 @@ is replaced with replacement."
       ;if an element is a list and if all slots in that list are equal, then collapse the list
     (loop for key being the hash-keys of (collection obj)	
        using (hash-value val)
-       do (if (if (consp val) (equal 1 (length (remove-duplicates val :test #'equalp))))
+       do (if (and (consp val) 
+		   (equal 1 (length (remove-duplicates val :test #'equalp))))
 	      (setf (gethash key (collection obj)) (first val))))
     (let ((elements (get-elements (keys obj) (collection obj) 
 				  (mapcar (lambda (x) (gethash-ifHash x (collapseHash obj))) (keys obj)))))
@@ -894,23 +883,21 @@ is replaced with replacement."
 
 ;reattaches lines that have been separated using the "\" character at the end of a line
 (defun restructure (str)
-  (let ((out) 
-	(lineDesigs (list #\Newline #\Return #\LineFeed))
+  (let ((lineDesigs (list #\Newline #\Return #\LineFeed))
 	(count -1)
 	(strLength (length str)))
-    (while (< (incf count) (- strLength 1))
-      (if (if (find-in-string (char str count) #\\)
-	      (find-in-string (char str (+ count 1)) lineDesigs))
-	  (while (and (< (+ 1 count) (- strLength 1))
-		      (find-in-string (char str (+ 1 count)) lineDesigs))
-	    (incf count))
-	  (push (char str count) out)))
-    (if (equal count (- strLength 1))
-	(push (char str count) out))
-    (coerce (reverse out) 'string)))
+    (with-output-to-string (out)
+      (while (< (incf count) (- strLength 1))
+	(if (and (find-in-string (char str count) #\\)
+		 (find-in-string (char str (+ count 1)) lineDesigs))
+	    (while (and (< (+ 1 count) (- strLength 1))
+			(find-in-string (char str (+ 1 count)) lineDesigs))
+	      (incf count))
+	    (write-string str out :start count :end (+ 1 count))))
+      (if (equal count (- strLength 1))
+	  (write-string str out :start count :end (+ 1 count))))))
 
-;modifies the collapse hash table that keeps track of how letf will collapse each DV when
-;collapseQuota is reached
+;modifies the collapse hash table that keeps track of how letf will collapse each DV when collapseQuota is reached
 (defmethod mod-collapseHash ((hash hash-table) collapseFn &key (DVKeys nil) (ApplyToKeys nil))
   (labels ((keys (hash)
 	     (let ((out))
@@ -947,8 +934,8 @@ is replaced with replacement."
       (mod-collapseHash 
        hash
        (let ((hsh (make-hash-table :test #'equalp)))
-	 (funcall (add-dependent-element) hsh configFileStr (cons "collapseFn=" (first words)))
-	 (funcall (remap-string) (concatenate 'string "[" "collapseFn" "]") hsh))
+	 (funcall (add-dependent-element) hsh configFileStr "collapseFn=" (first words))
+	 (funcall (remap-string) (fast-concatenate "[" "collapseFn" "]") hsh))
        :DVKeys (get-words (bracket-expand (get-matching-line tmpLn (list "DV=" "SDV=")) t))
        :ApplyToKeys (get-words (bracket-expand (get-matching-line tmpLn "ApplyTo=") t))))))
 
@@ -958,6 +945,28 @@ is replaced with replacement."
 	       (if (consp x)
 		   `(setf (,(car x) ,obj) ,(cadr x))
 		   `(setf (,x ,obj) ,x))) vals)))
+
+;This function returns the command line parameters, accounting for differences across several lisp implementations
+(defun my-command-line ()
+  (or 
+   #+SBCL *posix-argv*
+   #+LISPWORKS system:*line-arguments-list*
+   #+CMU extensions:*command-line-strings*
+   nil))
+
+;This function returns the nth command line argument from right to left (note that this is the reverse of normal)
+(defun get-arg ( from-right )
+  (nth (- (length (my-command-line)) (+ 1 from-right)) (my-command-line)))
+
+;defines the lexical closure 'args that stores all of the information that was passed to letf using command-line arguments 
+;'args is pandoric, so you can access its state using 'with-pandoric
+(let* ((platform (get-word (get-arg 2)))
+       (configFileStr (restructure (file-string (get-arg 1))))
+       (configFileLnLST (get-lines configFileStr))
+       (configFileWdLST (mapcar #'get-words configFileLnLST))
+       (workFilePath (unless (string-equal (get-arg 0) "nil") (get-arg 0))))
+  (setf (symbol-function 'args)
+	(plambda () (platform configFileStr configFileLnLST configFileWdLST workFilePath) ())))
 
 ;generates the code that generates the session object that will be executed
 ;this macro is configured by extending various pieces of the above
@@ -975,7 +984,7 @@ is replaced with replacement."
 				      :quota quota
 				      :collapseHash (copy-hash collapseHash)
 				      :session-collector session-collector)))
-  (setf work-instance (append work-instance '(:workFilePath (get-arg 0))))
+  (setf work-instance (append work-instance `(:workFilePath ,(get-pandoric #'args 'workFilePath))))
   (setf session-collector-instance (append session-collector-instance '(:quota (* (length (lines work)) iterations))))
   (setf run-collector-instance (append run-collector-instance '(:quota 1 :collector collector)))
   (setf process-output-str-instance (append process-output-str-instance '(:quota 200)))
@@ -995,94 +1004,91 @@ is replaced with replacement."
 				      :runProcess runProcess
 				      :entryFnType entryFnType)))
     `(progn
+       (time
        (let ((session) (runProcess) (line-index) (count) (iteration) (iterations)
 	     (DVHash) (IVHash) (DVKeys) (IVKeys) (modelProgram) (cellKeys) (mergedHash)
-	     (quota) (collector) (quot) (collapseHash) (work) (session-collector) (entryFnType)
-	     (configFilePath (get-arg 1)) (platform (get-word (get-arg 2)))
-	     (configFileStr) (runsPerProcess) (short-circuit-p) (configFileLnLST) (configFileWdLST))
-	 (setf configFileStr (restructure (file-string configFilePath)))
-	 (setf configFileLnLST (get-lines configFileStr))
-	 (setf configFileWdLST (mapcar #'get-words configFileLnLST))
-	 (setf work ,work-instance)
-	 (setf runsPerProcess (aif (get-matching-line configFileWdLST "runsPerProcess=")
-				   (read-from-string (get-word it))
-				   1))
-	 (setf session ,session-instance)
-	 (setf DVHash (make-hash-table :test #'equalp))
-	 (add-dependent-elements DVHash configFileWdLST (list "DV=" "SDV="))
-	 (eval-hash DVHash)
-	 (setf DVKeys (get-first-word-from-matching-lines configFileWdLST (list "dv=" "sdv="))
-	       IVKeys (aif (get-first-word-from-matching-lines configFileWdLST "input=")
-			   it
-			   (get-first-word-from-matching-lines configFileWdLST (list "constant=" "iv=")))
-	       cellKeys (get-first-word-from-matching-lines configFileWdLST (list "constant=" "iv=")))
-	 (setf collapseHash (get-collapseHash DVKeys DVHash configFileWdLST "#'mean"))
-	 (setf quota (aif (get-matching-line configFileWdLST "collapseQuota=")
-			  (eval (read-from-string (get-word it)))
-			  1))
-	 (setf modelProgram (aif (get-matching-line configFileLnLST "modelProgram=")
-				 (lump-brackets (replace-all it "$1" platform :test #'equalp) :desigs (cons #\" #\") :include-brackets nil)
-				 (lump-brackets "'run-model" :desigs (cons #\" #\") :include-brackets nil)))
-	 (setf short-circuit-p (let ((it (subseq (first modelProgram) 0 1)))
-				 (or (equal it "#") (equal it "'") (equal it "("))))
-	 (if short-circuit-p
-	     (setf modelProgram (symbol-function-safe (eval (read-from-string (make-sentence modelProgram))))
-		   runsPerProcess (read-from-string "inf")))
-	 (setf entryFnType (if short-circuit-p
-			       (aif (get-matching-line configFileLnLST "entryFnType=")
-				    (read-from-string (get-word it))
-				    'keys)
-			       'process))
-	 (assert (member entryFnType (if short-circuit-p (list 'keys 'hash) (list 'process))) nil "invalid entryFnType ~a" entryFnType)
-	 (setf runProcess ,run-process-instance)
-	 (setf iterations (aif (get-matching-line configFileWdLST "iterations=")
-			       (eval (read-from-string (get-word it)))
-			       1)	
-	       count 0
-	       line-index -1)
-	 (setf session-collector ,session-collector-instance)
-	 (while (< (incf line-index) (length (lines work)))
-	   (setf iteration -1)
-	   (setf IVHash (make-hash-table :test #'equalp))
-	   (let ((cell-values (nth line-index (lines work))))
-	     (merge-hash
-	      (mapcar #'cons
-		      (guard (get-first-word-from-matching-lines configFileWdLST (list "constant=" "iv="))
-			     (assert (equal (length (car it)) (length cell-values)) nil
-				     "number of cell keys (~d) does not equal number of cell values (~d)" 
-				     (length (car it)) (length cell-values)))
-		      cell-values)
-	      :toHash IVHash))
-	   (add-dependent-elements IVHash configFileWdLST "input=")
-	   (setf mergedHash (merge-hash (list DVHash IVHash)))
-	   (if (equal line-index 0) 
-	       (guard (necessaries IVKeys IVHash)
-		      (assert (not (car it)) nil 
-			      "IVs '~a' that are necessary to evaluate the 'input=' lines are not present in the config file" (car it))))
-	   (while (< (incf iteration) iterations)
-	     (setf quot -1)
-	     (setf collector ,collector-instance)
-	     (while (< (incf quot) quota)
-	       (push-to-end ,run-instance (runs runProcess))
-	       (incf count)
-	       (if (not (equal 'inf runsPerProcess)) 
-		   (when (equal (mod count runsPerProcess) 0)
-		     (push-to-end runProcess (runProcesses session))
-		     (setf runProcess ,run-process-instance))))))
-	 (if (runs runProcess) (push-to-end runProcess (runProcesses session)))	
-	 (upload-to session
-		    (quota (* (length (lines work)) iterations quota))
-		    (statusPrinters (mapcar (lambda (x) (symbol-function-safe (eval (read-from-string x)))) 
-					    (get-matching-lines configFileWdLST "statusPrinter=")))
-		    collapseHash DVHash DVKeys IVKeys cellKeys modelProgram iterations configFileLnLST entryFnType
-		    (collapseQuota quota)
-		    (lines (length (lines work)))
-		    (traversed (with-pandoric (traversed) #'get-matching-lines (sort (remove-duplicates traversed :test #'equal) #'<))))
-	 (guard (apply #'+ (mapcar #'(lambda (x) (length (runs x))) (runProcesses session)))
-		(assert (equal (quota session) (car it)) nil
-		"number of linesxiterationsxquota in work file (~d) not equal to number of run objects (~d)"	
-		(quota session) (car it)))
-	 session))))
+	     (quota) (collector) (quot) (collapseHash) (work) (session-collector) (entryFnType) (runsPerProcess) (short-circuit-p))
+	 (with-pandoric (platform configFileStr configFileLnLST configFileWDLST) #'args
+	   (setf work ,work-instance)
+	   (setf runsPerProcess (aif (get-matching-line configFileWdLST "runsPerProcess=")
+				     (read-from-string (get-word it))
+				     1))
+	   (setf session ,session-instance)
+	   (setf DVHash (make-hash-table :test #'equalp))
+	   (add-dependent-elements DVHash configFileWdLST (list "DV=" "SDV="))
+	   (eval-hash DVHash)
+	   (setf DVKeys (get-first-word-from-matching-lines configFileWdLST (list "dv=" "sdv="))
+		 IVKeys (aif (get-first-word-from-matching-lines configFileWdLST "input=")
+			     it
+			     (get-first-word-from-matching-lines configFileWdLST (list "constant=" "iv=")))
+		 cellKeys (get-first-word-from-matching-lines configFileWdLST (list "constant=" "iv=")))
+	   (setf collapseHash (get-collapseHash DVKeys DVHash configFileWdLST "#'mean"))
+	   (setf quota (aif (get-matching-line configFileWdLST "collapseQuota=")
+			    (eval (read-from-string (get-word it)))
+			    1))
+	   (setf modelProgram (aif (get-matching-line configFileLnLST "modelProgram=")
+				   (lump-brackets (replace-all it "$1" platform :test #'string-equal) :desigs (list #\" #\") :include-brackets nil)
+				   (lump-brackets "'run-model" :desigs (list #\" #\") :include-brackets nil)))
+	   (setf short-circuit-p (let ((it (subseq (first modelProgram) 0 1)))
+				   (or (equal it "#") (equal it "'") (equal it "("))))
+	   (if short-circuit-p
+	       (setf modelProgram (symbol-function-safe (eval (read-from-string (make-sentence modelProgram))))
+		     runsPerProcess (read-from-string "inf")))
+	   (setf entryFnType (if short-circuit-p
+				 (aif (get-matching-line configFileWdLST "entryFnType=")
+				      (read-from-string (get-word it))
+				      'keys)
+				 'process))
+	   (assert (member entryFnType (if short-circuit-p (list 'keys 'hash) (list 'process))) nil "invalid entryFnType ~a" entryFnType)
+	   (setf runProcess ,run-process-instance)
+	   (setf iterations (aif (get-matching-line configFileWdLST "iterations=")
+				 (eval (read-from-string (get-word it)))
+				 1)	
+		 count 0
+		 line-index -1)
+	   (setf session-collector ,session-collector-instance)
+	   (while (< (incf line-index) (length (lines work)))
+	     (setf iteration -1)
+	     (setf IVHash (make-hash-table :test #'equalp))
+	     (let ((cell-values (nth line-index (lines work))))
+	       (merge-hash
+		(mapcar #'cons
+			(guard (get-first-word-from-matching-lines configFileWdLST (list "constant=" "iv="))
+			       (assert (equal (length (car it)) (length cell-values)) nil
+				       "number of cell keys (~d) does not equal number of cell values (~d)" 
+				       (length (car it)) (length cell-values)))
+			cell-values)
+		:toHash IVHash))
+	     (add-dependent-elements IVHash configFileWdLST "input=")
+	     (setf mergedHash (merge-hash (list DVHash IVHash)))
+	     (if (equal line-index 0) 
+		 (guard (necessaries IVKeys IVHash)
+			(assert (not (car it)) nil 
+				"IVs '~a' that are necessary to evaluate the 'input=' lines are not present in the config file" (car it))))
+	     (while (< (incf iteration) iterations)
+	       (setf quot -1)
+	       (setf collector ,collector-instance)
+	       (while (< (incf quot) quota)
+		 (push-to-end ,run-instance (runs runProcess))
+		 (incf count)
+		 (if (not (equal 'inf runsPerProcess)) 
+		     (when (equal (mod count runsPerProcess) 0)
+		       (push-to-end runProcess (runProcesses session))
+		       (setf runProcess ,run-process-instance))))))
+	   (if (runs runProcess) (push-to-end runProcess (runProcesses session)))	
+	   (upload-to session
+		      (quota (* (length (lines work)) iterations quota))
+		      (statusPrinters (mapcar (lambda (x) (symbol-function-safe (eval (read-from-string x)))) 
+					      (get-matching-lines configFileWdLST "statusPrinter=")))
+		      collapseHash DVHash DVKeys IVKeys cellKeys modelProgram iterations configFileLnLST entryFnType
+		      (collapseQuota quota)
+		      (lines (length (lines work)))
+		      (traversed (with-pandoric (traversed) #'get-matching-lines (sort (remove-duplicates traversed :test #'equal) #'<))))
+	   (guard (apply #'+ (mapcar #'(lambda (x) (length (runs x))) (runProcesses session)))
+		  (assert (equal (quota session) (car it)) nil
+			  "number of linesxiterationsxquota in work file (~d) not equal to number of run objects (~d)"	
+			  (quota session) (car it)))
+	   session))))))
 
 ;converts an output line of text sent by the model to a dotted pair
 ;discards if it's not a valid output line (handles when warning statements are printed to stdout)
@@ -1107,7 +1113,7 @@ is replaced with replacement."
       (collect (process-output-str (runProcess obj)) (cons "str" line))
       (aif (line2element line) (push-to-end it currentDVs)))
     (when (and (not (append appetizers currentDVs)) 
-	     (not (equalp (format nil "~a" (process-status process)) "running")))
+	     (not (string-equal (mkstr (process-status process)) "running")))
       (print-collector (process-output-str (runProcess obj))) 
       (assert nil))
     (append appetizers currentDVs)))
@@ -1121,10 +1127,10 @@ is replaced with replacement."
 	   (setf tbl (list tbl)))
 	  ((equal (entryFnType obj) 'keys)
 	   (setf tbl (eval (read-from-string
-			    (concatenate 'string "(list "
-					 (make-sentence
-					  (mapcar #'(lambda (x) (format nil ":~a '~a" (car x) (cdr x))) (get-elements (IVKeys obj) (IVHash obj))))
-					 ")"))))))
+			    (fast-concatenate "(list "
+					      (make-sentence
+					       (mapcar #'(lambda (x) (format nil ":~a '~a" (car x) (cdr x))) (get-elements (IVKeys obj) (IVHash obj))))
+					      ")"))))))
     (setf fstr (make-array '(0) :element-type 'base-char :fill-pointer 0 :adjustable t))
     (handler-case 
 	(with-output-to-string (*standard-output* fstr) 
@@ -1150,10 +1156,10 @@ is replaced with replacement."
       (while (and necessaryDVs currentDVs)
 	(setf currentDV (car currentDVs))
 	(setf currentDVs (cdr currentDVs))
-	(assert (member (car currentDV) necessaryDVs :test #'equalp) nil 
+	(assert (member (car currentDV) necessaryDVs :test #'string-equal) nil 
 		"sent ~a DV for the next trial, before sending all the DVs for this trial" (car currentDV)) 
 	(merge-hash currentDV :toHash (DVHash obj))
-	(setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'equalp)))
+	(setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'string-equal)))
       (sleep (sleepTime obj))
       (setf appetizers nil))
     (collect (run-collector obj) (DVHash obj))
@@ -1177,21 +1183,22 @@ is replaced with replacement."
   ;launch the process
   (labels 
       ((get-iv-string (obj)
-	 (let ((out) (elements) (runCount) (elementCount) (line))
-	   (setf runCount 0)
-	   (dolist (run (runs obj) out)
-	     (setf line nil)
-	     (incf runCount)
-	     (setf elements (get-elements (IVKeys run) (IVHash run)))
-	     (setf elementCount 0) 
-	     (dolist (element elements)
-	       (incf elementCount)
-	       (setf line (concatenate 'string line (format nil "~a=~a" (car element) (cdr element))))
-	       (if (not (equal elementCount (length elements)))
-		   (setf line (concatenate 'string line (format nil ",")))))
-	     (if (not (equal runCount (length (runs obj))))
-		 (setf line (concatenate 'string line (format nil ";"))))
-	     (setf out (concatenate 'string out line))))))
+	 (let ((elements) (runCount 0) (elementCount))
+	   (with-output-to-string (out)
+	     (dolist (run (runs obj) out)
+	       (incf runCount)
+	       (setf elements (get-elements (IVKeys run) (IVHash run)))
+	       (setf elementCount 0) 
+	       (write-string 
+		(with-output-to-string (line)
+		  (dolist (element elements)
+		    (incf elementCount)
+		    (write-string (format nil "~a=~a" (car element) (cdr element)) line)
+		    (if (not (equal elementCount (length elements)))
+			(write-string "," line)))
+		  (if (not (equal runCount (length (runs obj))))
+		      (write-string ";" line)))
+		out))))))
     (setf (process obj)
 	  (run-program 
 	   (first (modelProgram obj)) 
@@ -1200,7 +1207,7 @@ is replaced with replacement."
 	    (list (get-IV-string obj))
 	    (list (platform obj)))
 	   :output :stream :error :output :wait nil)))
-  (assert (equalp (format nil "~a" (process-status (process obj))) "running") nil "model process failed to start correctly")
+  (assert (string-equal (mkstr (process-status (process obj))) "running") nil "model process failed to start correctly")
   ;then execute each run
   (let ((leftovers))
     (dolist (run (runs obj))
@@ -1210,7 +1217,7 @@ is replaced with replacement."
   ;a few assertions to make sure everything finished cleanly
   (assert (not (listen (process-output (process obj))))
 	  nil "unprocessed lines remain in stdout stream of model after all DVs have been processed")
-  (assert (equalp (format nil "~a" (process-status (process obj))) "exited")
+  (assert (string-equal (mkstr (process-status (process obj))) "exited")
 	  nil "model process failed to quit after all DVs have been processed"))
 
 (defmethod wrapper-execute ((obj session-class) &optional (process nil) (appetizers nil))
@@ -1267,8 +1274,7 @@ is replaced with replacement."
 	    (format strm "#####number of lines in the work file: ~a~%" (lines obj))
 	    (format strm "#####number of times to run each line in the work file (iterations=): ~a~%" (iterations obj))
 	    (format strm "#####quota before collapsing (collapseQuota=): ~a~%" (collapseQuota obj))
-	    (format strm "#####extra lisp files loaded (file2load=): ~a~%" 
-		    (make-sentence (with-pandoric (loaded) #'load-and-loaded loaded)))
+	    (format strm "#####extra lisp files loaded (file2load=): ~a~%" (make-sentence (get-pandoric #'load-and-loaded 'loaded)))
 	    (if (hash-table-p (collapseHash obj))
 		(format strm "#####collapse hash table (collapseFn=): ~%~a" (print-hash (collapseHash obj) :strm nil))
 		(format strm "#####collapse function (collapseFn=): ~a~%" (collapseHash obj)))
@@ -1318,19 +1324,18 @@ is replaced with replacement."
    :process-output-str-instance (make-instance 'hpc-process-output-str-class)))
 ;////////////////////////////////////////////
 
-;load the extra lisp files
-(dolist (line (get-matching-lines (restructure (file-string (get-arg 1))) "file2load="))
-  (load-and-loaded (format nil "~a" (replace-all line "$1" (get-word (get-arg 2)) :test #'equalp))))
-;run it!
-(let ((configFile (restructure (file-string (get-arg 1)))))
-  (aif (get-matching-line configFile "albumBuilder=")
+(with-pandoric (platform configFileWdLST) #'args
+  ;load the extra lisp files
+  (dolist (line (get-matching-lines configFileWdLST "file2load="))
+    (load-and-loaded (replace-all line "$1" platform :test #'string-equal)))
+  ;run it!
+  (aif (get-matching-line configFileWdLST "albumBuilder=")
        (funcall (eval (read-from-string it)))
-       (wrapper-execute 
+       (wrapper-execute
 	(funcall 
 	 (eval 
 	  (read-from-string 
-	   (aif (get-matching-line configFile "sessionBuilder=")  it "#'build-hpc-session")))))))
-
+	   (aif (get-matching-line configFileWdLST "sessionBuilder=")  it "#'build-hpc-session")))))))
 ;kill it!	    
 (quit)
 
