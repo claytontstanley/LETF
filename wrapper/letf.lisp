@@ -1004,7 +1004,6 @@ is replaced with replacement."
 				      :runProcess runProcess
 				      :entryFnType entryFnType)))
     `(progn
-       (time
        (let ((session) (runProcess) (line-index) (count) (iteration) (iterations)
 	     (DVHash) (IVHash) (DVKeys) (IVKeys) (modelProgram) (cellKeys) (mergedHash)
 	     (quota) (collector) (quot) (collapseHash) (work) (session-collector) (entryFnType) (runsPerProcess) (short-circuit-p))
@@ -1088,7 +1087,7 @@ is replaced with replacement."
 		  (assert (equal (quota session) (car it)) nil
 			  "number of linesxiterationsxquota in work file (~d) not equal to number of run objects (~d)"	
 			  (quota session) (car it)))
-	   session))))))
+	   session)))))
 
 ;converts an output line of text sent by the model to a dotted pair
 ;discards if it's not a valid output line (handles when warning statements are printed to stdout)
@@ -1251,7 +1250,7 @@ is replaced with replacement."
 	  (if (not (apply #'< (traversed obj)))
 	      (setf (traversed obj) (sort (remove-duplicates (traversed obj) :test #'equal) #'<)))
 	  (let ((strm *error-output*))
-	    (format strm "~%~a~%" "printing uncommented lines in configuration file that were not read by letf:")
+	    (format strm "~%~a~%" "printing uncommented lines in configuration file that were not read:")
 	    (mapc (lambda (x) (format strm "~a~%" x))
 		  (flatten 
 		   (mapcar 
