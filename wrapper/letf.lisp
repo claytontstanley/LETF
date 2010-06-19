@@ -15,8 +15,13 @@
 ;;; ----- History -----
 ;;;
 ;;; 2010.04.22  : Creation.
+
+;;;usage: <launch common lisp image> <load letf> <pass three arguments to letf: <platform> <configFile> <workFile>>
+;;;e.g.,  ./sbcl --core ./sbcl.core --noinform --noprint --disable-debugger --load letf.lisp darwin configFile.txt workFile.txt
+;;;       ./sbcl --core ./sbcl.core --noinform --noprint --disable-debugger --load letf.lisp nil configFile.txt workFile.txt
+;;;       ./sbcl --core ./sbcl.core --noinform --noprint --disable-debugger --load letf.lisp nil configFile.txt nil
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
-(setf *read-default-float-format* 'double-float) 
+(setf *read-default-float-format* 'double-float)
 
 ;////////////////////////////////////////////////////////////
 ;////////////////////////////////////////////////////////////
@@ -357,46 +362,6 @@ is replaced with replacement."
 
 (defmacro assertEqualLengths (l1 l2)
   `(assert (equal (length ,l1) (length ,l2)) nil "length ~d not equal to length ~d" (length ,l1) (length ,l2)))
-  
-(defun MAD (l1 l2 &key (throwOutYerNils nil))
-  (inLSTs l1 l2 MAD throwOutYerNils)
-  (assertEqualLengths l1 l2)
-  (if throwOutYerNils (multiple-value-setq (l1 l2) (throwOutYerNils l1 l2)))
-  (if l1 (/ (apply #'+ (mapcar (lambda (x y) (abs (- x y))) l1 l2)) (length l1))))
-
-(defun correl (l1 l2 &key (throwOutYerNils nil))
-  (inLSTs l1 l2 correl throwOutYerNils)
-  (labels ((std (lst)
-	     (assert (> (length lst) 1)
-		     nil "must have at least 2 numbers to calculation std; only supplied ~d" (length lst))
-	     (sqrt
-	      (/
-	       (apply #'+ (funcall #'(lambda (x) (mapcar (lambda (y) (* (- y x) (- y x))) lst))
-				  (/ (apply #'+ lst) (length lst))))
-	       (- (length lst) 1)))))
-    (assertEqualLengths l1 l2)
-    (ignore-errors
-      (if throwOutYerNils (multiple-value-setq (l1 l2) (throwOutYerNils l1 l2)))
-      (let ((out
-	     (if (> (length l1) 1)
-		 (/
-		  (apply #'+
-			 (mapcar (lambda (x y) (* x y))
-				 (funcall #'(lambda (x)
-					      (mapcar (lambda (y) (- y x)) l1))
-					  (/ (apply #'+ l1) (length l1)))
-				 (funcall #'(lambda (x)
-					      (mapcar (lambda (y) (- y x)) l2))
-					  (/ (apply #'+ l2) (length l2)))))
-		  (* (- (length l1) 1) (std l1) (std l2))))))
-	(if out (if (not (or (> 0 out) (< 0 out) (equal 0 out))) (setf out nil)))
-	out))))
-
-(defun RMSE (l1 l2 &key (throwOutYerNils nil))
-  (inLSTs l1 l2 RMSE throwOutYerNils)
-  (assertEqualLengths l1 l2)
-  (if throwOutYerNils (multiple-value-setq (l1 l2) (throwOutYerNils l1 l2)))
-  (if l1 (sqrt (/ (apply #'+ (mapcar (lambda (x y) (* (- x y) (- x y))) l1 l2)) (length l1)))))
 
 (defun median (lst &key (throwOutYerNils nil))
   (mklst lst)
@@ -418,7 +383,43 @@ is replaced with replacement."
 (defun mean (lst &key (throwOutYerNils nil))
   (mklst lst)
   (if throwOutYerNils (setf lst (throwOutYerNils lst)))
-  (if lst (/ (sum lst) (length lst))))
+  (if lst (/ (apply #'+ lst) (length lst))))
+  
+(defun MAD (l1 l2 &key (throwOutYerNils nil))
+  (inLSTs l1 l2 MAD throwOutYerNils)
+  (assertEqualLengths l1 l2)
+  (if throwOutYerNils (multiple-value-setq (l1 l2) (throwOutYerNils l1 l2)))
+  (if l1 (/ (apply #'+ (mapcar (lambda (x y) (abs (- x y))) l1 l2)) (length l1))))
+
+(defun RMSE (l1 l2 &key (throwOutYerNils nil))
+  (inLSTs l1 l2 RMSE throwOutYerNils)
+  (assertEqualLengths l1 l2)
+  (if throwOutYerNils (multiple-value-setq (l1 l2) (throwOutYerNils l1 l2)))
+  (if l1 (sqrt (/ (apply #'+ (mapcar (lambda (x y) (* (- x y) (- x y))) l1 l2)) (length l1)))))
+
+(defun correl (l1 l2 &key (throwOutYerNils nil))
+  (inLSTs l1 l2 correl throwOutYerNils)
+  (labels ((std (lst)
+	     (sqrt (/ (apply #'+ (mapcar 
+				  (let ((x (/ (apply #'+ lst) (length lst))))
+				    (lambda (y) (* (- y x) (- y x))))
+				  lst))
+		      (- (length lst) 1)))))
+    (assertEqualLengths l1 l2)
+    (ignore-errors
+      (if throwOutYerNils (multiple-value-setq (l1 l2) (throwOutYerNils l1 l2)))
+      (let ((out
+	     (if (> (length l1) 1)
+		 (/ (apply #'+ (mapcar #'* 
+				       (mapcar (let ((x (/ (apply #'+ l1) (length l1))))
+						 (lambda (y) (- y x))) 
+					       l1)
+				       (mapcar (let ((x (/ (apply #'+ l2) (length l2))))
+						 (lambda (y) (- y x))) 
+					       l2)))
+		    (* (- (length l1) 1) (std l1) (std l2))))))
+	(if out (if (not (or (> 0 out) (< 0 out) (equal 0 out))) (setf out nil)))
+	out))))
 
 ;returns a list of the words in str
 (defun get-words (str &key (spaceDesignators (list #\Space #\Tab)) (includeSpaceDesignators nil))
@@ -1112,7 +1113,7 @@ is replaced with replacement."
       (collect (process-output-str (runProcess obj)) (cons "str" line))
       (aif (line2element line) (push-to-end it currentDVs)))
     (when (and (not (append appetizers currentDVs)) 
-	     (not (string-equal (mkstr (process-status process)) "running")))
+	       (not (equal (process-status process) :running)))
       (print-collector (process-output-str (runProcess obj))) 
       (assert nil))
     (append appetizers currentDVs)))
@@ -1206,7 +1207,7 @@ is replaced with replacement."
 	    (list (get-IV-string obj))
 	    (list (platform obj)))
 	   :output :stream :error :output :wait nil)))
-  (assert (string-equal (mkstr (process-status (process obj))) "running") nil "model process failed to start correctly")
+  (assert (equal (process-status (process obj)) :running) nil "model process failed to start correctly")
   ;then execute each run
   (let ((leftovers))
     (dolist (run (runs obj))
@@ -1216,7 +1217,7 @@ is replaced with replacement."
   ;a few assertions to make sure everything finished cleanly
   (assert (not (listen (process-output (process obj))))
 	  nil "unprocessed lines remain in stdout stream of model after all DVs have been processed")
-  (assert (string-equal (mkstr (process-status (process obj))) "exited")
+  (assert (equal (process-status (process obj)) :exited)
 	  nil "model process failed to quit after all DVs have been processed"))
 
 (defmethod wrapper-execute ((obj session-class) &optional (process nil) (appetizers nil))
