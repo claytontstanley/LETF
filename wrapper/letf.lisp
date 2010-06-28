@@ -492,9 +492,6 @@ is replaced with replacement."
 	    (if inside-brackets
                ;remaps an expression surrounded by brackets by calling the hash table on each of the words in the expression
                ;each word in the expression should be a key that corresponds to an already-defined element in the hash table
-               ;you can also supply a list of lambda functions to be evaluated, that take, as input, the current word in the 
-               ;expression and the hash table; useful if you want to collect something other than what is returned by this 
-               ;function see 'necessaries' or 'get-elements', or 'eval-hash' for examples 
 		(let ((out))
 		  (dolist (word (get-words str) (make-sentence out))
 		    ,(if (not body)
@@ -749,7 +746,9 @@ is replaced with replacement."
    (IVKeys :accessor IVKeys :initarg :IVKeys :initform nil)
    (cellKeys :accessor cellKeys :initarg :cellKeys :initform nil)
    (modelProgram :accessor modelProgram :initarg :modelProgram :initform nil)
-   (entryFnType :accessor entryFnType :initarg :entryFnType :initform nil)))
+   (runsPerProcess :accessor runsPerProcess :initarg :runsPerProcess :initform nil)
+   (entryFnType :accessor entryFnType :initarg :entryFnType :initform nil)
+   (IVStringFn :accessor IVStringFn :initarg :IVStringFn :initform nil)))
 
 ;collector class pattern that can be extended to print results from letf in a specific way
 (defclass base-collector-class ()
@@ -1034,6 +1033,11 @@ is replaced with replacement."
 	   (if short-circuit-p
 	       (setf modelProgram (symbol-function-safe (eval (read-from-string (make-sentence modelProgram))))
 		     runsPerProcess (read-from-string "inf")))
+	   (setf (IVStringFn session)
+		 (if (not short-circuit-p)
+		     (aif (get-matching-line configFileWdLST "IVStringFn=")
+			  (symbol-function-safe (eval (read-from-string it)))
+			  #'defaultIVStringFn)))
 	   (setf entryFnType (if short-circuit-p
 				 (aif (get-matching-line configFileWdLST "entryFnType=")
 				      (read-from-string (get-word it))
@@ -1080,7 +1084,7 @@ is replaced with replacement."
 		      (quota (* (length (lines work)) iterations quota))
 		      (statusPrinters (mapcar (lambda (x) (symbol-function-safe (eval (read-from-string x)))) 
 					      (get-matching-lines configFileWdLST "statusPrinter=")))
-		      collapseHash DVHash DVKeys IVKeys cellKeys modelProgram iterations configFileLnLST entryFnType
+		      collapseHash DVHash DVKeys IVKeys cellKeys modelProgram iterations configFileLnLST entryFnType runsPerProcess
 		      (collapseQuota quota)
 		      (lines (length (lines work)))
 		      (traversed (with-pandoric (traversed) #'get-matching-lines (sort (remove-duplicates traversed :test #'equal) #'<))))
@@ -1175,38 +1179,24 @@ is replaced with replacement."
       (setf leftovers (wrapper-execute run (modelProgram obj) leftovers)))
     (assert (not leftovers) nil "should not be any leftovers after runProcess object finishes"))
   (sleep (sleepTime obj)))
-  
+
 (defmethod wrapper-execute ((obj number5-runProcess-class) &optional (process nil) (appetizers nil))
   (assert (not appetizers))
   (assert (not process))
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session obj)))
   ;launch the process
-  (labels 
-      ((get-iv-string (obj)
-	 (let ((elements) (runCount 0) (elementCount))
-	   (with-output-to-string (out)
-	     (dolist (run (runs obj) out)
-	       (incf runCount)
-	       (setf elements (get-elements (IVKeys run) (IVHash run)))
-	       (setf elementCount 0) 
-	       (write-string 
-		(with-output-to-string (line)
-		  (dolist (element elements)
-		    (incf elementCount)
-		    (write-string (format nil "~a=~a" (car element) (cdr element)) line)
-		    (if (not (equal elementCount (length elements)))
-			(write-string "," line)))
-		  (if (not (equal runCount (length (runs obj))))
-		      (write-string ";" line)))
-		out))))))
-    (setf (process obj)
-	  (run-program 
-	   (first (modelProgram obj)) 
-	   (append
-	    (rest (modelProgram obj))
-	    (list (get-IV-string obj))
-	    (list (platform obj)))
-	   :output :stream :error :output :wait nil)))
+  (setf (process obj)
+	(run-program 
+	 (first (modelProgram obj)) 
+	 (rest (modelProgram obj))
+	 :input (make-string-input-stream  
+		 (with-output-to-string (out)
+		   (dolist (run (runs obj))
+		     (write-string (funcall (IVStringFn (session (runProcess run))) run) out)
+		     (write-string (fast-concatenate (string #\Return) (string #\LineFeed)) out))))
+	 :output :stream 
+	 :error :output 
+	 :wait nil)) 
   (assert (equal (process-status (process obj)) :running) nil "model process failed to start correctly")
   ;then execute each run
   (let ((leftovers))
@@ -1269,8 +1259,11 @@ is replaced with replacement."
 	 (((obj session-class))
 	  (let ((strm *error-output*))
 	    (format strm "~%printing session status:~%")
-	    (format strm "#####entry function: ~a~%" (modelProgram obj))
+	    (format strm "#####entry function: ~a~%" (if (listp (modelProgram obj))
+							 (make-sentence (modelProgram obj))
+							 (modelProgram obj)))
 	    (format strm "#####total calls to entry function: ~a~%" (quota obj))
+	    (format strm "#####calls to entry function per model process (runsPerProcess=): ~a~%" (runsPerProcess obj))
 	    (format strm "#####number of lines in the work file: ~a~%" (lines obj))
 	    (format strm "#####number of times to run each line in the work file (iterations=): ~a~%" (iterations obj))
 	    (format strm "#####quota before collapsing (collapseQuota=): ~a~%" (collapseQuota obj))
@@ -1289,6 +1282,16 @@ is replaced with replacement."
 	    (format strm "#####necessary elements for the entry function to return:~%")
 	    (mapc (lambda (x) (format strm "~a~%" x)) (necessaries (DVKeys obj) (DVHash obj)))
 	    (format strm "~%"))))
+
+(defmethod defaultIVStringFn ((obj run-class))
+  (with-output-to-string (line)
+    (let ((elementCount 0) 
+	  (elements (get-elements (IVKeys obj) (IVHash obj))))
+      (dolist (element elements)
+	(incf elementCount)
+	(write-string (format nil "~a" (cdr element)) line)
+	(if (not (equal elementCount (length elements)))
+	    (write-string (string #\Tab) line))))))
 
 ;////////////////////////////////////////////
 ;hpc-specific classes, methods, and functions; all of this is to define the custom 'build-hpc-session
