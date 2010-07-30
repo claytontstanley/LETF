@@ -1311,7 +1311,7 @@ is replaced with replacement."
 	(format t "~a " (cdr (nth i (cellElements obj))))))
   (dolist (key (keys obj))
     (aif (cdr (get-element key (collection obj) (gethash-ifHash key (collapseHash obj))))
-	 (format t "~a: ~a~%" key (coerce it 'double-float)))))
+	 (format t "~a: ~a~%" key (if (stringp it) it (coerce it 'double-float))))))
 
 (defclass hpc-process-output-str-class (process-output-str-class) ())
 
