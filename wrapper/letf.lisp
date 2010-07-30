@@ -15,7 +15,7 @@
 ;;; ----- History -----
 ;;;
 ;;; 2010.04.22  : Creation.
-
+ 
 ;;;usage: <launch common lisp image> <load letf> <pass three arguments to letf: <platform> <configFile> <workFile>>
 ;;;e.g.,  ./sbcl --core ./sbcl.core --noinform --noprint --disable-debugger --load letf.lisp darwin configFile.txt workFile.txt
 ;;;       ./sbcl --core ./sbcl.core --noinform --noprint --disable-debugger --load letf.lisp nil configFile.txt workFile.txt
