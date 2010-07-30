@@ -15,7 +15,7 @@
 ;;; ----- History -----
 ;;;
 ;;; 2010.04.22  : Creation.
- 
+
 ;;;usage: <launch common lisp image> <load letf> <pass three arguments to letf: <platform> <configFile> <workFile>>
 ;;;e.g.,  ./sbcl --core ./sbcl.core --noinform --noprint --disable-debugger --load letf.lisp darwin configFile.txt workFile.txt
 ;;;       ./sbcl --core ./sbcl.core --noinform --noprint --disable-debugger --load letf.lisp nil configFile.txt workFile.txt
@@ -487,6 +487,23 @@ is replaced with replacement."
     (assert (not in-bracket) nil "something is wrong with string ~a, possibly a stray bracket somewhere" str)
     (flatten out)))
 
+(defun toString (lst)
+  (cond ((consp lst)
+	 (with-output-to-string (out)
+	   (write-string "(list " out)
+	   (dolist (item lst)
+	     (write-string (toString item) out)
+	     (write-string " " out))
+	   (write-string ") " out)))
+	((stringp lst)
+	 (fast-concatenate "\"" lst "\""))
+	((keywordp lst)
+	 (fast-concatenate ":" (string lst)))
+	((symbolp lst)
+	 (fast-concatenate "'" (string lst)))
+	(t
+	 (format nil "~a" (coerce lst 'double-float)))))
+
 (defmacro remap-string (&body body)
   `(alambda (str hash &key (collapseFn "#'mean") (inside-brackets nil) (key nil))
 	    (if inside-brackets
@@ -509,9 +526,8 @@ is replaced with replacement."
 			  (push-to-end 
 			   (self item hash :collapseFn collapseFn :inside-brackets nil :key nil)
 			   out))
-			(setf out (make-sentence 
-				   (append (list "(funcall #'collapse" "(list ") 
-					   out (list ")" (make-sentence (gethash-ifHash key collapseFn)) ")")))))
+			(setf out (fast-concatenate
+				   "(funcall #'collapse (list " (make-sentence out) " ) " (make-sentence (gethash-ifHash key collapseFn)) " )")))
 		      (progn
 			(dolist (word (lump-brackets str))
 			  (push-to-end
@@ -557,39 +573,31 @@ is replaced with replacement."
   `(traverse ,keys ,hash :bool t ,@args))
 
 ;evaluates all the stuff in the hash table that it can, given the current state of the hash table
-(defmethod eval-hash ((hash hash-table))
-  (labels ((toString (lst)
-	     (if (consp lst)
-		 (with-output-to-string (out)
-		   (write-string "(list " out)
-		   (dolist (item lst)
-		     (write-string (toString item) out))
-		   (write-string ") " out))
-		 (format nil "~a " lst))))
-    (let* ((traversed (make-hash-table :test #'equalp))
-	   (fun (remap-string
-		 (if (not (key-present word traversed))
-		     (let ((newVal) (val))
-		       (setf val (self (gethash word hash) hash 
-				       :collapseFn collapseFn 
-				       :inside-brackets nil :key word))
-		       (setf (gethash word traversed) val)
-		       (ignore-errors
-			 (multiple-value-bind (evaledVal lngth) (read-from-string val)
-			   (if (equal lngth (length val))
-			       (setf newVal (toString (eval evaledVal))))))
-		       (when (and newVal (not (equal (- (length val) 
-							(length (find-in-string val (list #\space #\tab))))
-						     (- (length newVal) 
-							(length (find-in-string newVal (list #\Space #\tab)))))))
-			 ;(format t "~a -> ~a -> ~a~%" (gethash word hash) val newVal)
-			 ;(format t "~a ~a~%" (incf count) word)
-			 (setf (gethash word hash) newVal)
-			 (setf (gethash word traversed) newVal))))
-		 (push-to-end (gethash word traversed) out))))
-      (loop for key being the hash-keys of hash do 
-	   (if (not (necessaries key hash))
-	       (funcall fun (fast-concatenate "[" key "]") hash))))))
+(defmethod eval-hash ((hash hash-table))	     
+  (let* ((traversed (make-hash-table :test #'equalp))
+	 (fun (remap-string
+	       (if (not (key-present word traversed))
+		   (let ((newVal) (val))
+		     (setf val (self (gethash word hash) hash 
+				     :collapseFn collapseFn 
+				     :inside-brackets nil :key word))
+		     (setf (gethash word traversed) val)
+		     (ignore-errors
+		       (multiple-value-bind (evaledVal lngth) (read-from-string val)
+			 (if (equal lngth (length val))
+			     (setf newVal (toString (eval evaledVal))))))
+		     (when (and newVal (not (equal (- (length val) 
+						      (length (find-in-string val (list #\space #\tab))))
+						   (- (length newVal) 
+						      (length (find-in-string newVal (list #\Space #\tab)))))))
+		       ;(format t "~a -> ~a -> ~a~%" (gethash word hash) val newVal)
+		       ;(format t "~a ~a~%" (incf count) word)
+		       (setf (gethash word hash) newVal)
+		       (setf (gethash word traversed) newVal))))
+	       (push-to-end (gethash word traversed) out))))
+    (loop for key being the hash-keys of hash do 
+	 (if (not (necessaries key hash))
+	     (funcall fun (fast-concatenate "[" key "]") hash)))))
 
 ;takes an expression, and expands the ':'s (similar to how matlab references arrays)
 ;for example: (bracket-expand "hello1:5") -> "hello1 hello2 hello3 hello4 hello5"
@@ -1130,11 +1138,8 @@ is replaced with replacement."
 	   (mapc #'(lambda (x) (setf (gethash (car x) tbl) (cdr x))) (get-elements (IVKeys obj) (IVHash obj)))
 	   (setf tbl (list tbl)))
 	  ((equal (entryFnType obj) 'keys)
-	   (setf tbl (eval (read-from-string
-			    (fast-concatenate "(list "
-					      (make-sentence
-					       (mapcar #'(lambda (x) (format nil ":~a '~a" (car x) (cdr x))) (get-elements (IVKeys obj) (IVHash obj))))
-					      ")"))))))
+	   (setf tbl (flatten (mapcar (lambda (x) (list (eval (read-from-string (fast-concatenate ":" (car x)))) (cdr x)))
+				      (get-elements (IVKeys obj) (IVHash obj)))))))
     (setf fstr (make-array '(0) :element-type 'base-char :fill-pointer 0 :adjustable t))
     (handler-case 
 	(with-output-to-string (*standard-output* fstr) 
@@ -1289,7 +1294,7 @@ is replaced with replacement."
 	  (elements (get-elements (IVKeys obj) (IVHash obj))))
       (dolist (element elements)
 	(incf elementCount)
-	(write-string (format nil "~a" (cdr element)) line)
+	(write-string (toString (cdr element)) line)
 	(if (not (equal elementCount (length elements)))
 	    (write-string (string #\Tab) line))))))
 
