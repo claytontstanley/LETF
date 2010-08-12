@@ -78,5 +78,21 @@ function designator."
 	    (when (equal entryFnType 'process)
 	      nil))))
 
+(methods validate-full-combinatorial
+	 (((obj runProcess-class)))
+	 (((obj run-class)))
+	 (((obj session-class))
+	  (with-pandoric (configFileWdLST) #'args
+	     (dolist (line (get-matching-lines configFileWdLST "IV="))
+	       (let ((nums (mapcar (lambda (x) (eval (read-from-string x)))
+				   (rest (get-words line)))))
+		 (mapc (lambda (x) (assert (numberp x))) nums)
+		 (assert (equal (length nums) 3))
+		 (assert (< (first nums) (third nums)))
+		 (assert (> (second nums) 0))
+		 (let ((cur (- (first nums) (second nums))))
+		   (while (< (incf cur (second nums)) (third nums))
+		     ())
+		   (assert (equal cur (third nums)))))))))
 
   
