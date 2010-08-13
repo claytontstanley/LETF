@@ -71,7 +71,14 @@ function designator."
     (html-color-start :color ,color)
     ,str
     (html-color-stop)))
-   
+
+;wrapping html font tags around the text output from all assertions that fail
+(sb-ext:without-package-locks
+    (let ((fun (symbol-function 'sb-kernel:assert-error)))
+      (setf (symbol-function 'sb-kernel:assert-error) 
+	    (lambda (assertion places datum &rest arguments) 
+	      (apply fun (append (list assertion places (html-color datum)) arguments))))))
+
 (methods validate-entryFn
 	 (((obj runprocess-class)))
 	 (((obj run-class)))
@@ -83,11 +90,11 @@ function designator."
 	    (when (equal entryFnType 'keys)
 	      (let ((lst (mapcar (lambda (x) (format nil "~a" (car x))) (cdr arglst))))
 		(assert (equalp (sort lst #'string<) (sort IVKeys #'string<)) nil
-			(html-color "keys ~a for entry function ~a do not match IVs ~a in config file")
+			"keys ~a for entry function ~a do not match IVs ~a in config file"
 			lst modelProgram IVKeys)))
 	    (when (equal entryFnType 'hash)
-	      (assert nil nil (html-color "not allowing hash-table style entry functions for MM yet. Keep it simple..."))
-	      (assert (equal (length arglst) 1) nil (html-color "problem with argument list ~a for the entry function ~a")
+	      (assert nil nil "not allowing hash-table style entry functions for MM yet. Keep it simple...")
+	      (assert (equal (length arglst) 1) nil "problem with argument list ~a for the entry function ~a"
 		      arglst modelProgram))
 	    ;not doing any validation when the model is launched as a separate process yet
 	    (when (equal entryFnType 'process)
@@ -102,19 +109,19 @@ function designator."
 	       (let ((nums (mapcar (lambda (x) 
 				     (handler-case (eval (read-from-string x))
 				       (error (condition) 
-					 (assert nil nil (html-color "error \"~a\" when parsing line IV=~a") condition line))))
+					 (assert nil nil "error \"~a\" when parsing line IV=~a" condition line))))
 				   (rest (get-words line)))))
-		 (mapc (lambda (x) (assert (numberp x) nil (html-color "~a not a number in line IV=~a") x line)) nums)
-		 (assert (equal (length nums) 3) nil (html-color "not 3 numbers in line IV=~a") line)
-		 (assert (< (first nums) (third nums)) nil (html-color "starting number ~a not less than ending number ~a in line IV=~a") (first nums) (third nums) line)
-		 (assert (> (second nums) 0) nil (html-color "stepsize ~a not greater than zero in line IV=~a") (second nums) line)
+		 (mapc (lambda (x) (assert (numberp x) nil "~a not a number in line IV=~a" x line)) nums)
+		 (assert (equal (length nums) 3) nil "not 3 numbers in line IV=~a" line)
+		 (assert (< (first nums) (third nums)) nil "starting number ~a not less than ending number ~a in line IV=~a" (first nums) (third nums) line)
+		 (assert (> (second nums) 0) nil "stepsize ~a not greater than zero in line IV=~a" (second nums) line)
 		 (let ((cur (- (first nums) (second nums))))
 		   (while (< (incf cur (second nums)) (third nums))
 		     ())
-		   (assert (equal cur (third nums)) nil (html-color "(~a-~a)/~a not a whole number in line IV=~a") (third nums) (first nums) (second nums) line))))
+		   (assert (equal cur (third nums)) nil "(~a-~a)/~a not a whole number in line IV=~a" (third nums) (first nums) (second nums) line))))
 	     (dolist (line (get-matching-lines configFileWdLST "DV="))
 	       (let ((name (get-words line)))
-		 (assert (equal (length name) 1) nil (html-color "not 1 name in line DV=~a") line))))))
+		 (assert (equal (length name) 1) nil "not 1 name in line DV=~a" line))))))
 
 (methods print-unread-lines-html-color
 	 (((obj runProcess-class)))
