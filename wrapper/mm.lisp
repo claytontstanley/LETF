@@ -56,6 +56,22 @@ function designator."
         (t
          (sb-kernel:%simple-fun-arglist (sb-kernel:%fun-fun function)))))
 
+(defmacro html-color-start (&key (color 'yellow))
+  `(fast-concatenate
+    "~%htmlStart~%"
+    "<FONT style=\"BACKGROUND-COLOR: " ,(string-downcase (string color)) "\">"))
+
+(defmacro html-color-stop ()
+  `(fast-concatenate
+    "</FONT>~%"
+    "htmlStop~%"))
+
+(defmacro html-color (str &key (color 'yellow))
+  `(fast-concatenate
+    (html-color-start :color ,color)
+    ,str
+    (html-color-stop)))
+   
 (methods validate-entryFn
 	 (((obj runprocess-class)))
 	 (((obj run-class)))
@@ -64,15 +80,14 @@ function designator."
 		 (modelProgram (modelProgram obj))
 		 (arglst (function-lambda-list modelProgram))
 		 (entryFnType (entryFnType obj)))
-	    (when (equal entryFnType 'keys) 
-	      (mapc (let ((lst (mapcar (lambda (x) (format nil "~a" (car x))) (cdr arglst))))
-		      (lambda (x) (assert (member x lst :test #'equalp) nil
-					  "IV ~a not a member of the keys ~a for entry function ~a"
-					  x arglst modelProgram))) 
-		    IVKeys))
+	    (when (equal entryFnType 'keys)
+	      (let ((lst (mapcar (lambda (x) (format nil "~a" (car x))) (cdr arglst))))
+		(assert (equalp (sort lst #'string<) (sort IVKeys #'string<)) nil
+			(html-color "keys ~a for entry function ~a do not match IVs ~a in config file")
+			lst modelProgram IVKeys)))
 	    (when (equal entryFnType 'hash)
-	      (assert nil nil "not allowing hash-table style entry functions for MM yet. Keep it simple...")
-	      (assert (equal (length arglst) 1) nil "problem with argument list ~a for the entry function ~a" 
+	      (assert nil nil (html-color "not allowing hash-table style entry functions for MM yet. Keep it simple..."))
+	      (assert (equal (length arglst) 1) nil (html-color "problem with argument list ~a for the entry function ~a")
 		      arglst modelProgram))
 	    ;not doing any validation when the model is launched as a separate process yet
 	    (when (equal entryFnType 'process)
@@ -84,15 +99,38 @@ function designator."
 	 (((obj session-class))
 	  (with-pandoric (configFileWdLST) #'args
 	     (dolist (line (get-matching-lines configFileWdLST "IV="))
-	       (let ((nums (mapcar (lambda (x) (eval (read-from-string x)))
+	       (let ((nums (mapcar (lambda (x) 
+				     (handler-case (eval (read-from-string x))
+				       (error (condition) 
+					 (assert nil nil (html-color "error \"~a\" when parsing line IV=~a") condition line))))
 				   (rest (get-words line)))))
-		 (mapc (lambda (x) (assert (numberp x))) nums)
-		 (assert (equal (length nums) 3))
-		 (assert (< (first nums) (third nums)))
-		 (assert (> (second nums) 0))
+		 (mapc (lambda (x) (assert (numberp x) nil (html-color "~a not a number in line IV=~a") x line)) nums)
+		 (assert (equal (length nums) 3) nil (html-color "not 3 numbers in line IV=~a") line)
+		 (assert (< (first nums) (third nums)) nil (html-color "starting number ~a not less than ending number ~a in line IV=~a") (first nums) (third nums) line)
+		 (assert (> (second nums) 0) nil (html-color "stepsize ~a not greater than zero in line IV=~a") (second nums) line)
 		 (let ((cur (- (first nums) (second nums))))
 		   (while (< (incf cur (second nums)) (third nums))
 		     ())
-		   (assert (equal cur (third nums)))))))))
+		   (assert (equal cur (third nums)) nil (html-color "(~a-~a)/~a not a whole number in line IV=~a") (third nums) (first nums) (second nums) line))))
+	     (dolist (line (get-matching-lines configFileWdLST "DV="))
+	       (let ((name (get-words line)))
+		 (assert (equal (length name) 1) nil (html-color "not 1 name in line DV=~a") line))))))
+
+(methods print-unread-lines-html-color
+	 (((obj runProcess-class)))
+	 (((obj run-class)))
+	 (((obj session-class))
+	  (format *error-output* (html-color-start :color orange))
+	  (print-unread-lines obj)
+	  (format *error-output* (html-color-stop))))
+
+(methods print-session-html-color
+	 (((obj runProcess-class)))
+	 (((obj run-class)))
+	 (((obj session-class))
+	  (format *error-output* (html-color-start :color orange))
+	  (print-session obj)
+	  (format *error-output* (html-color-stop))))
+
 
   
