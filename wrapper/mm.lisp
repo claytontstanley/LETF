@@ -35,27 +35,6 @@
    :process-output-str-instance (make-instance 'mm-process-output-str-class)
    :run-collector-instance (make-instance 'mm-run-collector-class)))
 
-(defun valid-function-name-p (name)
-  "True if NAME denotes a function name that can be passed to MACRO-FUNCTION or FDEFINITION "
-  (and (sb-int:valid-function-name-p name) t))
-
-(defun function-lambda-list (function)
-  "Describe the lambda list for the extended function designator FUNCTION.
-Works for special-operators, macros, simple functions, interpreted functions,
-and generic functions. Signals an error if FUNCTION is not a valid extended
-function designator."
-  (cond ((valid-function-name-p function)
-         (function-lambda-list (or (and (symbolp function)
-                                        (macro-function function))
-                                   (fdefinition function))))
-        ((typep function 'generic-function)
-         (sb-pcl::generic-function-pretty-arglist function))
-        #+sb-eval
-        ((typep function 'sb-eval:interpreted-function)
-         (sb-eval:interpreted-function-lambda-list function))
-        (t
-         (sb-kernel:%simple-fun-arglist (sb-kernel:%fun-fun function)))))
-
 (defmacro html-color-start (&key (color 'yellow))
   `(fast-concatenate
     "~%htmlStart~%"
@@ -85,7 +64,7 @@ function designator."
 	 (((obj session-class))
 	  (let* ((IVKeys (IVKeys obj))
 		 (modelProgram (modelProgram obj))
-		 (arglst (function-lambda-list modelProgram))
+		 (arglst (sb-introspect:function-lambda-list modelProgram))
 		 (entryFnType (entryFnType obj)))
 	    (when (equal entryFnType 'keys)
 	      (let ((lst (mapcar (lambda (x) (format nil "~a" (car x))) (cdr arglst))))
