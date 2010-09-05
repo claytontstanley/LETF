@@ -204,15 +204,15 @@
 		   ,(format nil "~a" fun) it)
 	  `(progn ,@body))
      (values-list it)))
-     
+            
 ;loads the file with pathname str
 ;keeps track of all the pathnames that have been sent 
 ;to this function; returns the list of those names
 (let ((loaded))
   (setf (symbol-function 'load-and-loaded)
 	(plambda (str) (loaded)
-	 (push-to-end str loaded)
-	 (load str))))
+	  (push-to-end str loaded)
+	  (load str))))
 
 ;returns if a key is present in the hash table
 (defun key-present (key hash)
@@ -315,14 +315,14 @@ is replaced with replacement."
 		(if (not (key-present key out))
 		    (setf (gethash key out) (copy-hash value)))))
 	 (rec (alambda (lst out)
-		       (if lst
-			   (cond ((hash-table-p lst)
-				  (loop for value being the hash-values of lst using (hash-key key) do 
-				       (funcall fun out key value)))
-				 ((or (hash-table-p (car lst)) (consp (car lst)))
-				  (self (car lst) out)
-				  (self (cdr lst) out))
-				 (t (funcall fun out (car lst) (cdr lst)))))))
+		(if lst
+		    (cond ((hash-table-p lst)
+			   (loop for value being the hash-values of lst using (hash-key key) do 
+				(funcall fun out key value)))
+			  ((or (hash-table-p (car lst)) (consp (car lst)))
+			   (self (car lst) out)
+			   (self (cdr lst) out))
+			  (t (funcall fun out (car lst) (cdr lst)))))))
 	 (out (aif toHash it (make-hash-table :test #'equalp))))
     (funcall rec lst out)
     out))
@@ -447,6 +447,18 @@ is replaced with replacement."
 (defmacro get-word (&rest lst)
   `(car (guard (get-words ,@lst))))
 
+(defun get-objects (str)
+  (let ((startIndex 0)
+	(out))
+    (while (< startIndex (length str))
+       (multiple-value-bind (it index) (read-from-string str nil nil :start startIndex :preserve-whitespace t)
+	 (if it (push-to-end (subseq str startIndex index) out))
+	 (setf startIndex index)))
+    out))
+
+(defmacro get-object (&rest lst)
+  `(car (guard (get-objects ,@lst))))
+
 (defun get-lines (str &key (lineDesignators (list #\Newline #\Return #\LineFeed)) (includeLineDesignators nil))
   (let ((out))
     (dolist (line (get-words str :spaceDesignators lineDesignators :includeSpaceDesignators includeLineDesignators) (reverse out))
@@ -506,37 +518,37 @@ is replaced with replacement."
 
 (defmacro remap-string (&body body)
   `(alambda (str hash &key (collapseFn "#'mean") (inside-brackets nil) (key nil))
-	    (if inside-brackets
-               ;remaps an expression surrounded by brackets by calling the hash table on each of the words in the expression
-               ;each word in the expression should be a key that corresponds to an already-defined element in the hash table
-		(let ((out))
-		  (dolist (word (get-words str) (make-sentence out))
-		    ,(if (not body)
-			 `(push-to-end (self (gethash word hash) hash 
-					    :collapseFn collapseFn 
-					    :inside-brackets nil :key word) out)
-			 `(progn ,@body))))
-                ;remaps an expression, which may or may not have parts that are surrounded by brackets
-                ;for each part that is surrounded by brackets, call remap-string with inside-brackets flagged to convert
-                ;the bracketed expression to actual values
-		(let ((out))
-		  (if (consp str)
-		      (progn
-			(dolist (item str)
-			  (push-to-end 
-			   (self item hash :collapseFn collapseFn :inside-brackets nil :key nil)
-			   out))
-			(setf out (fast-concatenate
-				   "(funcall #'collapse (list " (make-sentence out) " ) " (make-sentence (gethash-ifHash key collapseFn)) " )")))
-		      (progn
-			(dolist (word (lump-brackets str))
-			  (push-to-end
-			   (if (and (equal (char word 0) #\[) (equal (char word (- (length word) 1)) #\]))
-			       (self (string-trim "[]" word) hash :collapseFn collapseFn :inside-brackets t :key nil)
-			       word)
-			   out))
-			(setf out (make-sentence out))))
-		  out))))
+     (if inside-brackets
+         ;remaps an expression surrounded by brackets by calling the hash table on each of the words in the expression
+         ;each word in the expression should be a key that corresponds to an already-defined element in the hash table
+	 (let ((out))
+	   (dolist (word (get-words str) (make-sentence out))
+	     ,(if (not body)
+		  `(push-to-end (self (gethash word hash) hash 
+				      :collapseFn collapseFn 
+				      :inside-brackets nil :key word) out)
+		  `(progn ,@body))))
+         ;remaps an expression, which may or may not have parts that are surrounded by brackets
+         ;for each part that is surrounded by brackets, call remap-string with inside-brackets flagged to convert
+         ;the bracketed expression to actual values
+	 (let ((out))
+	   (if (consp str)
+	       (progn
+		 (dolist (item str)
+		   (push-to-end 
+		    (self item hash :collapseFn collapseFn :inside-brackets nil :key nil)
+		    out))
+		 (setf out (fast-concatenate
+			    "(funcall #'collapse (list " (make-sentence out) " ) " (make-sentence (gethash-ifHash key collapseFn)) " )")))
+	       (progn
+		 (dolist (word (lump-brackets str))
+		   (push-to-end
+		    (if (and (equal (char word 0) #\[) (equal (char word (- (length word) 1)) #\]))
+			(self (string-trim "[]" word) hash :collapseFn collapseFn :inside-brackets t :key nil)
+			word)
+		    out))
+		 (setf out (make-sentence out))))
+	   out))))
 
 ;traverses the 'keys' in the hash table 'hash', and recursively
 ;searches the other keys that each 'key' references. During the traversal
@@ -657,25 +669,25 @@ is replaced with replacement."
 (let ((traversed))
   (setf (symbol-function 'get-matching-lines) 
 	(plambda (str keys) (traversed)
-	 (mklst keys)
-	 (let ((words) (out) (line) (lines))
-	   (setf lines (if (consp str) str (get-lines str)))
-	   (dotimes (i (length lines) (reverse out))
-	     (setf line (nth i lines))
-	     (setf words (if (consp line) line (get-words line)))
-	     (if words
-		 (awhen 
-		  (block index=
-		    (dolist (key keys nil)
-		      (if (string-equal key (subseq (first words) 0 (min (length (first words)) (length key))))
-			  (return-from index= (length key)))))
-		  (push-to-end i traversed)
-		  (push 
-		   (bracket-expand 
-		    (string-trim 
-		     (list #\Space #\tab) 
-		     (subseq (make-sentence line) it (length (make-sentence line))))) 
-		   out))))))))
+	  (mklst keys)
+	  (let ((words) (out) (line) (lines))
+	    (setf lines (if (consp str) str (get-lines str)))
+	    (dotimes (i (length lines) (reverse out))
+	      (setf line (nth i lines))
+	      (setf words (if (consp line) line (get-words line)))
+	      (if words
+		  (awhen 
+		   (block index=
+		     (dolist (key keys nil)
+		       (if (string-equal key (subseq (first words) 0 (min (length (first words)) (length key))))
+			   (return-from index= (length key)))))
+		   (push-to-end i traversed)
+		   (push 
+		    (bracket-expand 
+		     (string-trim 
+		      (list #\Space #\tab) 
+		      (subseq (make-sentence line) it (length (make-sentence line))))) 
+		    out))))))))
 
 (defun get-first-word-from-matching-lines (str keys)
   (mklst keys)
@@ -712,17 +724,17 @@ is replaced with replacement."
 ;recursively adds all elements in the config file that are referenced in the 'lhs' line in the config file
 (defmacro add-dependent-element (&body body)
   `(alambda (hash &optional (configFileStr nil) (lhs nil) (rhs nil))
-	    (let ((line) (words))
-	      (setf line (aif rhs it (get-matching-line configFileStr lhs)))
-	      (when line
-		(merge-hash (cons (subseq lhs 0 (- (length lhs) 1)) line) :toHash hash)
-		(setf words (lump-brackets line))
-		(dolist (word words)
-		  (if (and (equal (char word 0) #\[) (equal (char word (- (length word) 1)) #\]))
-		      (dolist (item (get-words (string-trim "[]" word)))
-			,(if (not body)
-			     `(self hash configFileStr (fast-concatenate item "="))
-			     `(progn ,@body)))))))))
+     (let ((line) (words))
+       (setf line (aif rhs it (get-matching-line configFileStr lhs)))
+       (when line
+	 (merge-hash (cons (subseq lhs 0 (- (length lhs) 1)) line) :toHash hash)
+	 (setf words (lump-brackets line))
+	 (dolist (word words)
+	   (if (and (equal (char word 0) #\[) (equal (char word (- (length word) 1)) #\]))
+	       (dolist (item (get-words (string-trim "[]" word)))
+		 ,(if (not body)
+		      `(self hash configFileStr (fast-concatenate item "="))
+		      `(progn ,@body)))))))))
 
 ;recursively adds all elements in the config file that are referenced in the list of 'lhs' lines in the config file
 (defmethod add-dependent-elements ((hash hash-table) &optional (configFileStr nil) (lhs nil))
@@ -974,7 +986,8 @@ is replaced with replacement."
        (configFileWdLST (mapcar #'get-words configFileLnLST))
        (workFilePath (unless (string-equal (get-arg 0) "nil") (get-arg 0))))
   (setf (symbol-function 'args)
-	(plambda () (platform configFileStr configFileLnLST configFileWdLST workFilePath) ())))
+	(plambda () (platform configFileStr configFileLnLST configFileWdLST workFilePath) 
+	  ())))
 
 ;generates the code that generates the session object that will be executed
 ;this macro is configured by extending various pieces of the above
@@ -1095,7 +1108,8 @@ is replaced with replacement."
 		      collapseHash DVHash DVKeys IVKeys cellKeys modelProgram iterations configFileLnLST entryFnType runsPerProcess
 		      (collapseQuota quota)
 		      (lines (length (lines work)))
-		      (traversed (with-pandoric (traversed) #'get-matching-lines (sort (remove-duplicates traversed :test #'equal) #'<))))
+		      (traversed (with-pandoric (traversed) #'get-matching-lines 
+				   (sort (remove-duplicates traversed :test #'equal) #'<))))
 	   (guard (apply #'+ (mapcar #'(lambda (x) (length (runs x))) (runProcesses session)))
 		  (assert (equal (quota session) (car it)) nil
 			  "number of linesxiterationsxquota in work file (~d) not equal to number of run objects (~d)"	
@@ -1304,7 +1318,7 @@ is replaced with replacement."
 (defclass hpc-work-class (work-class) ())
 
 (defmethod initialize-instance :after ((obj hpc-work-class) &key)
-  (setf (lines obj) (mapcar #'get-words (get-lines (file-string (workFilePath obj))))))
+  (setf (lines obj) (mapcar #'get-objects (get-lines (file-string (workFilePath obj))))))
 
 (defclass hpc-collector-class (collector-class) ())
 
