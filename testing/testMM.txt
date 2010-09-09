@@ -1,0 +1,4 @@
+file2load= mm.lisp
+file2load= unitTestFramework.lisp
+file2load= testMM.lisp
+albumBuilder= #'testMM
