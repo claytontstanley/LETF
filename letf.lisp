@@ -981,13 +981,18 @@ is replaced with replacement."
 ;defines the lexical closure 'args that stores all of the information that was passed to letf using command-line arguments 
 ;'args is pandoric, so you can access its state using 'with-pandoric
 (let* ((platform (get-word (get-arg 2)))
-       (configFileStr (restructure (file-string (get-arg 1))))
-       (configFileLnLST (get-lines configFileStr))
-       (configFileWdLST (mapcar #'get-words configFileLnLST))
+       (configFilePath (get-arg 1))
+       (configFileStr)
+       (configFileLnLST)
+       (configFileWdLST)
        (workFilePath (unless (string-equal (get-arg 0) "nil") (get-arg 0))))
   (setf (symbol-function 'args)
-	(plambda () (platform configFileStr configFileLnLST configFileWdLST workFilePath) 
-	  ())))
+	(plambda () (platform configFilePath configFileStr configFileLnLST configFileWdLST workFilePath)
+	  (setf configFileStr (restructure (file-string configFilePath)))
+	  (setf configFileLnLST (get-lines configFileStr))
+	  (setf configFileWdLST (mapcar #'get-words configFileLnLST)))))
+
+(args) ;initialize configFile Str/LnLST/WdLST to defaults
 
 ;generates the code that generates the session object that will be executed
 ;this macro is configured by extending various pieces of the above

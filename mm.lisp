@@ -66,12 +66,12 @@
 (defmacro comb (&body body)
   `(alambda (rangeList &optional (trail nil))
      (if rangeList
-	 (let* ((element (car rangeList))
-		(point (first element))
-		(out))
-	   (dotimes (i (+ 1 (ceiling (- (third element) (first element)) (second element))) out)
-	     (setf out (append out (self (cdr rangeList) (append trail (list point)))))
-	     (incf point (second element))))
+	 (do* ((out) 
+	       (element (car rangeList))
+	       (point (first element) (+ point (second element)))
+	       (count 0 (+ count 1)))
+	      ((equal count (+ 1 (ceiling (- (third element) (first element)) (second element)))) out)
+	   (setf out (append out (self (cdr rangeList) (append trail (list point))))))
 	 (if (consp trail)
 	     ,(if body
 		  `(progn ,@body)
@@ -125,17 +125,21 @@
 	 (((obj run-class)))
 	 (((obj session-class))
 	  (with-pandoric (configFileWdLST) #'args
-	    (with-open-file (out 
-			     (eval
-			      (read-from-string
-			       (get-object
-				(get-matching-line configFileWdLST "workFileName="))))
-			     :direction :output :if-exists :supersede :if-does-not-exist :create)
-	      (let ((nums (mapcar (lambda (x) 
-				    (mapcar (lambda (x) (eval (read-from-string x)))
-					    (get-objects (make-sentence (rest (get-words x)))))) 
-				  (get-matching-lines configFileWdLST "IV="))))
-		(funcall (comb (format out "~{~,8f ~}~&" trail)) nums))))))
+	    (let ((nums (mapcar (lambda (line) 
+				  (mapcar (lambda (num) (eval (read-from-string num)))
+					  (get-objects (make-sentence (rest (get-words line)))))) 
+				(get-matching-lines configFileWdLST "IV=")))
+		  (workFileName (eval
+				 (read-from-string
+				  (get-object
+				   (get-matching-line configFileWdLST "workFileName=")))))
+		  (lines 0))
+	      (with-open-file (out workFileName :direction :output :if-exists :supersede :if-does-not-exist :create)
+		(funcall (comb 
+			  (incf lines) 
+			  (format out "~{~,8f ~}~&" trail)) 
+			 nums)
+		(format *error-output* "wrote ~a lines to ~a using IV ranges ~a~%" lines workFileName nums))))))
 
 (methods print-unread-lines-html-color
 	 (((obj runProcess-class)))
