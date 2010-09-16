@@ -62,22 +62,25 @@
 	(format nil "~{~,8f ~,8f ~%~}" (flatten (list (list 1 3) (list 1 4) (list 1 5) (list 3 3) (list 3 4) (list 3 5))))))))
 
 (deftest test-validate-entryFn ()
-  (macrolet ((deftest-vef (IVKeys entryFn will-error)
+  (macrolet ((deftest-vef (IVKeys DVKeys entryFn will-error)
 	       `(progn
 		  (with-pandoric (obj) #'session-object
 		    (setf (modelProgram obj) ,entryFn)
 		    (setf (IVKeys obj) ,IVKeys)
+		    (setf (DVKeys obj) ,DVKeys)
 		    (let (result)
 		      (handler-case (validate-entryFn obj)
 			(error (condition) (setf result condition)))
 		      (check
 		       (if ,will-error result (not result))))))))
-    (deftest-vef (list "noise") (lambda (&key (noise)) (declare (ignore noise))) nil)
-    (deftest-vef (list "noise") (lambda (&key (nois)) (declare (ignore nois))) t)
-    (deftest-vef (list "x" "y") (lambda (&key (X) (Y)) (declare (ignore x y))) nil)
-    (deftest-vef (list "a" "B") (lambda (&key (a) (b) (c)) (declare (ignore a b c))) t)
-    (deftest-vef (list "a" "b" "c") (lambda (&key (a) (b)) (declare (ignore a b))) t)
-    (deftest-vef (list "a" "a" "b") (lambda (&key (a) (b)) (declare (ignore a b))) t)))
+    (deftest-vef (list "noise") (list "DV") (lambda (&key (noise)) (declare (ignore noise))) nil)
+    (deftest-vef (list "noise") (list "DV") (lambda (&key (nois)) (declare (ignore nois))) t)
+    (deftest-vef (list "x" "y") (list "DV") (lambda (&key (X) (Y)) (declare (ignore x y))) nil)
+    (deftest-vef (list "a" "B") (list "DV") (lambda (&key (a) (b) (c)) (declare (ignore a b c))) t)
+    (deftest-vef (list "a" "b" "c") (list "DV") (lambda (&key (a) (b)) (declare (ignore a b))) t)
+    (deftest-vef (list "a" "a" "b") (list "DV") (lambda (&key (a) (b)) (declare (ignore a b))) t)
+    (deftest-vef () (list "DV") (lambda (&key (a) (b)) (declare (ignore a b))) t)
+    (deftest-vef (list "IV") () (lambda (&key (IV)) (declare (ignore IV))) t)))
 
 (defun testMM ()
   (let ((result
