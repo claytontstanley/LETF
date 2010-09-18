@@ -68,14 +68,19 @@
   (let ((syms (remove-duplicates
 	       (remove-if-not #'g!-symbol-p
 			      (flatten body)))))
+    (multiple-value-bind (forms decls doc) 
+	#+:SBCL (sb-int::parse-body body)
+	#-:SBCL (values body nil nil)
     `(defmacro ,name ,args
+       ,doc
+       ,@decls
        (let ,(mapcar
 	      (lambda (s)
 		`(,s (gensym ,(subseq
 			       (symbol-name s)
 			       2))))
 	      syms)
-         ,@body))))
+         ,@forms)))))
 
 (defun o!-symbol-p (s)
   (and (symbolp s)
@@ -92,9 +97,14 @@
 (defmacro defmacro! (name args &rest body)
   (let* ((os (remove-if-not #'o!-symbol-p args))
          (gs (mapcar #'o!-symbol-to-g!-symbol os)))
-    `(defmacro/g! ,name ,args
-       `(let ,(mapcar #'list (list ,@gs) (list ,@os))
-          ,(progn ,@body)))))
+    (multiple-value-bind (forms decls doc)
+	#+:SBCL (sb-int::parse-body body)
+	#-:SBCL (values body nil nil)
+	`(defmacro/g! ,name ,args
+	   ,doc
+	   ,@decls
+	   `(let ,(mapcar #'list (list ,@gs) (list ,@os))
+	      ,(progn ,@forms))))))
 
 (defmacro! dlambda (&rest ds)
   `(lambda (&rest ,g!args)
