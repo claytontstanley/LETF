@@ -12,7 +12,6 @@
 ;;;               Enables using the LETF interface when running models on MM
 ;;;               mm.lisp acts as the mediator, abstracting away all of the MM details from the modeler
 ;;;               This allows models that have been interfaced with LETF to be portable (run on both HPCs and MM without altering)
-;;; 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;work class is responsible for storing the points to run

@@ -10,7 +10,6 @@
 ;;; 
 ;;; Description : Unit tests for mm.lisp
 ;;;               Uses unitTestFramework.lisp as the UTF 
-;;;               
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 ;define a function called session-object that is a lexical closure that
