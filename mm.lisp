@@ -149,6 +149,9 @@
 			"keys ~a for entry function ~a do not match IVs ~a in config file"
 			lst modelProgram IVKeys)))
 	    (when (equal entryFnType 'hash)
+	      ;this assert nil nil will throw an error; only a 'keys entryFnType is allowed on MM
+	      ;for example (defun run-model (&key (x) (y)) ... is allowed, but
+	      ;(defun run-model (hash) ... is not allowed
 	      (assert nil nil "not allowing hash-table style entry functions for MM yet. Keep it simple...")
 	      (assert (equal (length arglst) 1) nil "problem with argument list ~a for the entry function ~a"
 		      arglst modelProgram))
