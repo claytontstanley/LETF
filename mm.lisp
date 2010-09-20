@@ -1,3 +1,20 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;  -*- mode: LISP; Syntax: COMMON-LISP;  Base: 10 -*-
+;;; 
+;;; Author      : Clayton Stanley
+;;; Address     : Air Force Research Laboratory
+;;;             : Mesa, AZ 85212 USA
+;;;             : clayton.stanley@wpafb.af.mil
+;;; Filename    : mm.lisp
+;;; Version     : 1.0
+;;; 
+;;; Description : MindModeling extensions to letf.lisp (lisp-based exploratory testing framework)
+;;;               Enables using the LETF interface when running models on MM
+;;;               mm.lisp acts as the mediator, abstracting away all of the MM details from the modeler
+;;;               This allows models that have been interfaced with LETF to be portable (run on both HPCs and MM without altering)
+;;; 
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;work class is responsible for storing the points to run
 ;this is done by setting the 'lines' slot in the class
 ;the 'workFilePath' slot gets set automatically; it is set to the 
