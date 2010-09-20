@@ -1,3 +1,18 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;;  -*- mode: LISP; Syntax: COMMON-LISP;  Base: 10 -*-
+;;; 
+;;; Author      : Clayton Stanley
+;;; Address     : Air Force Research Laboratory
+;;;             : Mesa, AZ 85212 USA
+;;;             : clayton.stanley@wpafb.af.mil
+;;; Filename    : testMM.lisp
+;;; Version     : 1.0
+;;; 
+;;; Description : Unit tests for mm.lisp
+;;;               Uses unitTestFramework.lisp as the UTF 
+;;;               
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 ;define a function called session-object that is a lexical closure that
 ;stores the mm object generated from calling the build-mm-session function
 ;this closure is pandoric, so we can access obj by using the with-pandoric macro
