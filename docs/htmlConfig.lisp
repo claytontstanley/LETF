@@ -1,5 +1,7 @@
 (require 'asdf)
-(load "cldoc/cldoc.asd")
+
+(load (format nil "~a/cldoc/cldoc.asd"
+	(get-pandoric #'args 'platform)))
 (require 'cldoc)
 
 (defun generate-docs ()
