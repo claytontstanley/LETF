@@ -1,4 +1,5 @@
 (require 'asdf)
+(asdf:disable-output-translations)
 
 (load (format nil "~a/cldoc/cldoc.asd"
 	(get-pandoric #'args 'platform)))
