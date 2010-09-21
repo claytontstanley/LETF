@@ -1,0 +1,5 @@
+albumBuilder= #'generate-docs
+file2load= mm.lisp
+file2load= htmlConfig.lisp 
+
+
