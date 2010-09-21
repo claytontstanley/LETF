@@ -1,11 +1,7 @@
-
-
-shareDir = /public/GridPortalShared/
+platform = $(shell uname | tr '[:upper:]' '[:lower:]')
 
 all: htmlDocs
 
 htmlDocs:
-	$(shareDir)SBCL/linux/sbcl --core $(shareDir)SBCL/linux/sbcl.core --noinform --noprint --disable-debugger --load letf.lisp linux htmlConfig.txt nil
+	sbcl --noinform --noprint --disable-debugger --load letf.lisp $(platform) htmlConfig.txt nil
 
-htmlDocsDarwin:
-	sbcl --noinform --noprint --disable-debugger --load letf.lisp darwin htmlConfig.txt nil	
