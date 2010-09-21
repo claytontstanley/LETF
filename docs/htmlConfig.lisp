@@ -1,4 +1,5 @@
 (require 'asdf)
+(load "cldoc/cldoc.asd")
 (require 'cldoc)
 
 (defun generate-docs ()
