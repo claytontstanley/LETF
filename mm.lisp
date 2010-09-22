@@ -14,24 +14,21 @@
 ;;;               This allows models that have been interfaced with LETF to be portable (run on both HPCs and MM without altering)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-;work class is responsible for storing the points to run
-;this is done by setting the 'lines' slot in the class
-;the 'workFilePath' slot gets set automatically; it is set to the 
-;string for the workFilePath that was passed to letf as an argument 
-(defclass mm-work-class (work-class) ())
+(defclass mm-work-class (work-class) 
+  () 
+  (:documentation "mm-work-class is responsible for storing the points to run; this is done by setting the 'lines' slot in the class"))
 
-;setting the 'lines' slot, and storing the points to run
 (defmethod initialize-instance :after ((obj mm-work-class) &key)
+  "setting the 'lines' slot, and storing the points to run"
   (setf (lines obj) (mapcar #'get-objects (get-lines (file-string (workFilePath obj))))))
 
-;collector class is responsible for printing the outputs of a collapsed set of runs 
-;extending the class to hold the filename where all of the results will be printed
 (defclass mm-collector-class (collector-class)
-  ((out :accessor out :initarg :out :initform "mm_out.txt")))
+  ((out :accessor out :initarg :out :initform "mm_out.txt" 
+	:documentation "extending the base class to hold the filename where all of the results will be printed"))
+  (:documentation "mm-collector-class is responsible for printing the outputs of a collapsed set of runs"))
 
-;the method that will be called after each collapsed run
-;for the mm system, the results will be appended to mm_out.txt
 (defmethod print-collector ((obj mm-collector-class))
+  "method will be called after each collapsed run; for the mm system, the results will be appended to mm_out.txt"
   (with-open-file (out (out obj) :direction :output :if-exists :append :if-does-not-exist :create)
     (dotimes (i (length (cellElements obj)))
       (format out "~a " (cdr (nth i (cellElements obj)))))
@@ -39,32 +36,30 @@
       (aif (cdr (get-element key (collection obj) (gethash-ifhash key (collapseHash obj))))
 	   (format out "~a " (coerce it 'double-float))))))
 
-;process-output-str-class is responsible for keeping track of the last N lines
-;that were printed by the model to stdout/sterr; so, if the model errors out,
-;these last N lines (the model's last dying comments) are printed
-(defclass mm-process-output-str-class (process-output-str-class) ())
+(defclass mm-process-output-str-class (process-output-str-class) 
+  ()
+  (:documentation "mm-process-output-str class is responsible for keeping track of the last N lines printed by the model"))
 
-;currently printing those last lines to stdout for the mm system
 (defmethod print-collector ((obj mm-process-output-str-class))
+  "method will be called if the model has died; will print the last lines outputted by the model (the model's last dying comments to stdout)"
   (format t "model unexpectedly quit... ~%~%here are the last ~a lines that were printed to stdout before the error~%~a~%"
 	  (quot obj) (make-sentence (gethash "str" (collection obj)) :spaceDesignator #\Newline))
   (if (error-p obj) (format t "here's the error~%~a~%" (error-p obj))))
 
-;run-collector-class is responsible for printing the outputs of a run
-;extending the class to hold the file that will be touched after each run
-;is completed, to relay progress back up to the server
 (defclass mm-run-collector-class (run-collector-class)
-  ((out :accessor out :initarg :out :initform "mm_fraction_done.txt")))
+  ((out :accessor out :initarg :out :initform "mm_fraction_done.txt"
+	:documentation "extending the base class to hold the file that will be touched after each run"))
+  (:documentation "mm-run-collector-class is responsible for printing the outputs of a run"))
 
-;touching the file after each run, and writing the percent done
 (defmethod print-collector ((obj mm-run-collector-class))
+  "method will be called after each run; will touch the file and write the percent done"
   (with-open-file (out (out obj) :direction :output :if-exists :supersede :if-does-not-exist :create)
     (format out "~a" (coerce (/ (quot (first (runs obj))) (quota (session (runProcess (first (runs obj)))))) 'double-float))))
 
-;calling the macro that builds the session object
-;passing constructors to each of the classes extended above
-;to customize the object for mm
 (defun build-mm-session ()
+  "top-level mm function called by letf that builds the session object"
+  
+  ;passing constructors to each of the classes extended above to customize the object for mm
   (build-session ;this is a macro
    :collector-instance (make-instance 'mm-collector-class)
    :work-instance (make-instance 'mm-work-class)
@@ -104,6 +99,7 @@
 ;try (funcall (comb) (list (list 0 1 2) (list 3 2 7)))
 (defmacro comb (&body body)
   "generate all of the combinations of the lists inside of rangeList"
+  
   ;macro is returning a function; the function is anaphoric, so you can recurse on it ('self') before it is defined
   ;this is the 'alambda' macro
   ;trail holds the history of where you have tracked
@@ -131,11 +127,11 @@
 		  `(progn ,@body)
 		  `(list trail))))))
 
-;validate the parameters defined in the entry function against parameter names specified in the config file
 (methods validate-entryFn
 	 (((obj runprocess-class)))
 	 (((obj run-class)))
 	 (((obj session-class))
+	  "method will validate the parameters defined in the entry function against par names specified in the config file"
 	  (let* ((IVKeys (IVKeys obj))
 		 (DVKeys (DVKeys obj))
 		 (modelProgram (modelProgram obj))
@@ -159,11 +155,11 @@
 	    (when (equal entryFnType 'process)
 	      nil))))
 
-;check that the syntax for the 'start stepsize end' points specified for each IV is correct
 (methods validate-full-combinatorial
 	 (((obj runProcess-class)))
 	 (((obj run-class)))
 	 (((obj session-class))
+	  "method will check that the syntax for the 'start stepsize end' points specified for each IV in the config file is correct"
 	  (with-pandoric (configFileWdLST) #'args
 	    (dolist (line (get-matching-lines configFileWdLST "IV="))
 	      (let ((nums (mapcar (lambda (x) 
@@ -182,11 +178,11 @@
 	      (let ((name (get-words line)))
 		(assert (equal (length name) 1) nil "not 1 name in line DV=~a" line))))))
 
-;generates all of the combinations of IVs, given their 'start stepsize end' points
 (methods generate-full-combinatorial
 	 (((obj runProcess-class)))
 	 (((obj run-class)))
 	 (((obj session-class))
+	  "method will generate all combinations of IVs in config file, and write the results (line by line) to file workFileName= in config file"
 	  (with-pandoric (configFileWdLST) #'args
 	    (let ((nums (mapcar (lambda (line) 
 				  (mapcar (lambda (num) (eval (read-from-string num)))
@@ -208,20 +204,20 @@
 			 nums)
 		(format *error-output* "wrote ~a lines to ~a using IV ranges ~a~%" lines workFileName nums))))))
 
-;an 'around' method that calls 'print-unread-lines' in letf, but prints the results in html color
 (methods print-unread-lines-html-color
 	 (((obj runProcess-class)))
 	 (((obj run-class)))
 	 (((obj session-class))
+	  "an 'around' method that calls 'print-unread-lines' in letf, but prints the results in html color"
 	  (format *error-output* (html-color-start :color orange))
 	  (print-unread-lines obj)
 	  (format *error-output* (html-color-stop))))
 
-;an 'around' method that calls 'print-session' in letf, but prints the results in html color
 (methods print-session-html-color
 	 (((obj runProcess-class)))
 	 (((obj run-class)))
 	 (((obj session-class))
+	  "an 'around' method that calls 'print-session' in letf, but prints the results in html color"
 	  (format *error-output* (html-color-start :color orange))
 	  (print-session obj)
 	  (format *error-output* (html-color-stop))))

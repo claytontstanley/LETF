@@ -14,6 +14,12 @@
 
 (require 'cldoc)
 
+;macroexpand the 'methods' macro to grab the documentation for each of the methods
+(cludg::define-descriptor-handler METHODS (form)
+  "methods"
+  (values nil :restart (list (let ((*print-case* :upcase))
+			       (macroexpand-1 form)))))
+
 (defun generate-docs ()
     (cldoc:extract-documentation 'cldoc:html "html"
      '("letf.lisp" "mm.lisp")

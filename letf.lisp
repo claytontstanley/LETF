@@ -1266,6 +1266,8 @@ is replaced with replacement."
    nil "not all collectors fully executed"))
 
 (defmacro methods (name &rest args)
+  ;adding a 'stub method' line to the documentation, if defining an empty stub method
+  (mapc (lambda (x) (if (not (cdr x)) (setf (cdr x) `("stub method")))) args)
   `(progn ,@(mapcar (lambda (x) `(defmethod ,name ,@x)) args)))
 
 (methods print-unread-lines 
