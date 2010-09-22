@@ -14,11 +14,26 @@
 
 (require 'cldoc)
 
-;macroexpand the 'methods' macro to grab the documentation for each of the methods
-(cludg::define-descriptor-handler METHODS (form)
-  "methods"
-  (values nil :restart (list (let ((*print-case* :upcase))
-			       (macroexpand-1 form)))))
+;each name in names will be macroexpanded-1 before trying to document
+;cldoc, by default, will document defun, defmacro, defmethod, etc.
+;in order to document macros that have been written that write code
+;that compiles down to defun, defmacro, defmethod, etc., you have
+;to tell cldoc to macroexpand each of these macros first, before trying
+;to parse the forms to grab the documentation
+;this allows you to write macros to extend the language (keep the power of lisp)
+;while still documenting the macros you write (keep the readability of cldoc)
+(defmacro macroexpand-for-documenting (&rest names)
+  `(progn
+     ,@(mapcar (lambda (name)
+	    `(cludg::define-descriptor-handler ,name (form)
+	       (symb ',name)
+	       (values nil :restart (list (let ((*print-case* :upcase))
+					    (macroexpand-1 form))))))
+	  names)))
+
+;macroexpand the macros that write code that defines other macros/functions/methods
+;this way the macros/functions/methods that the macros write gets documented as well
+(macroexpand-for-documenting METHODS DEFMACRO/G! DEFMACRO!)
 
 (defun generate-docs ()
     (cldoc:extract-documentation 'cldoc:html "html"
