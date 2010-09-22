@@ -27,16 +27,19 @@
 ;////////////////////////////////////////////////////////////
 ;everything below is from Doug Hoyte's 'Let over Lambda' book (lol.lisp)
 ;some of which is originally from Paul Graham's 'On Lisp' book
+
 (defmacro aif (test-form then-form &optional else-form)
+  "anaphoric version of if' 'it' is the anaphor"
   `(let ((it ,test-form))
      (if it ,then-form ,else-form)))
 
 (defmacro awhen (test-form &body body)
+  "anaphoric version of when; 'it' is the anaphor"
   `(aif ,test-form
      (progn ,@body)))
 
-;; Graham's alambda
 (defmacro alambda (parms &body body)
+  "Graham's anaphoric version of lambda; 'self' is the anaphor"
   `(labels ((self ,parms ,@body))
      #'self))
 
@@ -50,13 +53,16 @@
     (rec lis nil)))
 
 (defun mkstr (&rest args)
+  "concatenates and converts a list of symbols to a string"
   (with-output-to-string (s)
     (dolist (a args) (princ a s))))
 
 (defun symb (&rest args)
+  "concatenates and converts a list of symbols to a string"
   (values (intern (apply #'mkstr args))))
 
 (defun g!-symbol-p (s)
+  "returns true if symbol s starts with g!"
   (and (symbolp s)
        (> (length (symbol-name s)) 2)
        (string= (symbol-name s)
@@ -65,6 +71,7 @@
                 :end1 2)))
 
 (defmacro defmacro/g! (name args &rest body)
+  "gensym (g!) capabilities added to defmacro"
   (let ((syms (remove-duplicates
 	       (remove-if-not #'g!-symbol-p
 			      (flatten body)))))
@@ -83,6 +90,7 @@
          ,@forms)))))
 
 (defun o!-symbol-p (s)
+  "returns true if symbol s starts with an o!"
   (and (symbolp s)
        (> (length (symbol-name s)) 2)
        (string= (symbol-name s)
@@ -91,10 +99,12 @@
                 :end1 2)))
 
 (defun o!-symbol-to-g!-symbol (s)
+  "converts an o! symbol to a g! symbol"
   (symb "G!"
         (subseq (symbol-name s) 2)))
 
 (defmacro defmacro! (name args &rest body)
+  "once only (o!) and gensym (g!) capabilities added to defmacro"
   (let* ((os (remove-if-not #'o!-symbol-p args))
          (gs (mapcar #'o!-symbol-to-g!-symbol os)))
     (multiple-value-bind (forms decls doc)
@@ -107,6 +117,7 @@
 	      ,(progn ,@forms))))))
 
 (defmacro! dlambda (&rest ds)
+  "macro that returns a function that calls different user-defined functions depending on the input supplied"
   `(lambda (&rest ,g!args)
      (case (car ,g!args)
        ,@(mapcar
@@ -132,6 +143,7 @@
  #\# #\` #'|#`-reader|)
 
 (defun pandoriclet-get (letargs)
+  "low-level getter function for pandoric macros"
   `(case sym
      ,@(mapcar #`((,(car a1)) ,(car a1))
                letargs)
@@ -140,6 +152,7 @@
 	 sym))))
 
 (defun pandoriclet-set (letargs)
+  "low-level setter function for pandoric macros"
   `(case sym
      ,@(mapcar #`((,(car a1))
 		  (setq ,(car a1) val))
@@ -151,9 +164,11 @@
 (declaim (inline get-pandoric))
 
 (defun get-pandoric (box sym)
+  "opens a pandoric closure 'box' and returns the value for 'sym'"
   (funcall box :pandoric-get sym))
 
 (defsetf get-pandoric (box sym) (val)
+  "opens a pandoric closure 'box' and sets the value for 'sym' to 'val'"
   `(progn
      (funcall ,box :pandoric-set ,sym ,val)
      ,val))
@@ -166,6 +181,7 @@
 ;their value to something else), you wrap your 
 ;section of code with a 'with-pandoric
 (defmacro with-pandoric (syms box &rest body)
+  "opens a pandoric closure 'box' and places variables 'syms' within the scope of 'body'"
   (let ((g!box (gensym "box")))
     `(let ((,g!box ,box))
        (declare (ignorable ,g!box))
@@ -175,6 +191,7 @@
          ,@body))))
 
 (defmacro plambda (largs pargs &rest body)
+  "defines a pandoric closure that is a lexical closure over 'pargs'"
   (let ((pargs (mapcar #'list pargs)))
     `(let (this self)
        (setq
@@ -186,27 +203,32 @@
 ;////////////////////////////////////////////////////////////
 ;///////////////////////////////////////////end lol.lisp
 
-;equivalent to writing (concatenate 'string ...), but ~5x faster
 (defmacro! fast-concatenate (&rest lst)
+  "equivalent to writing (concatenate 'string ...), but ~5x faster"
   `(with-output-to-string (,g!stream)
      ,@(mapcar (lambda (x) `(write-string ,x ,g!stream)) lst)))
 
 (defmacro push-to-end (item place)
+  "analogous to the push macro; just places 'item' at the end of 'place', instead of the front"
   `(setf ,place (nconc ,place (list ,item))))
 	    
 (defmacro while (test &body body)
+  "loops through body, evaluating test each time until test returns false"
   `(do ()
        ((not ,test)) 
      ,@body))
 
 (defmacro mklst (item)
+  "makes a list out of item, if necessary; does not alter the empty list 'nil'"
   `(if (not (listp ,item)) (setf ,item (list ,item))))
 
 (defmacro verbose (&rest lst)
+  "echoes the unevaluated forms in lst to *error-output* before evaluating them"
   (mapc #'(lambda (x) (format *error-output* "~a~%" x)) lst)
   `(progn ,@lst))
 
 (defmacro guard (fun &body body)
+  "evaluates 'fun'; before returning, evaluates the guards in body (which can access fun through the anaphor 'it')"
   `(let ((it (multiple-value-call #'list ,fun)))
      ,(if (not body)
 	  `(assert (<= (length (car it)) 1) nil 
@@ -224,29 +246,28 @@
 	  (push-to-end str loaded)
 	  (load str))))
 
-;returns if a key is present in the hash table
 (defun key-present (key hash)
+  "returns if a key is present in the hash table"
   (multiple-value-bind (value flag) (gethash key hash)
     (declare (ignore value))
     flag))
 
-;equivalent to #'symbol-function, just safer.
-;converts a symbol to the function that the 
-;symbol points to; if it can't convert the 
-;symbol, it returns the symbol
 (defun symbol-function-safe (x)
+  "equivalent to #'symbol-function, just safer; converts a symbol to the function that the 
+   symbol points to; if it can't convert the symbol, it returns the symbol"
   (if (and (equal 'symbol (type-of x))
 	   (fboundp x))
       (symbol-function x)
       x))
 
 (defun gethash-ifHash (key hash)
+  "gets value of key in hash table, if hash is a hash table; otherwise, return hash"
   (if (hash-table-p hash)
       (guard (gethash key hash) (assert (key-present key hash)))
       hash))
 
-;converts the rows to columns (and vice versa) in a nested list
 (defun transpose (lst)
+  "converts the rows to columns (and vice versa) in a nested list"
   (if (and lst (consp lst) (consp (car lst)))
       (let ((templst) (out))
 	(assert (equal (length (remove-duplicates (mapcar #'length lst) :test #'equal)) 1))
@@ -256,9 +277,8 @@
 	    (push-to-end (nth j (nth i lst)) templst))))
       lst))
 
-;collapses across a nested list (returning a flat list)
-;by calling collapseFn on each column in the list
 (defun collapse (lst collapseFn)
+  "collapses across a nested list (returning a flat list) by calling collapseFn on each column in the list"
   (if (not collapseFn)
       lst
       (if (and lst (consp lst) (consp (car lst)))
@@ -268,22 +288,21 @@
 	  (funcall collapseFn lst))))
 	  
 (defun replace-all (string part replacement &key (test #'char-equal))
-"Returns a new string in which all the occurences of the part 
-is replaced with replacement."
-    (with-output-to-string (out)
-      (loop with part-length = (length part)
-            for old-pos = 0 then (+ pos part-length)
-            for pos = (search part string
-                              :start2 old-pos
-                              :test test)
-            do (write-string string out
-                             :start old-pos
-                             :end (or pos (length string)))
-            when pos do (write-string replacement out)
-            while pos))) 
+  "Returns a new string in which all the occurences of the part is replaced with replacement."
+  (with-output-to-string (out)
+    (loop with part-length = (length part)
+       for old-pos = 0 then (+ pos part-length)
+       for pos = (search part string
+			 :start2 old-pos
+			 :test test)
+       do (write-string string out
+			:start old-pos
+			:end (or pos (length string)))
+       when pos do (write-string replacement out)
+       while pos))) 
 
-;returns lst of indeces where any of the characters in list chr is in string strng
 (defun find-in-string (strng chr)
+  "returns lst of indeces where any of the characters in list chr is in string strng"
   (mklst chr)
   (if (and strng (not (stringp strng))) 
       (setf strng (string strng)))
@@ -297,6 +316,7 @@ is replaced with replacement."
        (push i out)))))
        
 (defun print-hash (hash &key (strm t) (keys nil))
+  "recursively prints the key values in hash table hash"
   (mklst keys)
   (labels ((hash-string (hash &key (keys nil))
 	     (if (not (hash-table-p hash))
@@ -308,6 +328,7 @@ is replaced with replacement."
     (format strm "~a~%" (string-trim (list #\Newline #\Return #\LineFeed) (hash-string hash :keys keys)))))
 
 (defun copy-hash (hash)
+  "recursively copies the hash table hash; returns the copied hash"
   (if (hash-table-p hash)
       (let ((out (make-hash-table :test #'equalp)))
 	(loop for value being the hash-values of hash using (hash-key key) do 
@@ -315,8 +336,8 @@ is replaced with replacement."
 	out)
       hash))
 
-;copies all of the hash tables in the list lst, and merges them
 (defun merge-hash (lst &key (toHash))
+  "copies all of the hash tables in the list lst, and merges them"
   (let* ((fun (lambda (out key value)
 		(if (key-present key out) 
 		    (assert (equalp (gethash key out) value) nil
@@ -338,16 +359,15 @@ is replaced with replacement."
     out))
 
 (defun file-string (path)
-  "Sucks up an entire file from PATH into a freshly-allocated string,
-      returning two values: the string and the number of bytes read."
+  "Sucks up an entire file from PATH into a freshly-allocated string returning two values: the string and the number of bytes read."
   (if path
       (with-open-file (s path)
 	(let* ((len (file-length s))
 	       (data (make-string len)))
 	  (values data (read-sequence data s))))))
 
-;if any column in the nested list is nil, it throws out the column
 (defun throwOutYerNils (&rest lsts)
+  "if any column in the nested list is nil, it throws out the column"
   (let ((out))
     (if (consp (car lsts))
 	(dolist (column (transpose lsts) (setf out (transpose out)))
@@ -356,9 +376,8 @@ is replaced with replacement."
 	(if (not (member nil lsts)) (setf out lsts)))
     (apply #'values (if out out (make-sequence 'list (length lsts) :initial-element nil)))))
 
-;shorthand macro for recursively calling a function across 
-;the lists in the nested lists left and right
 (defmacro inLST (left right fName throwOutYerNils)
+  "shorthand macro for recursively calling a function across the lists in the nested lists left and right"
   `(if ,left (if (consp (car ,left))
 		 (let ((out))
 		   (dolist (itm ,left)
@@ -366,14 +385,17 @@ is replaced with replacement."
 		   (return-from ,fName (flatten out))))))
 
 (defmacro inLSTs (left right fName throwOutYerNils)
+  "shorthand macro for recursively calling a function across the lists in the nested lists left and right"
   `(progn
      (inLST ,left ,right ,fName ,throwOutYerNils)
      (inLST ,right ,left ,fName ,throwOutYerNils)))
 
 (defmacro assertEqualLengths (l1 l2)
+  "asserts that l1 and l2 are equal in length"
   `(assert (equal (length ,l1) (length ,l2)) nil "length ~d not equal to length ~d" (length ,l1) (length ,l2)))
 
 (defun median (lst &key (throwOutYerNils nil))
+  "returns the median of lst, throwing out the 'nils' in list if flag is true"
   (mklst lst)
   (if throwOutYerNils (setf lst (throwOutYerNils lst)))
   (if lst
@@ -386,28 +408,33 @@ is replaced with replacement."
 	    (nth (/ (- len 1) 2) sortedList)))))
 
 (defun sum (lst &key (throwOutYerNils nil))
+  "returns the sum of lst, throwing out the 'nils' in list if flag is true"
   (mklst lst)
   (if throwOutYerNils (setf lst (throwOutYerNils lst)))
   (if lst (apply #'+ lst)))
 
 (defun mean (lst &key (throwOutYerNils nil))
+  "returns the mean of lst, throwing out the 'nils' in list if flag is true"
   (mklst lst)
   (if throwOutYerNils (setf lst (throwOutYerNils lst)))
   (if lst (/ (apply #'+ lst) (length lst))))
   
 (defun MAD (l1 l2 &key (throwOutYerNils nil))
+  "returns the mean absolute deviation of l1 and l2, throwing out the l1/l2 element pairs if either is 'nil', if flag is true"
   (inLSTs l1 l2 MAD throwOutYerNils)
   (assertEqualLengths l1 l2)
   (if throwOutYerNils (multiple-value-setq (l1 l2) (throwOutYerNils l1 l2)))
   (if l1 (/ (apply #'+ (mapcar (lambda (x y) (abs (- x y))) l1 l2)) (length l1))))
 
 (defun RMSE (l1 l2 &key (throwOutYerNils nil))
+  "returns the root mean squared deviation of l1 and l2, throwing out the l1/l2 element pairs if either is 'nil', if flag is true"
   (inLSTs l1 l2 RMSE throwOutYerNils)
   (assertEqualLengths l1 l2)
   (if throwOutYerNils (multiple-value-setq (l1 l2) (throwOutYerNils l1 l2)))
   (if l1 (sqrt (/ (apply #'+ (mapcar (lambda (x y) (* (- x y) (- x y))) l1 l2)) (length l1)))))
 
 (defun correl (l1 l2 &key (throwOutYerNils nil))
+  "returns the correlation of l1 and l2, throwing out the l1/l2 element pairs if either is 'nil', if flag is true"
   (inLSTs l1 l2 correl throwOutYerNils)
   (labels ((std (lst)
 	     (sqrt (/ (apply #'+ (mapcar 
@@ -431,8 +458,8 @@ is replaced with replacement."
 	(if out (if (not (or (> 0 out) (< 0 out) (equal 0 out))) (setf out nil)))
 	out))))
 
-;returns a list of the words in str
 (defun get-words (str &key (spaceDesignators (list #\Space #\Tab)) (includeSpaceDesignators nil))
+  "returns a list of the words in str"
   (if str (setf str (string-trim (list #\Space #\Tab) str))) ;yes, these should be hardcoded to space and tab
   (let ((out) (start) (in-the-white))
     (mklst spaceDesignators)
@@ -452,12 +479,12 @@ is replaced with replacement."
 	    (setf in-the-white nil)
 	    (setf start i))))))
 
-;just like get words, but asserts that only one word can be found. Returns that word, and not
-;a list of words, like get-words does
 (defmacro get-word (&rest lst)
+  "just like get words, but asserts that at most one word can be found. Returns that word, and not a list of words"
   `(car (guard (get-words ,@lst))))
 
 (defun get-objects (str)
+  "returns a list of the lisp objects in str; an object is anything that can be evaled by the lisp reader, e.g., 5, or (+ 3 2) or (+ (+ 1) 2)"
   (let ((startIndex 0)
 	(out))
     (while (< startIndex (length str))
@@ -467,15 +494,17 @@ is replaced with replacement."
     out))
 
 (defmacro get-object (&rest lst)
+  "just like get-objects, but asserts that at most one object can be found. Returns that object, and not a list of objects"
   `(car (guard (get-objects ,@lst))))
 
 (defun get-lines (str &key (lineDesignators (list #\Newline #\Return #\LineFeed)) (includeLineDesignators nil))
+  "returns a list of the lines in str"
   (let ((out))
     (dolist (line (get-words str :spaceDesignators lineDesignators :includeSpaceDesignators includeLineDesignators) (reverse out))
       (push (string-trim (list #\Space #\Tab) line) out))))
 
-;takes a list of strings, and returns a single string with single whitespaces between each word
 (defun make-sentence (lst &key (spaceDesignator " "))
+  "takes a list of strings, and returns a single string with single whitespaces between each word"
   (if (not (stringp spaceDesignator))
       (setf spaceDesignator (string spaceDesignator)))
   (mklst lst)
@@ -489,10 +518,9 @@ is replaced with replacement."
 		  (setf flag t))
 	      (write-string item out)))))))
 
-;like get-words, returns a list of the words in str
-;however, here all words that are within brackets are lumped together as one word (i.e., item) in the list
-;if there are no brackets in str, then lump-brackets is equivalent to get-words
 (defun lump-brackets (str &key (desigs (list #\[ #\])) (include-brackets t))
+  "like get-words, returns a list of the words in str however, all words that are within brackets are lumped together as one word;
+   if there are no brackets in str, then lump-brackets is equivalent to get-words"
   (if (not desigs) (return-from lump-brackets (get-words str)))
   (assert (equal (length desigs) 2))
   (let ((out) (in-bracket) (lump))
@@ -510,6 +538,7 @@ is replaced with replacement."
     (flatten out)))
 
 (defun toString (lst)
+  "converts a list of lisp objects to string representations that can be evaled to return the objects"
   (cond ((consp lst)
 	 (with-output-to-string (out)
 	   (write-string "(list " out)
@@ -527,6 +556,7 @@ is replaced with replacement."
 	 (format nil "~a" (coerce lst 'double-float)))))
 
 (defmacro remap-string (&body body)
+  "expands the string expression in body, by inserting all hash keynames written inside brackets [] in body to their values"
   `(alambda (str hash &key (collapseFn "#'mean") (inside-brackets nil) (key nil))
      (if inside-brackets
          ;remaps an expression surrounded by brackets by calling the hash table on each of the words in the expression
@@ -560,12 +590,12 @@ is replaced with replacement."
 		 (setf out (make-sentence out))))
 	   out))))
 
-;traverses the 'keys' in the hash table 'hash', and recursively
-;searches the other keys that each 'key' references. During the traversal
-;checks if keys are present not-present, and builds a list of those keys
-;if bool is t, returns the list of keys that are present; if bool is nil,
-;returns the list of keys that aren't present
 (defun traverse (keys hash &key (bool nil) (collapseFn "#'mean"))
+  "traverses the 'keys' in the hash table 'hash', and recursively
+   searches the other keys that each 'key' references. During the traversal,
+   checks if keys are present not-present, and builds a list of those keys
+   if bool is t, returns the list of keys that are present; if bool is nil,
+   returns the list of keys that aren't present"
   (mklst keys)
   (let* ((words) (str) 
 	 (traversed (make-hash-table :test #'equalp))
@@ -585,17 +615,16 @@ is replaced with replacement."
        str))
     (values (sort (flatten words) #'string<) str)))
 
-;returns the subset of keys that are needed to 'remap' the keys in 'keys' 
-;that do not currently have values associated with them
 (defmacro necessaries (keys hash &rest args)
+  "returns the subset of keys that are needed to 'remap' the keys in 'keys' that do not currently have values associated with them"
   `(traverse ,keys ,hash :bool nil ,@args))
 
-;...that already have values associated with them
 (defmacro availables (keys hash &rest args)
+  "returns the subset of keys that are needed to 'remap' the keys in 'keys' that already have values associated with them"
   `(traverse ,keys ,hash :bool t ,@args))
 
-;evaluates all the stuff in the hash table that it can, given the current state of the hash table
 (defmethod eval-hash ((hash hash-table))	     
+  "evaluates all the stuff in the hash table that it can, given the current state of the hash table"
   (let* ((traversed (make-hash-table :test #'equalp))
 	 (fun (remap-string
 	       (if (not (key-present word traversed))
@@ -621,10 +650,10 @@ is replaced with replacement."
 	 (if (not (necessaries key hash))
 	     (funcall fun (fast-concatenate "[" key "]") hash)))))
 
-;takes an expression, and expands the ':'s (similar to how matlab references arrays)
-;for example: (bracket-expand "hello1:5") -> "hello1 hello2 hello3 hello4 hello5"
-;(bracket-expand "1:5hello") -> "1hello 2hello 3hello 4hello 5hello"
 (defun bracket-expand (str &optional (inside-brackets nil))
+  "takes an expression, and expands the ':'s (similar to how matlab references arrays)
+   for example: (bracket-expand \"hello1:5\") -> \"hello1 hello2 hello3 hello4 hello5\"
+   (bracket-expand \"1:5hello\") -> \"1hello 2hello 3hello 4hello 5hello\""
   (labels ((num-indeces (str direction)
 	     (assert (or (string-equal direction "fromLeft") (string-equal direction "fromRight") (string-equal direction "both")))
 	     (let ((out) (numIndeces) (index -1))
@@ -700,6 +729,7 @@ is replaced with replacement."
 		    out))))))))
 
 (defun get-first-word-from-matching-lines (str keys)
+  "gets the RHS from lines in string 'str' where the LHS matches a key in 'keys'" 
   (mklst keys)
   (let ((out))
     (dolist (line (get-matching-lines str keys) out)
@@ -708,13 +738,13 @@ is replaced with replacement."
 		   (assert (> (length (car it)) 0) nil "no rhs for line in config file using keys ~a" keys)))
        out))))
 
-;same as above, just asserts the expectation that only one (or zero) lines should be returned
 (defmacro get-matching-line (&rest lst)
+  "same as get-matching-lines, just asserts the expectation that only one (or zero) lines should be returned"
   `(car (guard (get-matching-lines ,@lst))))
 
-;returns the list of elements (key . value) from the hash table 'hash' specified by 'keys'
-;will evaluate each value before putting it in the list
 (defun get-elements (keys hash &optional (collapseFns "#'mean"))
+  "returns the list of elements (key . value) from the hash table 'hash' specified by 'keys'
+   will evaluate each value before putting it in the list"
   (mklst keys)
   (if (not (consp collapseFns)) (setf collapseFns (make-list (length keys) :initial-element collapseFns)))
   (let ((out) (key) (collapseFn))
@@ -729,10 +759,11 @@ is replaced with replacement."
 	(push-to-end (cons key (eval (read-from-string (first val)))) out)))))
 
 (defmacro get-element (&rest lst)
+  "same as get-elements, but asserts that at most one element can be returned; returns that element (or nil), and not a list"
   `(car (guard (get-elements ,@lst))))
 
-;recursively adds all elements in the config file that are referenced in the 'lhs' line in the config file
 (defmacro add-dependent-element (&body body)
+  "recursively adds all elements in the config file that are referenced in the 'lhs' line in the config file"
   `(alambda (hash &optional (configFileStr nil) (lhs nil) (rhs nil))
      (let ((line) (words))
        (setf line (aif rhs it (get-matching-line configFileStr lhs)))
@@ -746,8 +777,8 @@ is replaced with replacement."
 		      `(self hash configFileStr (fast-concatenate item "="))
 		      `(progn ,@body)))))))))
 
-;recursively adds all elements in the config file that are referenced in the list of 'lhs' lines in the config file
 (defmethod add-dependent-elements ((hash hash-table) &optional (configFileStr nil) (lhs nil))
+  "recursively adds all elements in the config file that are referenced in the list of 'lhs' lines in the config file"
   (let* ((traversed (make-hash-table :test #'equalp))
 	 (fun (add-dependent-element
 	       (when (not (key-present item traversed))
