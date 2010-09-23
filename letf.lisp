@@ -76,7 +76,7 @@
 	       (remove-if-not #'g!-symbol-p
 			      (flatten body)))))
     (multiple-value-bind (forms decls doc) 
-	#+:SBCL (sb-int::parse-body body)
+	#+:SBCL (sb-int:parse-body body)
 	#-:SBCL (values body nil nil)
     `(defmacro ,name ,args
        ,doc
@@ -108,7 +108,7 @@
   (let* ((os (remove-if-not #'o!-symbol-p args))
          (gs (mapcar #'o!-symbol-to-g!-symbol os)))
     (multiple-value-bind (forms decls doc)
-	#+:SBCL (sb-int::parse-body body)
+	#+:SBCL (sb-int:parse-body body)
 	#-:SBCL (values body nil nil)
 	`(defmacro/g! ,name ,args
 	   ,doc
