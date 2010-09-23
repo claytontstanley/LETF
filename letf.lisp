@@ -203,6 +203,7 @@
 ;////////////////////////////////////////////////////////////
 ;///////////////////////////////////////////end lol.lisp
 
+;FIXME; need to look at internals of defun, to try and mimick more of defun here
 (defmacro defpun (name largs pargs &rest body)
   "defines a pandoric function; syntax similar to defun"
   `(setf (symbol-function ',name)
