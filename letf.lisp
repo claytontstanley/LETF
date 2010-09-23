@@ -203,6 +203,11 @@
 ;////////////////////////////////////////////////////////////
 ;///////////////////////////////////////////end lol.lisp
 
+(defmacro defpun (name largs pargs &rest body)
+  "defines a pandoric function; syntax similar to defun"
+  `(setf (symbol-function ',name)
+	 (plambda ,largs ,pargs ,@body)))
+     
 (defmacro! fast-concatenate (&rest lst)
   "equivalent to writing (concatenate 'string ...), but ~5x faster"
   `(with-output-to-string (,g!stream)
@@ -241,10 +246,9 @@
 ;keeps track of all the pathnames that have been sent 
 ;to this function; returns the list of those names
 (let ((loaded))
-  (setf (symbol-function 'load-and-loaded)
-	(plambda (str) (loaded)
-	  (push-to-end str loaded)
-	  (load str))))
+  (defpun load-and-loaded (str) (loaded)
+    (push-to-end str loaded)
+    (load str)))
 
 (defun key-present (key hash)
   "returns if a key is present in the hash table"
@@ -706,27 +710,26 @@
 ;been returned from calling this function
 ;you can access the line numbers using the 'with-pandoric macro
 (let ((traversed))
-  (setf (symbol-function 'get-matching-lines) 
-	(plambda (str keys) (traversed)
-	  (mklst keys)
-	  (let ((words) (out) (line) (lines))
-	    (setf lines (if (consp str) str (get-lines str)))
-	    (dotimes (i (length lines) (reverse out))
-	      (setf line (nth i lines))
-	      (setf words (if (consp line) line (get-words line)))
-	      (if words
-		  (awhen 
-		   (block index=
-		     (dolist (key keys nil)
-		       (if (string-equal key (subseq (first words) 0 (min (length (first words)) (length key))))
-			   (return-from index= (length key)))))
-		   (push-to-end i traversed)
-		   (push 
-		    (bracket-expand 
-		     (string-trim 
-		      (list #\Space #\tab) 
-		      (subseq (make-sentence line) it (length (make-sentence line))))) 
-		    out))))))))
+  (defpun get-matching-lines (str keys) (traversed)
+    (mklst keys)
+    (let ((words) (out) (line) (lines))
+      (setf lines (if (consp str) str (get-lines str)))
+      (dotimes (i (length lines) (reverse out))
+	(setf line (nth i lines))
+	(setf words (if (consp line) line (get-words line)))
+	(if words
+	    (awhen 
+	     (block index=
+	       (dolist (key keys nil)
+		 (if (string-equal key (subseq (first words) 0 (min (length (first words)) (length key))))
+		     (return-from index= (length key)))))
+	     (push-to-end i traversed)
+	     (push 
+	      (bracket-expand 
+	       (string-trim 
+		(list #\Space #\tab) 
+		(subseq (make-sentence line) it (length (make-sentence line))))) 
+	      out)))))))
 
 (defun get-first-word-from-matching-lines (str keys)
   "gets the RHS from lines in string 'str' where the LHS matches a key in 'keys'" 
@@ -788,28 +791,48 @@
       (funcall fun hash configFileStr (fast-concatenate word "=")))))
 
 (defclass work-class ()
-  ((lines :accessor lines :initarg :lines :initform nil)
-   (workFilePath :accessor workFilePath :initarg :workFilePath :initform nil)))
+  ((lines :accessor lines :initarg :lines :initform nil
+	  :documentation "stores all of the IV configs to run in a nested list; each line is an IV config")
+   (workFilePath :accessor workFilePath :initarg :workFilePath :initform nil
+		 :documentation "stores the path to the work file as a string"))
+  (:documentation "work-class is responsible for loading and storing the points to run"))
 
-;top-level class for session object that gets executed
 (defclass session-class ()
-  ((runProcesses :accessor runProcesses :initarg :runProcesses :initform nil)
-   (quota :accessor quota :initarg :quota :initform nil)
-   (traversed :accessor traversed :initarg :traversed :initform nil)
-   (configFileLnLST :accessor configFileLnLST :initarg :configFileLnLST :initform nil)
-   (statusPrinters :accessor statusPrinters :initarg :statusPrinters :initform nil)
-   (collapseQuota :accessor collapseQuota :initarg :collapseQuota :initform nil)
-   (iterations :accessor iterations :initarg :iterations :initform nil)
-   (lines :accessor lines :initarg :lines :initform nil)
-   (collapseHash :accessor collapseHash :initarg :collapseHash :initform nil)
-   (DVHash :accessor DVHash :initarg :DVHash :initform nil)
-   (DVKeys :accessor DVKeys :initarg :DVKeys :initform nil)
-   (IVKeys :accessor IVKeys :initarg :IVKeys :initform nil)
-   (cellKeys :accessor cellKeys :initarg :cellKeys :initform nil)
-   (modelProgram :accessor modelProgram :initarg :modelProgram :initform nil)
-   (runsPerProcess :accessor runsPerProcess :initarg :runsPerProcess :initform nil)
-   (entryFnType :accessor entryFnType :initarg :entryFnType :initform nil)
-   (IVStringFn :accessor IVStringFn :initarg :IVStringFn :initform nil)))
+  ((runProcesses :accessor runProcesses :initarg :runProcesses :initform nil
+		 :documentation "each of the runProcess objects for the session")
+   (quota :accessor quota :initarg :quota :initform nil
+	  :documentation "quota of the session; that is, total number of runs that the session will execute")
+   (traversed :accessor traversed :initarg :traversed :initform nil
+	      :documentation "lines in the config file that were touched to build the job")
+   (configFileLnLST :accessor configFileLnLST :initarg :configFileLnLST :initform nil
+		    :documentation "config file converted to a list of strings, where each item in the list is a line in the config")
+   (statusPrinters :accessor statusPrinters :initarg :statusPrinters :initform nil
+		   :documentation "all of the functions/methods that will be called before the session object is executed")
+   (collapseQuota :accessor collapseQuota :initarg :collapseQuota :initform nil
+		  :documentation "number of runs (with same IV config) before the result is collapsed; handles stochastic models")
+   (iterations :accessor iterations :initarg :iterations :initform nil
+	       :documentation "number of times each collapsed set of runs will be executed")
+   (lines :accessor lines :initarg :lines :initform nil
+	  :documentation "number of lines in the work file")
+   (collapseHash :accessor collapseHash :initarg :collapseHash :initform nil
+		 :documentation "stores all information related to collapsing functions for each DV")
+   (DVHash :accessor DVHash :initarg :DVHash :initform nil
+	   :documentation "stores all information related to the way that each DV will be calculated")
+   (DVKeys :accessor DVKeys :initarg :DVKeys :initform nil
+	   :documentation "stores names for DVs")
+   (IVKeys :accessor IVKeys :initarg :IVKeys :initform nil
+	   :documentation "stores names for IVs")
+   (cellKeys :accessor cellKeys :initarg :cellKeys :initform nil
+	     :documentation "stores names for columns in work file; usually, this will match IVKeys unless you are remapping the inputs")
+   (modelProgram :accessor modelProgram :initarg :modelProgram :initform nil
+		 :documentation "entry function that will get executed to run the model")
+   (runsPerProcess :accessor runsPerProcess :initarg :runsPerProcess :initform nil
+		   :documentation "if the model is launched as a separate process, determines number of runs that will be sent every time the process is spawned")
+   (entryFnType :accessor entryFnType :initarg :entryFnType :initform nil
+		:documentation "if the model is lisp-based, determines the interface for the entry function")
+   (IVStringFn :accessor IVStringFn :initarg :IVStringFn :initform nil
+	       :documentation "if the model is launched as a separate process, determines the interface for the entry function"))
+  (:documentation "session-class is responsible for storing all information related to the job, and executing it"))
 
 ;collector class pattern that can be extended to print results from letf in a specific way
 (defclass base-collector-class ()
@@ -1027,11 +1050,10 @@
        (configFileLnLST)
        (configFileWdLST)
        (workFilePath (unless (string-equal (get-arg 0) "nil") (get-arg 0))))
-  (setf (symbol-function 'args)
-	(plambda () (platform configFilePath configFileStr configFileLnLST configFileWdLST workFilePath)
-	  (setf configFileStr (restructure (file-string configFilePath)))
-	  (setf configFileLnLST (get-lines configFileStr))
-	  (setf configFileWdLST (mapcar #'get-words configFileLnLST)))))
+  (defpun args () (platform configFilePath configFileStr configFileLnLST configFileWdLST workFilePath)
+    (setf configFileStr (restructure (file-string configFilePath)))
+    (setf configFileLnLST (get-lines configFileStr))
+    (setf configFileWdLST (mapcar #'get-words configFileLnLST))))
 
 (args) ;initialize configFile Str/LnLST/WdLST to defaults
 
