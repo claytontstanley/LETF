@@ -99,7 +99,7 @@
 		    (setf (IVKeys obj) ,IVKeys)
 		    (setf (DVKeys obj) ,DVKeys)
 		    (let ((result))
-		      (handler-case (validate-entryFn obj)
+		      (handler-case (validate-entryfn obj)
 			(error (condition) (setf result condition)))
 		      (check
 		       (if ,will-error result (not result)))))
@@ -119,7 +119,23 @@
     ;should fail; must have at least one IV= in the config file
     (deftest-vef () (list "DV") (lambda (&key (a) (b)) (declare (ignore a b)) (send-dv dv 8)) t)
     ;should fail; must have at least one DV= in the config file
-    (deftest-vef (list "IV") () (lambda (&key (IV)) (declare (ignore IV)) (send-dv dv 2)) t)
+    (deftest-vef (list "IV") () (lambda (&key (IV)) (declare (ignore IV)) (send-dv dv 2)) t)))
+
+(deftest test-validate-dvs ()
+  "unit tests for validate-dvs"
+  (macrolet ((deftest-vef (IVKeys DVKeys entryFn will-error &optional (sessionPrinter 'validate-entryFn))
+	       `(progn
+		  ;mocking up necessary objects/functions/variables
+		  (with-pandoric (obj) #'session-object
+		    (setf (modelProgram obj) (eval ',entryFn))
+		    (setf (IVKeys obj) ,IVKeys)
+		    (setf (DVKeys obj) ,DVKeys)
+		    (let ((result))
+		      (handler-case (validate-dvs obj)
+			(error (condition) (setf result condition)))
+		      (check
+		       (if ,will-error result (not result)))))
+		  (setf (get-pandoric #'DVs 'DVs) nil))))
     ;should fail; dvs sent not equal to dvs specified in config file
     (deftest-vef (list "iv") (list "dvtypo") (lambda (&key (iv)) (declare (ignore iv)) (send-dv dv 2)) t)
     ;should pass; all ivs and dvs correct
@@ -134,6 +150,7 @@
 	  (test-comb)
 	  (test-validate-full-combinatorial)
 	  (test-validate-entryFn)
+	  (test-validate-dvs)
 	  (test-generate-full-combinatorial))))
     (format t "~%overall: ~:[FAIL~;pass~]~%" result)))
 

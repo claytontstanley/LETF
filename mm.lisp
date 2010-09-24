@@ -158,12 +158,7 @@
 	      (let ((lst (mapcar (lambda (x) (format nil "~a" (car x))) (cdr arglst))))
 		(assert (equalp (sort lst #'string<) (sort IVKeys #'string<)) nil
 			"keys ~a for entry function ~a do not match IVs ~a in config file"
-			lst modelProgram IVKeys))
-	      (let ((necessary-DVs (necessaries (DVKeys obj) (DVHash obj)))
-		    (supplied-DVs (get-pandoric #'DVs 'DVs)))
-	      (assert (equalp (sort necessary-DVs #'string<) (sort supplied-DVs #'string<)) nil
-		      "DVKeys ~a sent using 'send-DVs' do not match necessary DVs ~a in config file"
-		      supplied-DVs necessary-DVs)))
+			lst modelProgram IVKeys)))
 	    (when (equal entryFnType 'hash)
 	      ;this assert nil nil will throw an error; only a 'keys entryFnType is allowed on MM
 	      ;for example (defun run-model (&key (x) (y)) ... is allowed, but
@@ -174,6 +169,17 @@
 	    ;not doing any validation when the model is launched as a separate process yet
 	    (when (equal entryFnType 'process)
 	      nil))))
+
+(methods validate-DVs
+	 (((obj runprocess-class)))
+	 (((obj run-class)))
+	 (((obj session-class))
+	  "method will validate the DVs written in the model (using send-dv) against DV names specified in the config file"
+	  (let ((necessary-DVs (necessaries (DVKeys obj) (DVHash obj)))
+		(supplied-DVs (get-pandoric #'DVs 'DVs)))
+	    (assert (equalp (sort necessary-DVs #'string<) (sort supplied-DVs #'string<)) nil
+		    "DVKeys ~a sent using 'send-DVs' do not match necessary DVs ~a in config file"
+		    supplied-DVs necessary-DVs))))
 
 (methods validate-full-combinatorial
 	 (((obj runProcess-class)))
