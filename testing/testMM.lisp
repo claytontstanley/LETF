@@ -95,30 +95,37 @@
 	       `(progn
 		  ;mocking up necessary objects/functions/variables
 		  (with-pandoric (obj) #'session-object
-		    (setf (modelProgram obj) ,entryFn)
+		    (setf (modelProgram obj) (eval ',entryFn))
 		    (setf (IVKeys obj) ,IVKeys)
 		    (setf (DVKeys obj) ,DVKeys)
-		    (let (result)
+		    (let ((result))
 		      (handler-case (validate-entryFn obj)
 			(error (condition) (setf result condition)))
 		      (check
-		       (if ,will-error result (not result))))))))
+		       (if ,will-error result (not result)))))
+		  (setf (get-pandoric #'DVs 'DVs) nil))))
     ;should pass
-    (deftest-vef (list "noise") (list "DV") (lambda (&key (noise)) (declare (ignore noise))) nil)
+    (deftest-vef (list "noise") (list "DV") (lambda (&key (noise)) (declare (ignore noise)) (send-dv dv 5)) nil)
     ;should fail; IV names not equal to parnames in function
-    (deftest-vef (list "noise") (list "DV") (lambda (&key (nois)) (declare (ignore nois))) t)
+    (deftest-vef (list "noise") (list "DV") (lambda (&key (nois)) (declare (ignore nois)) (send-dv dv 4)) t)
     ;should pass; lisp isn't case sensitive
-    (deftest-vef (list "x" "y") (list "DV") (lambda (&key (X) (Y)) (declare (ignore x y))) nil)
+    (deftest-vef (list "x" "y") (list "DV") (lambda (&key (X) (Y)) (declare (ignore x y)) (send-dv dv 3)) nil)
     ;should fail; IV names not equal to parnames in function
-    (deftest-vef (list "a" "B") (list "DV") (lambda (&key (a) (b) (c)) (declare (ignore a b c))) t)
+    (deftest-vef (list "a" "B") (list "DV") (lambda (&key (a) (b) (c)) (declare (ignore a b c)) (send-dv dv 2)) t)
     ;should fail; IV names not equal to parnames in function
-    (deftest-vef (list "a" "b" "c") (list "DV") (lambda (&key (a) (b)) (declare (ignore a b))) t)
+    (deftest-vef (list "a" "b" "c") (list "DV") (lambda (&key (a) (b)) (declare (ignore a b)) (send-dv dv 5)) t)
     ;should fail; checking hard constraint that duplicate names cannot be used
-    (deftest-vef (list "a" "a" "b") (list "DV") (lambda (&key (a) (b)) (declare (ignore a b))) t)
+    (deftest-vef (list "a" "a" "b") (list "DV") (lambda (&key (a) (b)) (declare (ignore a b)) (send-dv dv 3)) t)
     ;should fail; must have at least one IV= in the config file
-    (deftest-vef () (list "DV") (lambda (&key (a) (b)) (declare (ignore a b))) t)
+    (deftest-vef () (list "DV") (lambda (&key (a) (b)) (declare (ignore a b)) (send-dv dv 8)) t)
     ;should fail; must have at least one DV= in the config file
-    (deftest-vef (list "IV") () (lambda (&key (IV)) (declare (ignore IV))) t)))
+    (deftest-vef (list "IV") () (lambda (&key (IV)) (declare (ignore IV)) (send-dv dv 2)) t)
+    ;should fail; dvs sent not equal to dvs specified in config file
+    (deftest-vef (list "iv") (list "dvtypo") (lambda (&key (iv)) (declare (ignore iv)) (send-dv dv 2)) t)
+    ;should pass; all ivs and dvs correct
+    (deftest-vef (list "iv") (list "DV" "DV2") (lambda (&key (iv)) (declare (ignore iv)) (send-dv dv 5) (send-dv dv2 3)) nil)
+    ;should fail; dvs sent not equal to dvs specified in config file
+    (deftest-vef (list "iv") (list "DV" "dv2") (lambda (&key (iv)) (declare (ignore iv)) (send-dv dv1 1) (send-dv dv2 nil)) t)))
 
 (defun testMM ()
   "unit tests for the mm.lisp code"

@@ -92,6 +92,21 @@
 	  (lambda (assertion places datum &rest arguments) 
 	    (apply fun (append (list assertion places (html-color datum)) arguments))))))
 
+(let ((DVs))
+  ;define a pandoric function that stores (closes over) 'DVs'
+  ;you can set/get the value of DVs using 'get-pandoric or 'with-pandoric
+  (defpun DVs () (DVs)
+    ()))
+
+(defmacro send-DV (name% val)
+  "interface for sending DVs evaluated by the model up to the wrapper"
+  (let ((name (symbol-name name%)))
+    ;store the DV name that the modeler is sending
+    ;these DVs are stored at compile time; not run time
+    (push name (get-pandoric #'DVs 'DVs))
+     ;at run time, send the value of the DV back to the wrapper
+    `(format t "~a=~a~%" ,name ,val)))
+
 ;generate all of the combinations of the lists inside of rangeList
 ;each list inside of rangeList consists of three elements: (start stepsize stop)
 ;each combination will be a list with a length of the number of elements in rangeList
@@ -143,7 +158,12 @@
 	      (let ((lst (mapcar (lambda (x) (format nil "~a" (car x))) (cdr arglst))))
 		(assert (equalp (sort lst #'string<) (sort IVKeys #'string<)) nil
 			"keys ~a for entry function ~a do not match IVs ~a in config file"
-			lst modelProgram IVKeys)))
+			lst modelProgram IVKeys))
+	      (let ((necessary-DVs (necessaries (DVKeys obj) (DVHash obj)))
+		    (supplied-DVs (get-pandoric #'DVs 'DVs)))
+	      (assert (equalp (sort necessary-DVs #'string<) (sort supplied-DVs #'string<)) nil
+		      "DVKeys ~a sent using 'send-DVs' do not match necessary DVs ~a in config file"
+		      supplied-DVs necessary-DVs)))
 	    (when (equal entryFnType 'hash)
 	      ;this assert nil nil will throw an error; only a 'keys entryFnType is allowed on MM
 	      ;for example (defun run-model (&key (x) (y)) ... is allowed, but

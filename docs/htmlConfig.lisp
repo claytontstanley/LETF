@@ -33,10 +33,10 @@
 
 ;macroexpand the macros that write code that defines other macros/functions/methods
 ;this way the macros/functions/methods that the macros write gets documented as well
-(macroexpand-for-documenting METHODS DEFMACRO/G! DEFMACRO!)
+(macroexpand-for-documenting METHODS DEFMACRO/G! DEFMACRO! DEFTEST)
 
 (defun generate-docs ()
     (cldoc:extract-documentation 'cldoc:html "html"
-     '("letf.lisp" "mm.lisp")
+     '("letf.lisp" "mm.lisp" "testMM.lisp")
      :table-of-contents-title
      "Common Lisp Universal Documentation Generator"))
