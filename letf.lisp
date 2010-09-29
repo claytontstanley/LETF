@@ -839,13 +839,16 @@
 	       :documentation "if the model is launched as a separate process, determines the interface for the entry function"))
   (:documentation "session-class is responsible for storing all information related to the job, and executing it"))
 
-;collector class pattern that can be extended to print results from letf in a specific way
 (defclass base-collector-class ()
-  ((quota :accessor quota :initarg :quota :initform 1)
-   (quot :accessor quot :initarg :quot :initform 0)
-   (collection :accessor collection :initarg :collection :initform (make-hash-table :test #'equalp))))
+  ((quota :accessor quota :initarg :quota :initform 1
+	  :documentation "quota of the collector; when quot reaches quota, the print method on the collector will fire")
+   (quot :accessor quot :initarg :quot :initform 0
+	 :documentation "current number of items that the collector has collected")
+   (collection :accessor collection :initarg :collection :initform (make-hash-table :test #'equalp)))
+  (:documentation "base class for all tasks involving collecting and printing results"))
 
 (defmethod collect ((obj base-collector-class) (lst list))
+  "pushes all values (cdrs lst) on the base collector, using keys (cars lst)"
   (assert (not (> (quot obj) (quota obj))))
   (if lst (if (not (consp (car lst))) (setf lst (list lst))))
   (dolist (item lst)
@@ -853,50 +856,64 @@
   (incf (quot obj)))
 
 (defmethod collect ((obj base-collector-class) (DVHash hash-table))
+  "pushes all values (values hash) on teh base collector, using keys (keys hash)"
   (let ((out))
     (maphash #'(lambda (key value) (push-to-end (cons key value) out)) DVHash)
     (collect obj out)))
 
-(defmethod print-collector ((obj base-collector-class)) ())
+(defmethod print-collector ((obj base-collector-class)) 
+  "stub method; will be overridden by any extension of the base-collector-class"
+  ())
 
 (defmethod print-collector :after ((obj base-collector-class))
+  "method to clear out the collection (uses garbage collection to reallocate memory)"
   (setf (collection obj) nil))
 
-;extendable collector class for printing the last N lines that have been 
-;returned by the model, if the model errors out
 (defclass process-output-str-class (base-collector-class)
-  ((error-p :accessor error-p :initarg :error-p :initform nil)))
+  ((error-p :accessor error-p :initarg :error-p :initform nil
+	    :documentation "stores the error object, if the model errors out"))
+  (:documentation "extendable collector class for printing the last N lines that have been returned by the model, if the model errors out"))
 
 (defmethod collect :after ((obj process-output-str-class) (lst list))
+  "method to keep track of the last N lines that have been returned by the model"
   (declare (ignore lst))
   (when (> (quot obj) (quota obj))
     (setf (gethash "str" (collection obj)) (rest (gethash "str" (collection obj))))
     (decf (quot obj))))
 
-;extendable collector class for printing the collected results after the entire
-;session is run
 (defclass session-collector-class (base-collector-class)
-  ((collectors :accessor collectors :initarg :collectors :initform nil)))
+  ((collectors :accessor collectors :initarg :collectors :initform nil
+	       :documentation "stores all instantiated collector objects that are part of this session-object"))
+  (:documentation "exendable collector class for printing the collected results after the entire session is run"))
 
 (defmethod collect :after ((obj session-collector-class) (lst list))
+  "method to fire the print-collector method after the quota has been reached"
   (declare (ignore lst))
   (if (equal (quota obj) (quot obj))
       (print-collector obj)))
 
-;extendable collector class for printing the collected results after each collapseQuota
-;is reached
 (defclass collector-class (base-collector-class)
-  ((collapseHash :accessor collapseHash :initarg :collapseHash :initform nil)
-   (keys :accessor keys :initarg :keys :initform nil)
-   (cellElements :accessor cellElements :initarg :cellElements :initform nil)
-   (run-collectors :accessor run-collectors :initarg :run-collectors :initform nil)
-   (session-collector :accessor session-collector :initarg :session-collector :initform nil)))
+  ((collapseHash :accessor collapseHash :initarg :collapseHash :initform nil
+		 :documentation "stores a hash table that determines how the items in the collection will be collapsed")
+   (keys :accessor keys :initarg :keys :initform nil
+	 :documentation "stores the keynames for each DV in the config file")
+   (cellElements :accessor cellElements :initarg :cellElements :initform nil
+		 :documentation "stores the values for each column in a single row of the work file")
+   (run-collectors :accessor run-collectors :initarg :run-collectors :initform nil
+		   :documentation "stores all instantiated run-collector objects that are part of this collector-object")
+   (session-collector :accessor session-collector :initarg :session-collector :initform nil
+		      :documentation "stores the session-collector object that this collector-object is part of"))
+  (:documentation "extendable collector class for printing the collected results after each collapseQuota is reached"))
 
 (defmethod initialize-instance :after ((obj collector-class) &key)
+  "registers this collector object in its parent session-collector object" 
   (assert (session-collector obj))
   (push-to-end obj (collectors (session-collector obj))))
 
 (defmethod collect :after ((obj collector-class) (lst list))
+  "method to fire the print-collector method after the quota has been reached;
+   will collapse the lists in the collector (using collapseHash) before calling print-collector;
+   also fires the collect method on the session-collector object"
   (declare (ignore lst))
   (when (equal (quota obj) (quot obj))
       ;short-circuit to optimize recursion called later
@@ -912,16 +929,21 @@
       (print-collector obj)
       (collect (session-collector obj) elements))))
 
-;extendable collector class for printing the collected results after each call to the entry function
+;FIXME; where is the 'runs' slot here used?
 (defclass run-collector-class (base-collector-class)
   ((runs :accessor runs :initarg :runs :initform nil)
-   (collector :accessor collector :initarg :collector :initform nil)))
+   (collector :accessor collector :initarg :collector :initform nil
+	      :documentation "stores the collector-object that this run-collector object is part of"))
+  (:documentation "extendable collector class for printing the collected results after each call to the entry function"))
 
 (defmethod initialize-instance :after ((obj run-collector-class) &key)
+  "registers this run-collector object in its parent session-collector object"
   (assert (collector obj))
   (push-to-end obj (run-collectors (collector obj))))
 
 (defmethod collect :after ((obj run-collector-class) (lst list))
+  "method will fire the print-collector method after the quota has been reached;
+   also fires the collect method on the collector object"
   (assert (equal (quot obj) 1))
   (assert (equal (quota obj) 1))
   (print-collector obj)

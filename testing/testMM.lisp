@@ -123,7 +123,7 @@
 
 (deftest test-validate-dvs ()
   "unit tests for validate-dvs"
-  (macrolet ((deftest-vef (IVKeys DVKeys entryFn will-error &optional (sessionPrinter 'validate-entryFn))
+  (macrolet ((deftest-vef (IVKeys DVKeys entryFn will-error)
 	       `(progn
 		  ;mocking up necessary objects/functions/variables
 		  (with-pandoric (obj) #'session-object
