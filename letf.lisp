@@ -949,24 +949,33 @@
   (print-collector obj)
   (collect (collector obj) lst))
  
-;class for a single process; if we're short-circuiting (i.e., calling a lisp-native model using an entry function)
-;then there will only be 1 instance of this class; if we're launching the model as a separate process, then
-;the number of instances will be (ceiling (total runs / runs per process))
 (defclass runProcess-class ()
-  ((runs :accessor runs :initarg :runs :initform nil)
-   (session :accessor session :initarg :session :initform nil)
-   (process :accessor process :initarg :process :initform nil)
-   (modelProgram :accessor modelProgram :initarg :modelProgram :initform nil)
-   (platform :accessor platform :initarg :platform :initform nil)
-   (process-output-str :accessor process-output-str :initarg :process-output-str :initform nil)))
+  ((runs :accessor runs :initarg :runs :initform nil
+	 :documentation "stores all of the run objects for this run process")
+   (session :accessor session :initarg :session :initform nil
+	    :documentation "stores the session object that this runProcess object is part of")
+   (process :accessor process :initarg :process :initform nil
+	    :documentation "stores a pointer to the process that is spawned, if running the model by launching a separate process")
+   (modelProgram :accessor modelProgram :initarg :modelProgram :initform nil
+		 :documentation "stores the call to run the entryFn for the model")
+   (platform :accessor platform :initarg :platform :initform nil
+	     :documentation "stores the platform that the program is running on")
+   (process-output-str :accessor process-output-str :initarg :process-output-str :initform nil
+		       :documentation "stores the process-output-str object that is keeping track of the last N lines printed by the process (model)"))
+  (:documentation 
+   "class for a single process; if we're short-circuiting (i.e., calling a lisp-native model using an entry function)
+   then there will only be 1 instance of this class; if we're launching the model as a separate process, then
+   the number of instances will be (ceiling (total runs / runs per process))"))
 
-;class for a single process if we're not short circuiting
 (defclass number5-runProcess-class (runProcess-class)
-  ((sleepTime :accessor sleepTime :initarg :sleepTime :initform .2)))
+  ((sleepTime :accessor sleepTime :initarg :sleepTime :initform .2
+	      :documentation "amount of time (in seconds) the program will sleep between checking the strm for model output (using a polling solution)"))
+  (:documentation "class for a single process if we're not short circuiting"))
 
-;class for a single process if we're short circuiting
 (defclass johnny5-runProcess-class (runProcess-class)
-  ((sleepTime :accessor sleepTime :initarg :sleepTime :initform 0)))
+  ((sleepTime :accessor sleepTime :initarg :sleepTime :initform 0
+	      :documentation "should be 0s when short circuiting b/c all of the model's output will be on the strm on the first check of strm"))
+  (:documentation "class for a single process if we're short circuiting"))
 
 ;class for a single run
 (defclass run-class ()
@@ -1057,16 +1066,16 @@
 		   `(setf (,(car x) ,obj) ,(cadr x))
 		   `(setf (,x ,obj) ,x))) vals)))
 
-;This function returns the command line parameters, accounting for differences across several lisp implementations
 (defun my-command-line ()
+  "This function returns the command line parameters, accounting for differences across several lisp implementations"
   (or 
    #+SBCL *posix-argv*
    #+LISPWORKS system:*line-arguments-list*
    #+CMU extensions:*command-line-strings*
    nil))
 
-;This function returns the nth command line argument from right to left (note that this is the reverse of normal)
 (defun get-arg ( from-right )
+  "This function returns the nth command line argument from right to left (note that this is the reverse of normal)"
   (nth (- (length (my-command-line)) (+ 1 from-right)) (my-command-line)))
 
 ;defines the lexical closure 'args that stores all of the information that was passed to letf using command-line arguments 
