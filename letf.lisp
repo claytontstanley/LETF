@@ -333,7 +333,7 @@
 		 (with-output-to-string (out)
 		   (loop for value being the hash-values of hash using (hash-key key) do
 			(if (or (not keys) (member key keys :test #'equalp))
-			    (write-string (fast-concatenate (string #\newline) key " -> " (hash-string value)) out)))))))
+			    (write-string (fast-concatenate (string #\newline) (format nil "~a" key) " -> " (hash-string value)) out)))))))
     (format strm "~a~%" (string-trim (list #\Newline #\Return #\LineFeed) (hash-string hash :keys keys)))))
 
 (defun copy-hash (hash)
@@ -977,32 +977,47 @@
 	      :documentation "should be 0s when short circuiting b/c all of the model's output will be on the strm on the first check of strm"))
   (:documentation "class for a single process if we're short circuiting"))
 
-;class for a single run
 (defclass run-class ()
-  ((IVHash :accessor IVHash :initarg :IVHash :initform nil)
-   (DVHash :accessor DVHash :initarg :DVHash :initform nil)
-   (IVKeys :accessor IVKeys :initarg :IVKeys :initform nil)
-   (DVKeys :accessor DVKeys :initarg :DVKeys :initform nil)
-   (quot :accessor quot :initarg :quot :initform nil)
-   (cellKeys :accessor cellKeys :initarg :cellKeys :initform nil)
-   (sleepTime :accessor sleepTime :initarg :sleepTime :initform 0)
-   (run-collector :accessor run-collector :initarg :run-collector :initform nil)
-   (runProcess :accessor runProcess :initarg :runProcess :initform nil)
-   (entryFnType :accessor entryFnType :initarg :entryFnType :initform nil)))
+  ((IVHash :accessor IVHash :initarg :IVHash :initform nil
+	   :documentation "stores a hash table containing all IV key->values for the run")
+   (DVHash :accessor DVHash :initarg :DVHash :initform nil
+	   :documentation "stores a hash table containing all DV key->calues for the run")
+   (IVKeys :accessor IVKeys :initarg :IVKeys :initform nil
+	   :documentation "stores a list of keynames for the IVs")
+   (DVKeys :accessor DVKeys :initarg :DVKeys :initform nil
+	   :documentation "stores a list of keynames for the DVs")
+   (quot :accessor quot :initarg :quot :initform nil
+	 :documentation "counter for the number of runs contained in the class (should equal 1 after the run finishes)")
+   (cellKeys :accessor cellKeys :initarg :cellKeys :initform nil
+	     :documentation "stores a list of keynames for the raw IVs in the work file")
+   (sleepTime :accessor sleepTime :initarg :sleepTime :initform 0
+	      :documentation "amount of time to sleep after the run is completed (should be zero)")
+   (run-collector :accessor run-collector :initarg :run-collector :initform nil
+		  :documentation "stores the run-collector object that this run-class is part of")
+   (runProcess :accessor runProcess :initarg :runProcess :initform nil
+	       :documentation "stores the runProcess object that this run-class is part of")
+   (entryFnType :accessor entryFnType :initarg :entryFnType :initform nil
+		:documentation "either 'keys or 'hash; defines the interface between the model & this wrapper"))
+  (:documentation "base class for a single run"))
 
 (defmethod initialize-instance :after ((obj run-class) &key)
+  "registers this run-class object in its parent run-collector object"
   (assert (run-collector obj))
   (assert (not (runs (run-collector obj))))
   (push-to-end obj (runs (run-collector obj))))
 
-(defclass number5-run-class (run-class) ())
+(defclass number5-run-class (run-class) 
+  ()
+  (:documentation "class for a single run, if not short circuiting"))
 
-(defclass johnny5-run-class (run-class) ())
+(defclass johnny5-run-class (run-class) 
+  ()
+  (:documentation "class for a single run, if short circuiting"))
 
 ;////helper functions and macros for build-session macro////
 
-;reattaches lines that have been separated using the "\" character at the end of a line
 (defun restructure (str)
+  "reattaches lines that have been separated using the \ character at the end of a line"
   (let ((lineDesigs (list #\Newline #\Return #\LineFeed))
 	(count -1)
 	(strLength (length str)))
@@ -1017,8 +1032,8 @@
       (if (equal count (- strLength 1))
 	  (write-string str out :start count :end (+ 1 count))))))
 
-;modifies the collapse hash table that keeps track of how letf will collapse each DV when collapseQuota is reached
 (defmethod mod-collapseHash ((hash hash-table) collapseFn &key (DVKeys nil) (ApplyToKeys nil))
+  "modifies the collapse hash table that keeps track of how letf will collapse each DV when collapseQuota is reached"
   (labels ((keys (hash)
 	     (let ((out))
 	       (loop for value being the hash-values of hash using (hash-key key) do 
@@ -1032,6 +1047,7 @@
 	    (setf (gethash ApplyToKey (gethash DVKey hash)) collapseFn))))))
 
 (defun get-collapseHash (DVKeys DVHash configFileStr defaultCollapseFn)
+  "builds the collapse hash table by parsing the config file"
   (let ((hash (make-hash-table :test #'equalp)) 
 	(words) (tmpLn) (tmpLST))
     (setf tmpLST (get-matching-lines configFileStr "collapseFn="))
@@ -1060,6 +1076,7 @@
        :ApplyToKeys (get-words (bracket-expand (get-matching-line tmpLn "ApplyTo=") t))))))
 
 (defmacro upload-to (obj &rest vals)
+  "uploads vals to obj by setting the slots in obj (named vals) to the value of vals"
   `(progn ,@(mapcar 
 	     (lambda (x) 
 	       (if (consp x)
@@ -1093,16 +1110,16 @@
 
 (args) ;initialize configFile Str/LnLST/WdLST to defaults
 
-;generates the code that generates the session object that will be executed
-;this macro is configured by extending various pieces of the above
-;object-oriented hierarchy and sending constructors to those new pieces
-;as inputs to the 'build-session macro call
 (defmacro build-session (&key 
 			 (collector-instance `(make-instance 'collector-class)) 
 			 (work-instance `(make-instance 'work-class))
 			 (session-collector-instance `(make-instance 'session-collector-class))
 			 (process-output-str-instance `(make-instance 'process-output-str-class))
 			 (run-collector-instance `(make-instance 'run-collector-class)))
+  "generates the code that generates the session object that will be executed;
+   this macro is configured by extending various pieces of the above
+   object-oriented hierarchy and sending constructors to those new pieces
+   as inputs to the 'build-session macro call"
   (setf collector-instance (append collector-instance
 				    '(:cellElements (get-elements cellKeys IVHash)
 				      :keys DVKeys
@@ -1220,9 +1237,9 @@
 			  (quota session) (car it)))
 	   session)))))
 
-;converts an output line of text sent by the model to a dotted pair
-;discards if it's not a valid output line (handles when warning statements are printed to stdout)
 (defun line2element (line)
+  "converts an output line of text sent by the model to a dotted pair;
+   discards if it's not a valid output line (handles when warning statements are printed to stdout)"
   (let ((equal-index) (key) (value))
     (setf equal-index (find-in-string line #\=))
     (when (equal (length equal-index) 1)
@@ -1232,9 +1249,9 @@
 	;(format t "key=~a value=~a~%" (first key) (first value))
 	(cons (first key) (make-sentence value))))))
 
-;capture all the input lines that the model has sent; 
-;then, remap each line as a dotted pair (key . value)
 (defmethod get-DVs ((obj number5-run-class) &optional (process nil) (appetizers nil)) 
+  "capture all the input lines that the model has sent; 
+   then, remap each line as a dotted pair (key . value)"
   (assert process)
   (mklst appetizers)
   (let ((currentDVs) (line))
@@ -1249,6 +1266,8 @@
     (append appetizers currentDVs)))
 
 (defmethod get-DVs ((obj johnny5-run-class) &optional (process nil) (appetizers nil))
+  "capture all the input lines that the model has sent; 
+   then, remap each line as a dotted pair (key . value)"
   (mklst appetizers)  
   (let ((currentDVs) (fstr) (error-p) (tbl))
     (cond ((equal (entryFnType obj) 'hash)
@@ -1274,6 +1293,7 @@
     (append appetizers currentDVs)))
 	     			 
 (defmethod wrapper-execute ((obj run-class) &optional (process nil) (appetizers nil))
+  "execute the run-class object"
   (mklst appetizers)
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session (runProcess obj))))
   (let ((necessaryDVs) (currentDVs) (currentDV))
@@ -1294,6 +1314,7 @@
     currentDVs))
 
 (defmethod wrapper-execute ((obj johnny5-runProcess-class) &optional (process nil) (appetizers nil))
+  "execute the runProcess-class object, if short circuiting"
   (assert (not appetizers))
   (assert (not process))
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session obj)))
@@ -1304,6 +1325,7 @@
   (sleep (sleepTime obj)))
 
 (defmethod wrapper-execute ((obj number5-runProcess-class) &optional (process nil) (appetizers nil))
+  "execute the runProcess-class object, if we're not short circuiting"
   (assert (not appetizers))
   (assert (not process))
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session obj)))
@@ -1334,6 +1356,7 @@
 	  nil "model process failed to quit after all DVs have been processed"))
 
 (defmethod wrapper-execute ((obj session-class) &optional (process nil) (appetizers nil))
+  "execute the top-level session-class object"
   ;print information about the session to the terminal
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters obj))
   ;execute each runProcess
@@ -1355,6 +1378,8 @@
    nil "not all collectors fully executed"))
 
 (defmacro methods (name &rest args)
+  "shorthand for defining multiple methods that are taking advantage of dynamic dispatching;
+   that is, they all have the same name, they just operate on different classes"
   ;adding a 'stub method' line to the documentation, if defining an empty stub method
   (mapc (lambda (x) (if (not (cdr x)) (setf (cdr x) `("stub method")))) args)
   `(progn ,@(mapcar (lambda (x) `(defmethod ,name ,@x)) args)))
@@ -1363,6 +1388,7 @@
 	 (((obj runprocess-class)) nil)
 	 (((obj run-class)) nil)
 	 (((obj session-class))
+	  "print to terminal, uncommented lines in config file that were not read"
 	  (if (not (apply #'< (traversed obj)))
 	      (setf (traversed obj) (sort (remove-duplicates (traversed obj) :test #'equal) #'<)))
 	  (let ((strm *error-output*))
@@ -1382,6 +1408,7 @@
 	 (((obj runprocess-class)))
 	 (((obj run-class)))
 	 (((obj session-class))
+	  "print to terminal, information about the top-level session-class object"
 	  (let ((strm *error-output*))
 	    (format strm "~%printing session status:~%")
 	    (format strm "#####entry function: ~a~%" (if (listp (modelProgram obj))
@@ -1409,6 +1436,7 @@
 	    (format strm "~%"))))
 
 (defmethod defaultIVStringFn ((obj run-class))
+  "defines how an IV vector will look when sent across stdin, when the model is launched as a separate process"
   (with-output-to-string (line)
     (let ((elementCount 0) 
 	  (elements (get-elements (IVKeys obj) (IVHash obj))))
@@ -1421,14 +1449,20 @@
 ;////////////////////////////////////////////
 ;hpc-specific classes, methods, and functions; all of this is to define the custom 'build-hpc-session
 ;function, and then call it by specifying "sessionBuilder='build-hpc-session" in the config file
-(defclass hpc-work-class (work-class) ())
+(defclass hpc-work-class (work-class) 
+  ()
+  (:documentation "hpc-work-class is responsible for storing the points to run; this is done by setting the 'lines' slot in the class"))
 
 (defmethod initialize-instance :after ((obj hpc-work-class) &key)
+  "setting the lines slot, and storing the points to run"
   (setf (lines obj) (mapcar #'get-objects (get-lines (file-string (workFilePath obj))))))
 
-(defclass hpc-collector-class (collector-class) ())
+(defclass hpc-collector-class (collector-class) 
+  ()
+  (:documentation "hpc-collector-class is responsible for printing the outputs of a collapsed set of runs"))
 
 (defmethod print-collector ((obj hpc-collector-class))
+  "method will be called after each collapsed run; for the hpcs, the results will be printed to stdout"
   (format t "Evaluating: ")
   (dotimes (i (length (cellElements obj)))
     (if (equal i (- (length (cellElements obj)) 1))
@@ -1438,14 +1472,18 @@
     (aif (cdr (get-element key (collection obj) (gethash-ifHash key (collapseHash obj))))
 	 (format t "~a: ~a~%" key (if (numberp it) (coerce it 'double-float) it)))))
 
-(defclass hpc-process-output-str-class (process-output-str-class) ())
+(defclass hpc-process-output-str-class (process-output-str-class) 
+  ()
+  (:documentation "hpc-process-output-str class is responsible for keeping track of the last N lines printed by the model"))
 
 (defmethod print-collector ((obj hpc-process-output-str-class))
+  "method will be called if the model has died; will print the last lines outputted by the model (the model's last dying comments to stderr)"
   (format *error-output* "model unexpectedly quit... ~%~%here are the last ~a lines that were printed to stdout before the error~%~a~%"
 	  (quot obj) (make-sentence (gethash "str" (collection obj)) :spaceDesignator #\Newline))
   (if (error-p obj) (format *error-output* "here's the error~%~a~%" (error-p obj))))
 
 (defun build-hpc-session ()
+  "top-level hpc function called by letf that builds the session object"
   (build-session ;this is a macro
    :collector-instance (make-instance 'hpc-collector-class)
    :work-instance (make-instance 'hpc-work-class)
