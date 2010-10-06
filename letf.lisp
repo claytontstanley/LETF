@@ -53,11 +53,6 @@
     (rec lis nil)))
 
 (defun mkstr (&rest args)
-  "concatenates and converts a list of symbols to a string"
-  (with-output-to-string (s)
-    (dolist (a args) (princ a s))))
-
-(defun mkstr (&rest args)
   "concatenates and converts a list of things to an uppercase string"
   (format nil "~:@(~{~a~}~)" args))
 
