@@ -41,10 +41,10 @@
   (:documentation "mm-process-output-str class is responsible for keeping track of the last N lines printed by the model"))
 
 (defmethod print-collector ((obj mm-process-output-str-class))
-  "method will be called if the model has died; will print the last lines outputted by the model (the model's last dying comments to stdout)"
-  (format t "model unexpectedly quit... ~%~%here are the last ~a lines that were printed to stdout before the error~%~a~%"
+  "method will be called if the model has died; will print the last lines outputted by the model (the model's last dying comments to stderr)"
+  (format *error-output* "model unexpectedly quit... ~%~%here are the last ~a lines that were printed to stdout before the error~%~a~%"
 	  (quot obj) (make-sentence (gethash "str" (collection obj)) :spaceDesignator #\Newline))
-  (if (error-p obj) (format t "here's the error~%~a~%" (error-p obj))))
+  (if (error-p obj) (format *error-output* "here's the error~%~a~%" (error-p obj))))
 
 (defclass mm-run-collector-class (run-collector-class)
   ((out :accessor out :initarg :out :initform "mm_fraction_done.txt"
