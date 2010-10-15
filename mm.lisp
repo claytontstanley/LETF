@@ -27,14 +27,26 @@
 	:documentation "extending the base class to hold the filename where all of the results will be printed"))
   (:documentation "mm-collector-class is responsible for printing the outputs of a collapsed set of runs"))
 
-(defmethod print-collector ((obj mm-collector-class))
-  "method will be called after each collapsed run; for the mm system, the results will be appended to mm_out.txt"
-  (with-open-file (out (out obj) :direction :output :if-exists :append :if-does-not-exist :create)
-    (dotimes (i (length (cellElements obj)))
-      (format out "~a " (cdr (nth i (cellElements obj)))))
-    (dolist (key (keys obj))
-      (aif (cdr (get-element key (collection obj) (gethash-ifhash key (collapseHash obj))))
-	   (format out "~a " (coerce it 'double-float))))))
+(let ((count 0))
+  (defmethod print-collector ((obj mm-collector-class))
+    "method will be called after each collapsed run; for the mm system, the results will be appended to mm_out.txt"
+    (incf count)
+    (with-open-file (out (out obj) :direction :output :if-exists (if (eq count 1) :supersede :append) :if-does-not-exist :create)
+      ;print a fresh line
+      (if (not (eq count 1)) (format out "~%"))
+      (labels ((printIt (str &rest args)
+		 (format out "~{~a~}" (append (list (if (numberp str) (coerce str 'double-float) str)) args))))
+	;print the IVs with a tab after each
+	(dotimes (i (length (cellElements obj)))
+	  (printIt (cdr (nth i (cellElements obj))) (string #\Tab)))
+	;print the DVs with a tab after all but the last
+	(dotimes (i (length (keys obj)))
+	  (let ((it (cdr (get-element (nth i (keys obj)) 
+				      (collection obj) 
+				      (gethash-ifhash (nth i (keys obj)) (collapseHash obj))))))
+	    (if (eq i (- (length (keys obj)) 1))
+		(printIt it)
+		(printIt it (string #\Tab)))))))))
 
 (defclass mm-process-output-str-class (process-output-str-class) 
   ()
