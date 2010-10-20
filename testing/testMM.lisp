@@ -79,15 +79,45 @@
 		  (with-pandoric (obj) #'session-object
 		    (with-output-to-string (*error-output*)
 		      (generate-full-combinatorial obj)))
-		  (check (string-equal (file-string (string-trim (list #\") ,workFileName)) ,combinationString))
+		  (check (string-equal (file-string ,workFileName) ,combinationString))
 		  ;cleaning up after ourselves
-		  (delete-file (string-trim (list #\") ,workFileName)))))
+		  (delete-file ,workFileName))))
     (let ((workFileName "Test Full Combinatorial Output.txt"))
       ;checking that one set of IVs works correctly
       (deftest-gfc (list (list "IV=" "noise" "1" "1" "3")) workFileName (format nil "~{~,8f ~%~}" (list 1 2 3)))
       ;checking that multiple sets of IVs work correctly
       (deftest-gfc (list (list "IV=" "noise" "1" "2" "3") (list "IV=" "speed" "3" "1" "5")) workFileName
 	(format nil "~{~,8f ~,8f ~%~}" (flatten (list (list 1 3) (list 1 4) (list 1 5) (list 3 3) (list 3 4) (list 3 5))))))))
+
+(deftest test-generate-remaining-combinatorial ()
+  "unit tests for generate-remaining-combinatorial"
+  (macrolet ((deftest-vfc (IVPiece completedPoints workFileName outFileName combinationString)
+	       `(progn
+		  (with-pandoric (configFileWdLST) #'args
+		    (setf configFileWdLST
+			  (format nil "~a~%workFileName=\"~a\"~%outFileName=\"~a\"~%DV=DV1~%DV=DV2~%" ,IVPiece ,workFileName ,outFileName))
+		    (with-open-file (out ,outFileName :direction :output :if-exists :supersede :if-does-not-exist :create)
+		      (format out "~a~%" ,completedPoints))
+		    (with-pandoric (obj) #'session-object
+		      (with-output-to-string (*error-output*)
+			(generate-remaining-combinatorial obj)))
+		    (check (equal
+			    (sort (get-lines (file-string ,workFileName)) #'string<)
+			    (sort (get-lines ,combinationString) #'string<)))
+		    (delete-file ,workFileName)
+		    (delete-file ,outFileName)))))
+    (let ((workFileName "workFile.txt")
+	  (outFileName "outFile.txt"))
+      ;checking a standard case, where a couple are finished "1 3~%1 5"
+      (deftest-vfc (format nil "iv=noise 1 1 3~%iv=speed 3 1 5") (format nil "1 3~%1 5") workFileName outFileName
+		   (format nil "~{~a ~a ~%~}" (flatten (list `(1 4) `(2 3) `(2 4) `(2 5) `(3 3) `(3 4) `(3 5)))))
+      ;checking another standard case, this time spreading the finished ones out and stepping by twos
+      (deftest-vfc (format nil "iv=noi 1 2 9") (format nil "3~%5~%7") workFileName outFileName
+		   (format nil "~{~a~%~}" (list 9 1)))
+      ;checking a fringe case, where there are no IVs or results
+      (deftest-vfc "" "" workFileName outFileName "")
+      ;checking the case where all are finished
+      (deftest-vfc (format nil "iv=step 1 2 7") (format nil "1~%3~%5~%7") workFileName outFileName ""))))
 
 (deftest test-validate-entryFn ()
   "unit tests for validate-entryFn"
@@ -151,7 +181,9 @@
 	  (test-validate-full-combinatorial)
 	  (test-validate-entryFn)
 	  (test-validate-dvs)
-	  (test-generate-full-combinatorial))))
+	  (test-generate-full-combinatorial)
+	  (test-generate-remaining-combinatorial)
+	  )))
     (format t "~%overall: ~:[FAIL~;pass~]~%" result)))
 
 

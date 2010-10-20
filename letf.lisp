@@ -501,6 +501,15 @@
   "just like get-objects, but asserts that at most one object can be found. Returns that object, and not a list of objects"
   `(car (guard (get-objects ,@lst))))
 
+(defun eval-objects (str)
+  "evals all of the lisp objects in str"
+  (mapcar (lambda (x) (eval (read-from-string x)))
+	  (get-objects str)))
+
+(defmacro eval-object (&rest lst)
+  "just like eval-objects, but asserts that at most one object can be evaled. Returns that evaled object, and not a list of objects"
+  `(car (guard (eval-objects ,@lst))))
+
 (defun get-lines (str &key (lineDesignators (list #\Newline #\Return #\LineFeed)) (includeLineDesignators nil))
   "returns a list of the lines in str"
   (let ((out))

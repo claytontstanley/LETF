@@ -222,14 +222,9 @@
 	 (((obj session-class))
 	  "method will generate all combinations of IVs in config file, and write the results (line by line) to file workFileName= in config file"
 	  (with-pandoric (configFileWdLST) #'args
-	    (let ((nums (mapcar (lambda (line) 
-				  (mapcar (lambda (num) (eval (read-from-string num)))
-					  (get-objects (make-sentence (rest (get-words line)))))) 
+	    (let ((nums (mapcar (lambda (line) (eval-objects (make-sentence (rest (get-words line)))))
 				(get-matching-lines configFileWdLST "IV=")))
-		  (workFileName (eval
-				 (read-from-string
-				  (get-object
-				   (get-matching-line configFileWdLST "workFileName=")))))
+		  (workFileName (eval-object (get-matching-line configFileWdLST "workFileName=")))
 		  (lines 0))
 	      (with-open-file (out workFileName :direction :output :if-exists :supersede :if-does-not-exist :create)
 		;creating a lexical closure over the macro comb; instead of having comb do its default thing and return
@@ -242,6 +237,31 @@
 			 nums)
 		(format *error-output* "wrote ~a lines to ~a using IV ranges ~a~%" lines workFileName nums))))))
 
+(methods generate-remaining-combinatorial
+	 (((obj runProcess-class)))
+	 (((obj run-class)))
+	 (((obj session-class))
+	  "method will generate all remaining combinations of IVs in config file, subtracting off those finished in 'outFileName='
+           and write results (line by line) to file 'workFileName=' in config file"
+	  (with-pandoric (configFileWdLST) #'args
+	    (let ((nums (mapcar (lambda (line) (eval-objects (make-sentence (rest (get-words line)))))
+				(get-matching-lines configFileWdLST "IV=")))
+		  (workFileName (eval-object (get-matching-line configFileWdLST "workFileName=")))
+		  (outFileName (eval-object (get-matching-line configFileWdLST "outFileName=")))
+		  (completedPoints)
+		  (remainingPoints)
+		  (allPoints)
+		  (lines 0))
+	      (setf completedPoints (mapcar #'eval-objects (get-lines (file-string outFileName))))
+	      (setf completedPoints (mapcar (lambda (point) (subseq point 0 (length nums))) completedPoints))
+	      (setf allPoints (funcall (comb) nums))
+	      (setf remainingPoints (set-difference allPoints completedPoints :test #'equal))
+	      (with-open-file (out workFileName :direction :output :if-exists :supersede :if-does-not-exist :create)
+		(dolist (point remainingPoints)
+		  (format out "~{~a ~}~&" point)
+		  (incf lines)))
+	      (format *error-output* "wrote ~a lines to ~a using IV ranges ~a~%" (length remainingPoints) workFileName nums)))))
+	      
 (methods print-unread-lines-html-color
 	 (((obj runProcess-class)))
 	 (((obj run-class)))
