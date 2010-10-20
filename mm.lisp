@@ -97,6 +97,10 @@
     ,str
     (html-color-stop)))
 
+(defmacro attempt (form &key (on-error `(format *error-output* "error: ~a~%" condition)))
+  "anaphoric macro for attemping to evaluate form; default is to print error to screen on error"
+  `(handler-case ,form (error (condition) ,on-error)))
+
 ;wrapping html font tags around the text output from all assertions that fail
 (sb-ext:without-package-locks
   (let ((fun (symbol-function 'sb-kernel:assert-error)))
@@ -220,29 +224,9 @@
 	 (((obj runProcess-class)))
 	 (((obj run-class)))
 	 (((obj session-class))
-	  "method will generate all combinations of IVs in config file, and write the results (line by line) to file workFileName= in config file"
-	  (with-pandoric (configFileWdLST) #'args
-	    (let ((nums (mapcar (lambda (line) (eval-objects (make-sentence (rest (get-words line)))))
-				(get-matching-lines configFileWdLST "IV=")))
-		  (workFileName (eval-object (get-matching-line configFileWdLST "workFileName=")))
-		  (lines 0))
-	      (with-open-file (out workFileName :direction :output :if-exists :supersede :if-does-not-exist :create)
-		;creating a lexical closure over the macro comb; instead of having comb do its default thing and return
-		;all of the combinations, we are printing each combination (as a side effect) to the stream 'out' (defined above)
-		;'trail' is defined in comb, and it's a single combination (of all the combinations)
-		;this is what happens when you combine anaphoric macros (variable capture) with lexical closures (functions with memory)...
-		(funcall (comb 
-			  (incf lines) 
-			  (format out "~{~,8f ~}~&" trail)) 
-			 nums)
-		(format *error-output* "wrote ~a lines to ~a using IV ranges ~a~%" lines workFileName nums))))))
-
-(methods generate-remaining-combinatorial
-	 (((obj runProcess-class)))
-	 (((obj run-class)))
-	 (((obj session-class))
 	  "method will generate all remaining combinations of IVs in config file, subtracting off those finished in 'outFileName='
-           and write results (line by line) to file 'workFileName=' in config file"
+           and write results (line by line) to file 'workFileName=' in config file; if the output file names 'outFileName=' doesn't
+           already exist, this this method will generate a full combinatorial"
 	  (with-pandoric (configFileWdLST) #'args
 	    (let ((nums (mapcar (lambda (line) (eval-objects (make-sentence (rest (get-words line)))))
 				(get-matching-lines configFileWdLST "IV=")))
@@ -252,7 +236,7 @@
 		  (remainingPoints)
 		  (allPoints)
 		  (lines 0))
-	      (setf completedPoints (mapcar #'eval-objects (get-lines (file-string outFileName))))
+	      (setf completedPoints (mapcar #'eval-objects (get-lines (attempt (file-string outFileName)))))
 	      (setf completedPoints (mapcar (lambda (point) (subseq point 0 (length nums))) completedPoints))
 	      (setf allPoints (funcall (comb) nums))
 	      (setf remainingPoints (set-difference allPoints completedPoints :test #'equal))
