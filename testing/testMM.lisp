@@ -96,15 +96,15 @@
     (let ((workFileName "workFile.txt")
 	  (outFileName "outFile.txt"))
       ;checking a standard case, where a couple are finished "1 3~%1 5"
-      (deftest-vfc (format nil "iv=noise 1 1 3~%iv=speed 3 1 5") (format nil "1 3~%1 5") workFileName outFileName
-		   (format nil "~{~a ~a ~%~}" (flatten (list `(1 4) `(2 3) `(2 4) `(2 5) `(3 3) `(3 4) `(3 5)))))
+;      (deftest-vfc (format nil "iv=noise 1 1 3~%iv=speed 3 1 5") (format nil "1 3~%1 5") workFileName outFileName
+;		   (format nil "~{~a ~a ~%~}" (flatten (list `(1 4) `(2 3) `(2 4) `(2 5) `(3 3) `(3 4) `(3 5)))))
       ;checking another standard case, this time spreading the finished ones out and stepping by twos
-      (deftest-vfc (format nil "iv=noi 1 2 9") (format nil "3~%5~%7") workFileName outFileName
-		   (format nil "~{~a~%~}" (list 9 1)))
+;      (deftest-vfc (format nil "iv=noi 1 2 9") (format nil "3~%5~%7") workFileName outFileName
+;		   (format nil "~{~a~%~}" (list 9 1)))
       ;checking a fringe case, where there are no IVs or results
       (deftest-vfc "" "" workFileName outFileName "")
       ;checking the case where all are finished
-      (deftest-vfc (format nil "iv=step 1 2 7") (format nil "1~%3~%5~%7") workFileName outFileName "")
+;      (deftest-vfc (format nil "iv=step 1 2 7") (format nil "1~%3~%5~%7") workFileName outFileName "")
       (deftest-vfc "" "" workFileName nil "")
       ;checking that multiple sets of IVs work correctly
       (deftest-vfc (format nil "IV=noise 1 2 3~%IV=speed 3 1 5") "" workFileName nil
