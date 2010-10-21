@@ -43,7 +43,7 @@
 	(dotimes (i (length (keys obj)))
 	  (let ((it (cdr (get-element (nth i (keys obj)) 
 				      (collection obj) 
-				      (gethash-ifhash (nth i (keys obj)) (collapseHash obj))))))
+				      :collapseFns (gethash-ifhash (nth i (keys obj)) (collapseHash obj))))))
 	    (if (eq i (- (length (keys obj)) 1))
 		(printIt it)
 		(printIt it (string #\Tab)))))))))
@@ -244,7 +244,7 @@
 		(dolist (point remainingPoints)
 		  (format out "~{~a ~}~&" point)
 		  (incf lines)))
-	      (format *error-output* "wrote ~a lines to ~a using IV ranges ~a~%" (length remainingPoints) workFileName nums)))))
+	      (format *error-output* "wrote ~a lines to ~a using IV ranges ~a~%" lines workFileName nums)))))
 	      
 (methods print-unread-lines-html-color
 	 (((obj runProcess-class)))

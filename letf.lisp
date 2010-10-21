@@ -754,7 +754,7 @@
   "same as get-matching-lines, just asserts the expectation that only one (or zero) lines should be returned"
   `(car (guard (get-matching-lines ,@lst))))
 
-(defun get-elements (keys hash &optional (collapseFns "#'mean"))
+(defun get-elements (keys hash &key (collapseFns "#'mean") (eval-val-p t))
   "returns the list of elements (key . value) from the hash table 'hash' specified by 'keys'
    will evaluate each value before putting it in the list"
   (mklst keys)
@@ -768,7 +768,7 @@
 		 (assert (equal (length (car it)) 0) nil
 			 "necessaries ~a left over when calling get-elements; not allowed to have any necessaries here" (car it)))
 	(declare (ignore words))
-	(push-to-end (cons key (eval (read-from-string (first val)))) out)))))
+	(push-to-end (cons key (if eval-val-p (eval (read-from-string (first val))) (first val))) out)))))
 
 (defmacro get-element (&rest lst)
   "same as get-elements, but asserts that at most one element can be returned; returns that element (or nil), and not a list"
@@ -929,7 +929,7 @@
 		   (equal 1 (length (remove-duplicates val :test #'equalp))))
 	      (setf (gethash key (collection obj)) (first val))))
     (let ((elements (get-elements (keys obj) (collection obj) 
-				  (mapcar (lambda (x) (gethash-ifHash x (collapseHash obj))) (keys obj)))))
+				  :collapseFns (mapcar (lambda (x) (gethash-ifHash x (collapseHash obj))) (keys obj)))))
       (print-collector obj)
       (collect (session-collector obj) elements))))
 
@@ -1125,7 +1125,7 @@
    object-oriented hierarchy and sending constructors to those new pieces
    as inputs to the 'build-session macro call"
   (setf collector-instance (append collector-instance
-				    '(:cellElements (get-elements cellKeys IVHash)
+				    '(:cellElements (get-elements cellKeys IVHash :eval-val-p nil)
 				      :keys DVKeys
 				      :quota quota
 				      :collapseHash (copy-hash collapseHash)
@@ -1443,10 +1443,10 @@
   "defines how an IV vector will look when sent across stdin, when the model is launched as a separate process"
   (with-output-to-string (line)
     (let ((elementCount 0) 
-	  (elements (get-elements (IVKeys obj) (IVHash obj))))
+	  (elements (get-elements (IVKeys obj) (IVHash obj) :eval-val-p nil)))
       (dolist (element elements)
 	(incf elementCount)
-	(write-string (toString (cdr element)) line)
+	(write-string (cdr element) line)
 	(if (not (equal elementCount (length elements)))
 	    (write-string (string #\Tab) line))))))
 
@@ -1473,7 +1473,7 @@
 	(format t "~a~%" (cdr (nth i (cellElements obj))))
 	(format t "~a " (cdr (nth i (cellElements obj))))))
   (dolist (key (keys obj))
-    (aif (cdr (get-element key (collection obj) (gethash-ifHash key (collapseHash obj))))
+    (aif (cdr (get-element key (collection obj) :collapseFns (gethash-ifHash key (collapseHash obj))))
 	 (format t "~a: ~a~%" key (if (numberp it) (coerce it 'double-float) it)))))
 
 (defclass hpc-process-output-str-class (process-output-str-class) 
