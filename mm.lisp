@@ -224,30 +224,17 @@
 	 (((obj runProcess-class)))
 	 (((obj run-class)))
 	 (((obj session-class))
-	  "method will generate all remaining combinations of IVs in config file, subtracting off those finished in 'outFileName='
-           and write results (line by line) to file 'workFileName=' in config file; if the output file names 'outFileName=' doesn't
-           already exist, this this method will generate a full combinatorial"
+	  "method will generate the full combination of IVs in config file, and write results (line by line) to file 'workFileName=' in config file"
 	  (with-pandoric (configFileWdLST) #'args
 	    (let ((nums (mapcar (lambda (line) (eval-objects (make-sentence (rest (get-words line)))))
 				(get-matching-lines configFileWdLST "IV=")))
 		  (workFileName (eval-object (get-matching-line configFileWdLST "workFileName=")))
-		  (outFileName (eval-object (get-matching-line configFileWdLST "outFileName=")))
-		  (completedPoints)
-		  (remainingPoints)
-		  (allPoints)
 		  (lines 0))
-	      ;(setf completedPoints (mapcar #'eval-objects (get-lines (attempt (file-string outFileName)))))
-	      ;(setf completedPoints (mapcar (lambda (point) (subseq point 0 (length nums))) completedPoints))
-	      ;(setf allPoints (funcall (comb) nums))
-	      ;(setf remainingPoints (set-difference allPoints completedPoints :test #'equal))
 	      (with-open-file (out workFileName :direction :output :if-exists :supersede :if-does-not-exist :create)
 		(funcall (comb
 			  (incf lines)
 			  (format out "~{~a ~}~&" trail))
 			 nums))
-		;(dolist (point remainingPoints)
-		  ;(format out "~{~a ~}~&" point)
-		  ;(incf lines)))
 	      (format *error-output* "wrote ~a lines to ~a using IV ranges ~a~%" lines workFileName nums)))))
 	      
 (methods print-unread-lines-html-color
