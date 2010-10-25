@@ -233,7 +233,7 @@
 	      (with-open-file (out workFileName :direction :output :if-exists :supersede :if-does-not-exist :create)
 		(funcall (comb
 			  (incf lines)
-			  (format out "~{~a ~}~&" trail))
+			  (format out "~{~a~a~}~&" (flatten (mapcar #'list trail (make-list (length trail) :initial-element #\Tab)))))
 			 nums))
 	      (format *error-output* "wrote ~a lines to ~a using IV ranges ~a~%" lines workFileName nums)))))
 	      

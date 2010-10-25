@@ -111,10 +111,12 @@
       (deftest-vfc "" "" workFileName nil "")
       ;checking that multiple sets of IVs work correctly
       (deftest-vfc (format nil "IV=noise 1 2 3~%IV=speed 3 1 5") "" workFileName nil
-	(format nil "~{~a ~a ~%~}" (flatten (list (list 1 3) (list 1 4) (list 1 5) (list 3 3) (list 3 4) (list 3 5)))))
+	(format nil "~{~a~a~a~a~%~}" (flatten (list (list 1 #\tab 3 #\tab) (list 1 #\tab 4 #\tab) 
+						    (list 1 #\tab 5 #\tab) (list 3 #\tab 3 #\tab) 
+						    (list 3 #\tab 4 #\tab) (list 3 #\tab 5 #\tab)))))
       ;checking that one set of IVs works correctly
       (deftest-vfc (format nil "IV=noise 1 1 3") "" workFileName outFileName
-		   (format nil "~{~a ~%~}" (list 1 2 3))))))
+		   (format nil "~{~a~a~%~}" (flatten (mapcar #'list (list 1 2 3) (list #\tab #\tab #\tab))))))))
 
 (deftest test-validate-entryFn ()
   "unit tests for validate-entryFn"
