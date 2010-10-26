@@ -1300,8 +1300,8 @@
 	   (currentDVs (if necessaryDVs (get-DVs obj process appetizers))))
       ;cars of currentDVs should equal necessaryDVs
       (awhen (set-difference necessaryDVs (mapcar #'car currentDVs) :test #'string-equal)
-         (format *error-output* "failed to send all DVs for this trial; missing ~a~%" it)
-	 (merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) it) :toHash DVHash))
+	(format *error-output* "failed to send all DVs for this trial; missing ~a~%" it)
+	(merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) it) :toHash DVHash))
       ;push all currentDVs onto DVHash
       (merge-hash currentDVs :toHash DVHash)
       ;there should be no currentDV that is not in necessaryDVs
