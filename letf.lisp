@@ -1308,7 +1308,7 @@
 	(setf currentDV (car currentDVs))
 	(setf currentDVs (cdr currentDVs))
 	(assert (member (car currentDV) necessaryDVs :test #'string-equal) nil 
-		"sent ~a DV for the next trial, before sending all the DVs for this trial" (car currentDV)) 
+		"sent ~a DV for the next trial, before sending all ~a DVs left for this trial" (car currentDV) necessaryDVs) 
 	(merge-hash currentDV :toHash (DVHash obj))
 	(setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'string-equal)))
       (sleep (sleepTime obj))
