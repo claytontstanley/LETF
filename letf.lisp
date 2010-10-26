@@ -1263,10 +1263,6 @@
       (setf line (read-line (process-output process) nil))
       (collect (process-output-str (runProcess obj)) (cons "str" line))
       (aif (line2element line) (push-to-end it currentDVs)))
-    (when (and (not (append appetizers currentDVs)) 
-	       (not (equal (process-status process) :running)))
-      (print-collector (process-output-str (runProcess obj))) 
-      (assert nil))
     (append appetizers currentDVs)))
 
 (defmethod get-DVs ((obj johnny5-run-class) &optional (process nil) (appetizers nil))
@@ -1295,27 +1291,65 @@
       (print-collector (process-output-str (runProcess obj))) 
       (assert nil))
     (append appetizers currentDVs)))
-	     			 
-(defmethod wrapper-execute ((obj run-class) &optional (process nil) (appetizers nil))
-  "execute the run-class object"
+
+(defmethod wrapper-execute ((obj johnny5-run-class) &optional (process nil) (appetizers nil))
   (mklst appetizers)
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session (runProcess obj))))
-  (let ((necessaryDVs) (currentDVs) (currentDV))
-    (while (setf necessaryDVs (necessaries (DVKeys obj) (DVHash obj)))
-     ;loop over the current DVs and add them to the DVHash table
-      (setf currentDVs (get-DVs obj process appetizers))
-      (while (and necessaryDVs currentDVs)
-	(setf currentDV (car currentDVs))
-	(setf currentDVs (cdr currentDVs))
-	(assert (member (car currentDV) necessaryDVs :test #'string-equal) nil 
-		"sent ~a DV for the next trial, before sending all ~a DVs left for this trial" (car currentDV) necessaryDVs) 
-	(merge-hash currentDV :toHash (DVHash obj))
-	(setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'string-equal)))
-      (sleep (sleepTime obj))
-      (setf appetizers nil))
-    (collect (run-collector obj) (DVHash obj))
-    (setf (DVHash obj) nil)
-    currentDVs))
+  (with-slots (DVKeys DVHash run-collector sleepTime) obj
+    (let* ((necessaryDVs (necessaries DVKeys DVHash))
+	   (currentDVs (if necessaryDVs (get-DVs obj process appetizers))))
+      ;cars of currentDVs should equal necessaryDVs
+      (awhen (set-difference necessaryDVs (mapcar #'car currentDVs) :test #'string-equal)
+         (format *error-output* "failed to send all DVs for this trial; missing ~a~%" it)
+	 (merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) it) :toHash DVHash))
+      ;push all currentDVs onto DVHash
+      (merge-hash currentDVs :toHash DVHash)
+      ;there should be no currentDV that is not in necessaryDVs
+      (aif (set-difference (mapcar #'car currentDVs) necessaryDVs :test #'string-equal)
+	   (assert nil nil "sent extra DVs ~a for this trial~%" it))
+      (collect run-collector DVHash)
+      (setf DVHash nil)
+      (sleep sleepTime)
+      ;not returning any leftovers
+      nil)))
+
+(defmethod wrapper-execute ((obj number5-run-class) &optional (process) (appetizers))
+  (mklst appetizers)
+  (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session (runProcess obj))))
+  (with-slots (DVKeys DVHash run-collector sleepTime) obj
+    (let ((necessaryDVs) (currentDVs) (currentDV) (process-alive-p t))
+      (while (and (setf necessaryDVs (necessaries DVKeys DVHash))
+		  process-alive-p)
+	(if (not (equal (process-status process) :running))
+	    (setf process-alive-p nil))
+	(setf currentDVs (get-DVs obj process appetizers))
+	(setf appetizers nil)
+	(while (and necessaryDVs currentDVs)
+	  (setf currentDV (pop currentDVs))
+	  (if (not (member (car currentDV) necessaryDVs :test #'string-equal))
+	      (progn
+	        ;log it
+		(format *error-output* "sent ~a DV for the next trial, before sending all ~a DVs left for this trial~%" (car currentDV) necessaryDVs)
+	        ;make sure currentDVs is correct (undo the pop)
+		(push currentDV currentDVs)
+	        ;merge nils for all necessaryDVs to the dvhash
+		(merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) necessaryDVs) :toHash DVHash)
+	        ;set necessaryDVs to nil
+		(setf necessaryDVs nil))
+	      (progn
+		(merge-hash currentDV :toHash DVHash)
+		(setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'string-equal))))))
+      (awhen necessaryDVs
+	;it should be really difficult not to throw an error here
+	(when (equal (process-exit-code process) 1)
+	  (print-collector (process-output-str (runProcess obj)))       
+	  (assert nil))
+	(format *error-output* "failed to send all ~a DVs left for this trial~%" it)
+	(merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) it) :toHash DVHash))
+      (collect run-collector DVHash)
+      (setf DVHash nil)
+      (sleep sleepTime)
+      currentDVs)))
 
 (defmethod wrapper-execute ((obj johnny5-runProcess-class) &optional (process nil) (appetizers nil))
   "execute the runProcess-class object, if short circuiting"
