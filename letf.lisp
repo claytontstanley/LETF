@@ -1529,8 +1529,6 @@
 ;////////////////////////////////////////////
 
 (with-pandoric (platform configFileWdLST) #'args
-  ;run the pre-processing commands
-  (mapc (lambda (str) (eval-object str)) (get-matching-lines configFileWdLST "runBeforeLoad="))
   ;load the extra lisp files
   (dolist (line (get-matching-lines configFileWdLST "file2load="))
     (load-and-loaded (replace-all line "$1" platform :test #'string-equal)))
