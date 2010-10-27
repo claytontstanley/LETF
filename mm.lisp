@@ -228,7 +228,7 @@
 	  (with-pandoric (configFileWdLST) #'args
 	    (let ((nums (mapcar (lambda (line) (eval-objects (make-sentence (rest (get-words line)))))
 				(get-matching-lines configFileWdLST "IV=")))
-		  (workFileName (eval-object (get-matching-line configFileWdLST "workFileName=")))
+		  (workFileName (get-word (get-matching-line configFileWdLST "workFileName=")))
 		  (lines 0))
 	      (with-open-file (out workFileName :direction :output :if-exists :supersede :if-does-not-exist :create)
 		(funcall (comb
