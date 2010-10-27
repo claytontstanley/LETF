@@ -158,101 +158,92 @@
 		  `(progn ,@body)
 		  `(list trail))))))
 
-(methods validate-entryFn
-	 (((obj runprocess-class)))
-	 (((obj run-class)))
-	 (((obj session-class))
-	  "method will validate the parameters defined in the entry function against par names specified in the config file"
-	  (let* ((IVKeys (IVKeys obj))
-		 (DVKeys (DVKeys obj))
-		 (modelProgram (modelProgram obj))
-		 (arglst (sb-introspect:function-lambda-list modelProgram))
-		 (entryFnType (entryFnType obj)))
-	    (when (equal entryFnType 'keys)
-	      (assert (> (length IVKeys) 0) nil "at least one IV is needed in config file")
-	      (assert (> (length DVKeys) 0) nil "at least one DV is needed in config file")
-	      (let ((lst (mapcar (lambda (x) (format nil "~a" (car x))) (cdr arglst))))
-		(assert (equalp (sort lst #'string<) (sort IVKeys #'string<)) nil
-			"keys ~a for entry function ~a do not match IVs ~a in config file"
-			lst modelProgram IVKeys)))
-	    (when (equal entryFnType 'hash)
-	      ;this assert nil nil will throw an error; only a 'keys entryFnType is allowed on MM
-	      ;for example (defun run-model (&key (x) (y)) ... is allowed, but
-	      ;(defun run-model (hash) ... is not allowed
-	      (assert nil nil "not allowing hash-table style entry functions for MM yet. Keep it simple...")
-	      (assert (equal (length arglst) 1) nil "problem with argument list ~a for the entry function ~a"
-		      arglst modelProgram))
-	    ;not doing any validation when the model is launched as a separate process yet
-	    (when (equal entryFnType 'process)
-	      nil))))
+(defmacro defmethod% (name pattern &body body)
+  "works like defmethod, but fills in stub methods for the two classes not defined"
+  (let* ((all-classes (list 'runprocess-class 'run-class 'session-class))
+	 (stub-methods (set-difference all-classes (flatten pattern))))
+    (assert (equal (length stub-methods) 2) nil "used defmethod% on an invalid class")
+    `(methods ,name
+	      ,@(mapcar (lambda (stub-method) `(((obj ,stub-method)))) stub-methods)
+	      (,pattern ,@body))))
 
-(methods validate-DVs
-	 (((obj runprocess-class)))
-	 (((obj run-class)))
-	 (((obj session-class))
-	  "method will validate the DVs written in the model (using send-dv) against DV names specified in the config file"
-	  (let ((necessary-DVs (necessaries (DVKeys obj) (DVHash obj)))
-		(supplied-DVs (get-pandoric #'DVs 'DVs)))
-	    (assert (equalp (sort necessary-DVs #'string<) (sort supplied-DVs #'string<)) nil
-		    "DVKeys ~a sent using 'send-DVs' do not match necessary DVs ~a in config file"
-		    supplied-DVs necessary-DVs))))
+(defmethod% validate-entryFn ((obj session-class))
+  "method will validate the parameters defined in the entry function against par names specified in the config file"
+  (let* ((IVKeys (IVKeys obj))
+	 (DVKeys (DVKeys obj))
+	 (modelProgram (modelProgram obj))
+	 (arglst (sb-introspect:function-lambda-list modelProgram))
+	 (entryFnType (entryFnType obj)))
+    (when (equal entryFnType 'keys)
+      (assert (> (length IVKeys) 0) nil "at least one IV is needed in config file")
+      (assert (> (length DVKeys) 0) nil "at least one DV is needed in config file")
+      (let ((lst (mapcar (lambda (x) (format nil "~a" (car x))) (cdr arglst))))
+	(assert (equalp (sort lst #'string<) (sort IVKeys #'string<)) nil
+		"keys ~a for entry function ~a do not match IVs ~a in config file"
+		lst modelProgram IVKeys)))
+    (when (equal entryFnType 'hash)
+      ;this assert nil nil will throw an error; only a 'keys entryFnType is allowed on MM
+      ;for example (defun run-model (&key (x) (y)) ... is allowed, but
+      ;(defun run-model (hash) ... is not allowed
+      (assert nil nil "not allowing hash-table style entry functions for MM yet. Keep it simple...")
+      (assert (equal (length arglst) 1) nil "problem with argument list ~a for the entry function ~a"
+	      arglst modelProgram))
+    ;not doing any validation when the model is launched as a separate process yet
+    (when (equal entryFnType 'process)
+      nil)))
 
-(methods validate-full-combinatorial
-	 (((obj runProcess-class)))
-	 (((obj run-class)))
-	 (((obj session-class))
-	  "method will check that the syntax for the 'start stepsize end' points specified for each IV in the config file is correct"
-	  (with-pandoric (configFileWdLST) #'args
-	    (dolist (line (get-matching-lines configFileWdLST "IV="))
-	      (let ((nums (mapcar (lambda (x) 
-				    (handler-case (eval (read-from-string x))
-				      (error (condition) 
-					(assert nil nil "error \"~a\" when parsing line IV=~a" condition line))))
-				  (get-objects (make-sentence (rest (get-words line)))))))
-		(mapc (lambda (x) (assert (numberp x) nil "~a not a number in line IV=~a" x line)) nums)
-		(assert (equal (length nums) 3) nil "not 3 numbers in line IV=~a" line)
-		(assert (< (first nums) (third nums)) nil "starting number ~a not less than ending number ~a in line IV=~a" (first nums) (third nums) line)
-		(assert (> (second nums) 0) nil "stepsize ~a not greater than zero in line IV=~a" (second nums) line)
-		(multiple-value-bind (q r) (ffloor (- (third nums) (first nums)) (second nums))
-		  (declare (ignore q))
-		  (assert (< (abs r) .000001) nil "(~a-~a)/~a not a whole number in line IV=~a" (third nums) (first nums) (second nums) line))))
-	    (dolist (line (get-matching-lines configFileWdLST "DV="))
-	      (let ((name (get-words line)))
-		(assert (equal (length name) 1) nil "not 1 name in line DV=~a" line))))))
+(defmethod% validate-DVs ((obj session-class))
+  "method will validate the DVs written in the model (using send-dv) against DV names specified in the config file"
+  (let ((necessary-DVs (necessaries (DVKeys obj) (DVHash obj)))
+	(supplied-DVs (get-pandoric #'DVs 'DVs)))
+    (assert (equalp (sort necessary-DVs #'string<) (sort supplied-DVs #'string<)) nil
+	    "DVKeys ~a sent using 'send-DVs' do not match necessary DVs ~a in config file"
+	    supplied-DVs necessary-DVs)))
 
-(methods generate-full-combinatorial
-	 (((obj runProcess-class)))
-	 (((obj run-class)))
-	 (((obj session-class))
-	  "method will generate the full combination of IVs in config file, and write results (line by line) to file 'workFileName=' in config file"
-	  (with-pandoric (configFileWdLST) #'args
-	    (let ((nums (mapcar (lambda (line) (eval-objects (make-sentence (rest (get-words line)))))
-				(get-matching-lines configFileWdLST "IV=")))
-		  (workFileName (get-word (get-matching-line configFileWdLST "workFileName=")))
-		  (lines 0))
-	      (with-open-file (out workFileName :direction :output :if-exists :supersede :if-does-not-exist :create)
-		(funcall (comb
-			  (incf lines)
-			  (format out "~{~a~a~}~&" (flatten (mapcar #'list trail (make-list (length trail) :initial-element #\Tab)))))
-			 nums))
-	      (format *error-output* "wrote ~a lines to ~a using IV ranges ~a~%" lines workFileName nums)))))
+(defmethod% validate-full-combinatorial ((obj session-class))
+  "method will check that the syntax for the 'start stepsize end' points specified for each IV in the config file is correct"
+  (with-pandoric (configFileWdLST) #'args
+    (dolist (line (get-matching-lines configFileWdLST "IV="))
+      (let ((nums (mapcar (lambda (x) 
+			    (handler-case (eval (read-from-string x))
+			      (error (condition) 
+				(assert nil nil "error \"~a\" when parsing line IV=~a" condition line))))
+			  (get-objects (make-sentence (rest (get-words line)))))))
+	(mapc (lambda (x) (assert (numberp x) nil "~a not a number in line IV=~a" x line)) nums)
+	(assert (equal (length nums) 3) nil "not 3 numbers in line IV=~a" line)
+	(assert (< (first nums) (third nums)) nil "starting number ~a not less than ending number ~a in line IV=~a" (first nums) (third nums) line)
+	(assert (> (second nums) 0) nil "stepsize ~a not greater than zero in line IV=~a" (second nums) line)
+	(multiple-value-bind (q r) (ffloor (- (third nums) (first nums)) (second nums))
+	  (declare (ignore q))
+	  (assert (< (abs r) .000001) nil "(~a-~a)/~a not a whole number in line IV=~a" (third nums) (first nums) (second nums) line))))
+    (dolist (line (get-matching-lines configFileWdLST "DV="))
+      (let ((name (get-words line)))
+	(assert (equal (length name) 1) nil "not 1 name in line DV=~a" line)))))
+
+(defmethod% generate-full-combinatorial ((obj session-class))
+  "method will generate the full combination of IVs in config file, and write results (line by line) to file 'workFileName=' in config file"
+  (with-pandoric (configFileWdLST) #'args
+    (let ((nums (mapcar (lambda (line) (eval-objects (make-sentence (rest (get-words line)))))
+			(get-matching-lines configFileWdLST "IV=")))
+	  (workFileName (get-word (get-matching-line configFileWdLST "workFileName=")))
+	  (lines 0))
+      (with-open-file (out workFileName :direction :output :if-exists :supersede :if-does-not-exist :create)
+	(funcall (comb
+		  (incf lines)
+		  (format out "~{~a~a~}~&" (flatten (mapcar #'list trail (make-list (length trail) :initial-element #\Tab)))))
+		 nums))
+      (format *error-output* "wrote ~a lines to ~a using IV ranges ~a~%" lines workFileName nums))))
 	      
-(methods print-unread-lines-html-color
-	 (((obj runProcess-class)))
-	 (((obj run-class)))
-	 (((obj session-class))
-	  "an 'around' method that calls 'print-unread-lines' in letf, but prints the results in html color"
-	  (format *error-output* (html-color-start :color orange))
-	  (print-unread-lines obj)
-	  (format *error-output* (html-color-stop))))
+(defmethod% print-unread-lines-html-color ((obj session-class))
+  "an 'around' method that calls 'print-unread-lines' in letf, but prints the results in html color"
+  (format *error-output* (html-color-start :color orange))
+  (print-unread-lines obj)
+  (format *error-output* (html-color-stop)))
 
-(methods print-session-html-color
-	 (((obj runProcess-class)))
-	 (((obj run-class)))
-	 (((obj session-class))
-	  "an 'around' method that calls 'print-session' in letf, but prints the results in html color"
-	  (format *error-output* (html-color-start :color orange))
-	  (print-session obj)
-	  (format *error-output* (html-color-stop))))
+(defmethod% print-session-html-color ((obj session-class))
+  "an 'around' method that calls 'print-session' in letf, but prints the results in html color"
+  (format *error-output* (html-color-start :color orange))
+  (print-session obj)
+  (format *error-output* (html-color-stop)))
 
 
