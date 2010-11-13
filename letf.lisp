@@ -205,8 +205,10 @@
 ;FIXME; need to look at internals of defun, to try and mimick more of defun here
 (defmacro defpun (name largs pargs &rest body)
   "defines a pandoric function; syntax similar to defun"
-  `(setf (symbol-function ',name)
-	 (plambda ,largs ,pargs ,@body)))
+  `(let ,(remove-if-not #'consp pargs)
+     (setf (symbol-function ',name)
+	   (plambda ,largs ,(mapcar (lambda (parg) (if (consp parg) (car parg) parg)) pargs) 
+	     ,@body))))
      
 (defmacro! fast-concatenate (&rest lst)
   "equivalent to writing (concatenate 'string ...), but ~5x faster"
@@ -245,10 +247,9 @@
 ;loads the file with pathname str
 ;keeps track of all the pathnames that have been sent 
 ;to this function; returns the list of those names
-(let ((loaded))
-  (defpun load-and-loaded (str) (loaded)
-    (push-to-end str loaded)
-    (load str)))
+(defpun load-and-loaded (str) ((loaded))
+  (push-to-end str loaded)
+  (load str))
 
 (defun key-present (key hash)
   "returns if a key is present in the hash table"
@@ -718,27 +719,25 @@
 ;keeps track of the line numbers for all of the lines that have
 ;been returned from calling this function
 ;you can access the line numbers using the 'with-pandoric macro
-(let ((traversed))
-  (defpun get-matching-lines (str keys) (traversed)
-    (mklst keys)
-    (let ((words) (out) (line) (lines))
-      (setf lines (if (consp str) str (get-lines str)))
-      (dotimes (i (length lines) (reverse out))
-	(setf line (nth i lines))
-	(setf words (if (consp line) line (get-words line)))
-	(if words
-	    (awhen 
-	     (block index=
-	       (dolist (key keys nil)
-		 (if (string-equal key (subseq (first words) 0 (min (length (first words)) (length key))))
-		     (return-from index= (length key)))))
-	     (push-to-end i traversed)
-	     (push 
-	      (bracket-expand 
-	       (string-trim 
-		(list #\Space #\tab) 
-		(subseq (make-sentence line) it (length (make-sentence line))))) 
-	      out)))))))
+(defpun get-matching-lines (str keys) ((traversed))
+  (mklst keys)
+  (let ((words) (out) (line) (lines))
+    (setf lines (if (consp str) str (get-lines str)))
+    (dotimes (i (length lines) (reverse out))
+      (setf line (nth i lines))
+      (setf words (if (consp line) line (get-words line)))
+      (if words
+	  (awhen (block index=
+		   (dolist (key keys nil)
+		     (if (string-equal key (subseq (first words) 0 (min (length (first words)) (length key))))
+			 (return-from index= (length key)))))
+	    (push-to-end i traversed)
+	    (push 
+	     (bracket-expand 
+	      (string-trim 
+	       (list #\Space #\tab) 
+	       (subseq (make-sentence line) it (length (make-sentence line))))) 
+	     out))))))
 
 (defun get-first-word-from-matching-lines (str keys)
   "gets the RHS from lines in string 'str' where the LHS matches a key in 'keys'" 
@@ -1101,16 +1100,15 @@
 
 ;defines the lexical closure 'args that stores all of the information that was passed to letf using command-line arguments 
 ;'args is pandoric, so you can access its state using 'with-pandoric
-(let* ((platform (get-word (get-arg 2)))
-       (configFilePath (get-arg 1))
-       (configFileStr)
-       (configFileLnLST)
-       (configFileWdLST)
-       (workFilePath (unless (string-equal (get-arg 0) "nil") (get-arg 0))))
-  (defpun args () (platform configFilePath configFileStr configFileLnLST configFileWdLST workFilePath)
-    (setf configFileStr (restructure (file-string configFilePath)))
-    (setf configFileLnLST (get-lines configFileStr))
-    (setf configFileWdLST (mapcar #'get-words configFileLnLST))))
+(defpun args () ((platform (get-word (get-arg 2)))
+		 (configFilePath (get-arg 1))
+		 (configFileStr)
+		 (configFileLnLST)
+		 (configFileWdLST)
+		 (workFilePath (unless (string-equal (get-arg 0) "nil") (get-arg 0))))
+  (setf configFileStr (restructure (file-string configFilePath)))
+  (setf configFileLnLST (get-lines configFileStr))
+  (setf configFileWdLST (mapcar #'get-words configFileLnLST)))
 
 (args) ;initialize configFile Str/LnLST/WdLST to defaults
 
