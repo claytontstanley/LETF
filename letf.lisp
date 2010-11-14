@@ -54,7 +54,7 @@
 
 (defun mkstr (&rest args)
   "concatenates and converts a list of things to an uppercase string"
-  (format nil "~:@(~{~a~}~)" args))
+  (if args (format nil "~:@(~{~a~}~)" args)))
 
 (defun symb (&rest args)
   "concatenates and converts a list of things to an interned symbol"
