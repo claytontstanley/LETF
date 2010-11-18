@@ -22,7 +22,7 @@
 ;;;       ./sbcl --core ./sbcl.core --noinform --noprint --disable-debugger --load letf.lisp nil configFile.txt nil
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (setf *read-default-float-format* 'double-float)
- 
+
 ;////////////////////////////////////////////////////////////
 ;////////////////////////////////////////////////////////////
 ;everything below is from Doug Hoyte's 'Let over Lambda' book (lol.lisp)
