@@ -189,26 +189,26 @@
 		      syms))
          ,@body))))
 
-(defmacro plambda (largs pargs &rest body)
-  "defines a pandoric closure that is a lexical closure over 'pargs'"
-  (let ((pargs (mapcar #'list pargs)))
-    `(let (this self)
-       (setq
-	this (lambda ,largs ,@body)
-	self (dlambda
-	      (:pandoric-get (sym) ,(pandoriclet-get pargs))
-	      (:pandoric-set (sym val) ,(pandoriclet-set pargs))
-	      (t (&rest args) (apply this args)))))))
+(defmacro plambda (largs pargs% &rest body)
+  "defines a pandoric lambda that is a lexical closure over 'pargs'"
+  (let ((pargs (mapcar #'list (mapcar (lambda (parg) (if (consp parg) (car parg) parg)) pargs%))))
+    `(let ,(remove-if-not #'consp pargs%)
+       (let (this self)
+	 (setq
+	  this (lambda ,largs ,@body)
+	  self (dlambda
+		(:pandoric-get (sym) ,(pandoriclet-get pargs))
+		(:pandoric-set (sym val) ,(pandoriclet-set pargs))
+		(t (&rest args) (apply this args))))))))
 ;////////////////////////////////////////////////////////////
 ;///////////////////////////////////////////end lol.lisp
 
 ;FIXME; need to look at internals of defun, to try and mimick more of defun here
 (defmacro defpun (name largs pargs &rest body)
   "defines a pandoric function; syntax similar to defun"
-  `(let ,(remove-if-not #'consp pargs)
-     (setf (symbol-function ',name)
-	   (plambda ,largs ,(mapcar (lambda (parg) (if (consp parg) (car parg) parg)) pargs) 
-	     ,@body))))
+  `(setf (symbol-function ',name)
+	 (plambda ,largs ,pargs 
+	   ,@body)))
      
 (defmacro! fast-concatenate (&rest lst)
   "equivalent to writing (concatenate 'string ...), but ~5x faster"
@@ -1092,6 +1092,7 @@
    #+SBCL *posix-argv*
    #+LISPWORKS system:*line-arguments-list*
    #+CMU extensions:*command-line-strings*
+   #+CCL *unprocessed-command-line-arguments*
    nil))
 
 (defun get-arg ( from-right )
