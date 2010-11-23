@@ -19,4 +19,8 @@ java:
 string:
 	cd ../../2009-12-15-present\ wrapping\ the\ wrapper/string\ example; make
 
-deep: MM HPC C java string unitTest
+u3:
+	#should output mm_bold_out.txt and wc to terminal
+	cd unit3; make; ls | grep "mm_bold_out.txt"; wc mm_bold_out.txt
+
+deep: MM HPC C java string unitTest u3

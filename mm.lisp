@@ -60,13 +60,25 @@
 
 (defclass mm-run-collector-class (run-collector-class)
   ((out :accessor out :initarg :out :initform "mm_fraction_done.txt"
-	:documentation "extending the base class to hold the file that will be touched after each run"))
+	:documentation "extending the base class to hold the file that will be touched after each run")
+   (bold-out :accessor bold-out :initarg :bold-out :initform "mm_bold_out.txt"
+	     :documentation "holds the file that will contain the bold response data from each run"))
   (:documentation "mm-run-collector-class is responsible for printing the outputs of a run"))
 
 (defmethod print-collector ((obj mm-run-collector-class))
   "method will be called after each run; will touch the file and write the percent done"
   (with-open-file (out (out obj) :direction :output :if-exists :supersede :if-does-not-exist :create)
-    (format out "~a" (coerce (/ (quot (first (runs obj))) (quota (session (runProcess (first (runs obj)))))) 'double-float))))
+    (format out "~a" (coerce (/ (quot (first (runs obj))) (quota (session (runProcess (first (runs obj)))))) 'double-float)))
+  (with-pandoric (configFileWdLST) #'args
+    (dolist (line (get-matching-lines configFileWdLST "file2load="))
+      ;when an actr6 model
+      (when (get-matching-line (string-left-trim (list #\Space #\Tab) line) "actr6")
+	;when the bold response data is available
+	(when (and (meta-p-current-model (current-mp)) (get-module bold))
+	  ;output the predicted bold response to bold-out
+	  (with-open-file (out (bold-out obj) :direction :output :if-exists :supersede :if-does-not-exist :create)
+	    (format out "~a" (with-output-to-string (*standard-output*)
+			       (predict-bold-response)))))))))
 
 (defun build-mm-session ()
   "top-level mm function called by letf that builds the session object"
