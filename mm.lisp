@@ -73,12 +73,14 @@
     (dolist (line (get-matching-lines configFileWdLST "file2load="))
       ;when an actr6 model
       (when (get-matching-line (string-left-trim (list #\Space #\Tab) line) "actr6")
+	;it's not mission critical that the bold response data is extracted, so don't kill lisp on an error
+	(attempt
 	;when the bold response data is available
-	(when (and (meta-p-current-model (current-mp)) (get-module bold))
+	 (when (and (meta-p-current-model (current-mp)) (get-module bold))
 	  ;output the predicted bold response to bold-out
-	  (with-open-file (out (bold-out obj) :direction :output :if-exists :supersede :if-does-not-exist :create)
-	    (format out "~a" (with-output-to-string (*standard-output*)
-			       (attempt (predict-bold-response))))))))))
+	   (with-open-file (out (bold-out obj) :direction :output :if-exists :supersede :if-does-not-exist :create)
+	     (format out "~a" (with-output-to-string (*standard-output*)
+				(predict-bold-response))))))))))
 
 (defun build-mm-session ()
   "top-level mm function called by letf that builds the session object"
