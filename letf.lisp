@@ -215,6 +215,12 @@
   `(with-output-to-string (,g!stream)
      ,@(mapcar (lambda (x) `(write-string ,x ,g!stream)) lst)))
 
+(defmacro attempt (form &key (on-error `(format t "error: ~a~%" condition)))
+  "anaphoric macro for attemping to evaluate form; default is to print error to screen on error"
+  `(handler-case ,form (error (condition) 
+			 (declare (ignorable condition))
+			 ,on-error)))
+
 (defmacro push-to-end (item place)
   "analogous to the push macro; just places 'item' at the end of 'place', instead of the front"
   `(setf ,place (nconc ,place (list ,item))))

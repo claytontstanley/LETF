@@ -78,7 +78,7 @@
 	  ;output the predicted bold response to bold-out
 	  (with-open-file (out (bold-out obj) :direction :output :if-exists :supersede :if-does-not-exist :create)
 	    (format out "~a" (with-output-to-string (*standard-output*)
-			       (predict-bold-response)))))))))
+			       (attempt (predict-bold-response))))))))))
 
 (defun build-mm-session ()
   "top-level mm function called by letf that builds the session object"
@@ -108,10 +108,6 @@
     (html-color-start :color ,color)
     ,str
     (html-color-stop)))
-
-(defmacro attempt (form &key (on-error `(format *error-output* "error: ~a~%" condition)))
-  "anaphoric macro for attemping to evaluate form; default is to print error to screen on error"
-  `(handler-case ,form (error (condition) ,on-error)))
 
 ;wrapping html font tags around the text output from all assertions that fail
 (sb-ext:without-package-locks
