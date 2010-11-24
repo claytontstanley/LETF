@@ -66,9 +66,10 @@
   (:documentation "mm-run-collector-class is responsible for printing the outputs of a run"))
 
 (defmethod print-collector ((obj mm-run-collector-class))
-  "method will be called after each run; will touch the file and write the percent done"
+  "method will be called after each run; will touch the file, write the percent done, and write out bold response"
   (with-open-file (out (out obj) :direction :output :if-exists :supersede :if-does-not-exist :create)
     (format out "~a" (coerce (/ (quot (first (runs obj))) (quota (session (runProcess (first (runs obj)))))) 'double-float)))
+  ;write out bold response
   (with-pandoric (configFileWdLST) #'args
     (dolist (line (get-matching-lines configFileWdLST "file2load="))
       ;when an actr6 model
@@ -118,11 +119,9 @@
 	  (lambda (assertion places datum &rest arguments) 
 	    (apply fun (append (list assertion places (html-color datum)) arguments))))))
 
-(let ((DVs))
-  ;define a pandoric function that stores (closes over) 'DVs'
-  ;you can set/get the value of DVs using 'get-pandoric or 'with-pandoric
-  (defpun DVs () (DVs)
-    ()))
+;define a pandoric function that stores (closes over) 'DVs'
+;you can set/get the value of DVs using 'get-pandoric or 'with-pandoric
+(defpun DVs () ((DVs)))
 
 (defmacro send-DV (name% val)
   "interface for sending DVs evaluated by the model up to the wrapper"
@@ -160,7 +159,7 @@
 	   (setf out (append out (self (cdr rangeList) (append trail (list point))))))
 	 ;base case
 	 (if (consp trail)
-	     ;here's the cool part about having this as a macro; if you body is empty, then this function will
+	     ;here's the cool part about having this as a macro; if your body is empty, then this function will
 	     ;just return all of the combinations; however, if you have something in body, then that code will
 	     ;be executed instead of returning all of the combinations; for example, you can reroute each of the 
 	     ;combinations to be outputted to a text file (see generate-full-combinatorial below)
