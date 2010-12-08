@@ -13,6 +13,17 @@
 ;;;               mm.lisp acts as the mediator, abstracting away all of the MM details from the modeler
 ;;;               This allows models that have been interfaced with LETF to be portable (run on both HPCs and MM without altering)
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+(defun sandwich (item lst)
+  "places item in between all elements of lst, but not to the left or right of lst"
+  (assert (listp lst) nil "error; ~a not a list" lst)
+  (cond ((null lst) nil)
+	((eq (length lst) 1) lst)
+	(t (append (list (car lst) item) (sandwich item (cdr lst))))))
+
+;pandoric function that stores names for mm-specific variables and output files
+(defpun mods () ((mm_out "mm_out.txt")
+		 (mm_fraction_done "mm_fraction_done.txt")
+		 (mm_bold_out "mm_bold_out.txt")))
 
 (defclass mm-work-class (work-class) 
   () 
@@ -23,7 +34,7 @@
   (setf (lines obj) (mapcar #'get-objects (get-lines (file-string (workFilePath obj))))))
 
 (defclass mm-collector-class (collector-class)
-  ((out :accessor out :initarg :out :initform "mm_out.txt" 
+  ((out :accessor out :initarg :out :initform (get-pandoric 'mods 'mm_out) 
 	:documentation "extending the base class to hold the filename where all of the results will be printed"))
   (:documentation "mm-collector-class is responsible for printing the outputs of a collapsed set of runs"))
 
@@ -89,22 +100,19 @@ before launching the model for those IVs, etc.
   (defmethod print-collector ((obj mm-collector-class))
     "method will be called after each collapsed run; for the mm system, the results will be appended to mm_out.txt"
     (incf count)
-    (with-open-file (out (out obj) :direction :output :if-exists (if (eq count 1) :supersede :append) :if-does-not-exist :create)
+    (with-open-file (out (out obj) :direction :output :if-exists :append :if-does-not-exist :create)
       ;print a fresh line
       (if (not (eq count 1)) (format out "~%"))
-      (labels ((printIt (str &rest args)
-		 (format out "~{~a~}" (append (list (if (numberp str) (coerce str 'double-float) str)) args))))
-	;print the IVs with a tab after each
-	(dotimes (i (length (cellElements obj)))
-	  (printIt (cdr (nth i (cellElements obj))) (string #\Tab)))
-	;print the DVs with a tab after all but the last
-	(dotimes (i (length (keys obj)))
-	  (let ((it (cdr (get-element (nth i (keys obj)) 
-				      (collection obj) 
-				      :collapseFns (gethash-ifhash (nth i (keys obj)) (collapseHash obj))))))
-	    (if (eq i (- (length (keys obj)) 1))
-		(printIt it)
-		(printIt it (string #\Tab)))))))))
+      (labels ((printIt (str)
+		 (format out "~{~a~}" (mapcar (lambda (x) (if (numberp x) (coerce x 'double-float) x)) str))))
+	;print the IVs & DVs, with a tab sandwiched in between them
+	(with-slots (cellElements collection collapseHash keys) obj
+	  (printIt (sandwich #\Tab
+			     (append (mapcar #'cdr cellElements)
+				     (mapcar (lambda (key)
+					       (cdr (get-element key 
+								 collection 
+								 :collapseFns (gethash-ifhash key collapseHash)))) keys)))))))))
 
 (defclass mm-process-output-str-class (process-output-str-class) 
   ()
@@ -117,9 +125,9 @@ before launching the model for those IVs, etc.
   (if (error-p obj) (format *error-output* "here's the error~%~a~%" (error-p obj))))
 
 (defclass mm-run-collector-class (run-collector-class)
-  ((out :accessor out :initarg :out :initform "mm_fraction_done.txt"
+  ((out :accessor out :initarg :out :initform (get-pandoric 'mods 'mm_fraction_done)
 	:documentation "extending the base class to hold the file that will be touched after each run")
-   (bold-out :accessor bold-out :initarg :bold-out :initform "mm_bold_out.txt"
+   (bold-out :accessor bold-out :initarg :bold-out :initform (get-pandoric 'mods 'mm_bold_out)
 	     :documentation "holds the file that will contain the bold response data from each run"))
   (:documentation "mm-run-collector-class is responsible for printing the outputs of a run"))
 
@@ -300,7 +308,13 @@ before launching the model for those IVs, etc.
 		  (format out "~{~a~a~}~&" (flatten (mapcar #'list trail (make-list (length trail) :initial-element #\Tab)))))
 		 nums))
       (format *error-output* "wrote ~a lines to ~a using IV ranges ~a~%" lines workFileName nums))))
-	      
+
+(defmethod% generate-header ((obj session-class))
+  "places the names of the IVs then DVs at the top of the output file, separated by tabs"
+  (with-open-file (out (get-pandoric 'mods 'mm_out) :direction :output :if-exists :supersede :if-does-not-exist :create)
+    (with-slots (cellKeys DVKeys) obj
+      (format out "~{~a~}~%" (sandwich #\Tab (append cellKeys DVKeys))))))
+
 (defmethod% print-unread-lines-html-color ((obj session-class))
   "an 'around' method that calls 'print-unread-lines' in letf, but prints the results in html color"
   (format *error-output* (html-color-start :color orange))

@@ -75,6 +75,22 @@
 		       (list "IV=speed" "1.0" "0.1" "2.0")) nil)
     (deftest-vfc (list (list "IV=" "noise" "1" "1/2" "2")) nil))) ;should not fail; checking that code can read fractions
 
+(deftest test-generate-header ()
+  "unit tests for generate-header"
+  (macrolet ((mac (cellKeys DVKeys)
+	       `(with-pandoric (obj) #'session-object
+		  (with-slots (cellKeys DVKeys) obj
+		    (setf cellKeys ,cellKeys)
+		    (setf DVKeys ,DVKeys))
+		  (generate-header obj)
+		  (check (equalp (flatten (mapcar #'get-words (get-lines (file-string (get-pandoric 'mods 'mm_out)))))
+				 (append ,cellKeys ,DVKeys)))
+		  (delete-file (get-pandoric 'mods 'mm_out)))))
+    (mac (list "IV1" "IV2") (list "DV1" "DV2"))
+    (mac nil nil)
+    (mac (list "testing") (list "one" "two" "three"))
+    (mac (list "one" "two" "three") (list "testing"))))
+
 (deftest test-generate-full-combinatorial ()
   "unit tests for generate-full-combinatorial"
   (macrolet ((deftest-vfc (IVPiece completedPoints workFileName outFileName combinationString)
@@ -172,6 +188,14 @@
     ;should fail; dvs sent not equal to dvs specified in config file
     (deftest-vef (list "iv") (list "DV" "dv2") (lambda (&key (iv)) (declare (ignore iv)) (send-dv dv1 1) (send-dv dv2 nil)) t)))
 
+(deftest test-sandwich ()
+  "unit tests for sandwich"
+  (check (equal (sandwich 'a (list 5 4 3)) (list 5 'a 4 'a 3)))
+  (check (equal (sandwich 'a nil) nil))
+  (check (equal (sandwich #\Tab (list 5)) (list 5)))
+  (check (equal (sandwich #\Tab (list "ha" #\g 'ksk)) (list "ha" #\Tab #\g #\Tab 'ksk)))
+  (check (errors-p (sandwich #\Tab 5))))
+
 (defun testMM ()
   "unit tests for the mm.lisp code"
   (let ((result
@@ -181,6 +205,8 @@
 	  (test-validate-entryFn)
 	  (test-validate-dvs)
 	  (test-generate-full-combinatorial)
+	  (test-sandwich)
+	  (test-generate-header)
 	  )))
     (format t "~%overall: ~:[FAIL~;pass~]~%" result)))
 
