@@ -96,23 +96,20 @@ before launching the model for those IVs,
 before launching the model for those IVs, etc.
 |#
 
-(let ((count 0))
-  (defmethod print-collector ((obj mm-collector-class))
-    "method will be called after each collapsed run; for the mm system, the results will be appended to mm_out.txt"
-    (incf count)
-    (with-open-file (out (out obj) :direction :output :if-exists :append :if-does-not-exist :create)
-      ;print a fresh line
-      (if (not (eq count 1)) (format out "~%"))
-      (labels ((printIt (str)
-		 (format out "~{~a~}" (mapcar (lambda (x) (if (numberp x) (coerce x 'double-float) x)) str))))
-	;print the IVs & DVs, with a tab sandwiched in between them
-	(with-slots (cellElements collection collapseHash keys) obj
-	  (printIt (sandwich #\Tab
-			     (append (mapcar #'cdr cellElements)
-				     (mapcar (lambda (key)
-					       (cdr (get-element key 
-								 collection 
-								 :collapseFns (gethash-ifhash key collapseHash)))) keys)))))))))
+(defmethod print-collector ((obj mm-collector-class))
+  "method will be called after each collapsed run; for the mm system, the results will be appended to mm_out.txt"
+  (with-open-file (out (out obj) :direction :output :if-exists :append :if-does-not-exist :create)
+    (format out "~%") ;print a fresh line
+    (labels ((printIt (str)
+	       (format out "~{~a~}" (mapcar (lambda (x) (if (numberp x) (coerce x 'double-float) x)) str))))
+      ;print the IVs & DVs, with a tab sandwiched in between them
+      (with-slots (cellElements collection collapseHash keys) obj
+	(printIt (sandwich #\Tab
+			   (append (mapcar #'cdr cellElements)
+				   (mapcar (lambda (key)
+					     (cdr (get-element key 
+							       collection 
+							       :collapseFns (gethash-ifhash key collapseHash)))) keys))))))))
 
 (defclass mm-process-output-str-class (process-output-str-class) 
   ()
@@ -313,7 +310,7 @@ before launching the model for those IVs, etc.
   "places the names of the IVs then DVs at the top of the output file, separated by tabs"
   (with-open-file (out (get-pandoric 'mods 'mm_out) :direction :output :if-exists :supersede :if-does-not-exist :create)
     (with-slots (cellKeys DVKeys) obj
-      (format out "~{~a~}~%" (sandwich #\Tab (append cellKeys DVKeys))))))
+      (format out "~{~a~}" (sandwich #\Tab (append cellKeys DVKeys))))))
 
 (defmethod% print-unread-lines-html-color ((obj session-class))
   "an 'around' method that calls 'print-unread-lines' in letf, but prints the results in html color"
