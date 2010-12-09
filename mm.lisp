@@ -97,21 +97,22 @@ before launching the model for those IVs,
 before launching the model for those IVs, etc.
 |#
 
-(defmethod print-collector ((obj mm-collector-class))
-  "method will be called after each collapsed run; for the mm system, the results will be appended to mm_out.txt"
-  (with-open-file (out (out obj) :direction :output :if-exists :append :if-does-not-exist :create)
-    (format out "~%") ;print a fresh line
-    (labels ((printIt (str)
-	       (format out "~{~a~}" (mapcar (lambda (x) (if (numberp x) (coerce x 'double-float) x)) str))))
-      ;print the IVs & DVs, with a tab sandwiched in between them
-      (with-slots (cellElements collection collapseHash keys) obj
-	(printIt (sandwich #\Tab
-			   (append (mapcar #'cdr cellElements)
-				   (mapcar (lambda (key)
-					     (cdr (get-element key 
-							       collection 
-							       :collapseFns (gethash-ifhash key collapseHash)))) keys))))))))
-
+(let ((first t))
+  (defmethod print-collector ((obj mm-collector-class))
+    "method will be called after each collapsed run; for the mm system, the results will be appended to mm_out.txt"
+    (with-open-file (out (out obj) :direction :output :if-exists (if first :supersede :append) :if-does-not-exist :create)
+      (if first (setf first nil) (format out "~%")) ;print a fresh line
+      (labels ((printIt (str)
+		 (format out "~{~a~}" (mapcar (lambda (x) (if (numberp x) (coerce x 'double-float) x)) str))))
+        ;print the IVs & DVs, with a tab sandwiched in between them
+	(with-slots (cellElements collection collapseHash keys) obj
+	  (printIt (sandwich #\Tab
+			     (append (mapcar #'cdr cellElements)
+				     (mapcar (lambda (key)
+					       (cdr (get-element key 
+								 collection 
+								 :collapseFns (gethash-ifhash key collapseHash)))) keys)))))))))
+  
 (defclass mm-process-output-str-class (process-output-str-class) 
   ()
   (:documentation "mm-process-output-str class is responsible for keeping track of the last N lines printed by the model"))
