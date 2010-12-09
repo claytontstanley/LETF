@@ -18,7 +18,8 @@
   (assert (listp lst) nil "error; ~a not a list" lst)
   (cond ((null lst) nil)
 	((eq (length lst) 1) lst)
-	(t (append (list (car lst) item) (sandwich item (cdr lst))))))
+	(t (cons (car lst) 
+		 (cons item (sandwich item (cdr lst)))))))
 
 ;pandoric function that stores names for mm-specific variables and output files
 (defpun mods () ((mm_out "mm_out.txt")
