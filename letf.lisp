@@ -203,6 +203,19 @@
 ;////////////////////////////////////////////////////////////
 ;///////////////////////////////////////////end lol.lisp
 
+(defmacro! acond (&rest clauses)
+ "works just like cond, but stores the 
+  value of each condition as 'it', which is accessable in the code
+  following the condition"
+    (if clauses
+	(let ((cl1 (car clauses)))
+	  `(let ((,g!sym ,(car cl1)))
+	     (if ,g!sym
+		 (let ((it ,g!sym)) 
+		   (declare (ignorable it)) 
+		   ,@(cdr cl1))
+		 (acond ,@(cdr clauses)))))))
+
 ;FIXME; need to look at internals of defun, to try and mimick more of defun here
 (defmacro defpun (name largs pargs &rest body)
   "defines a pandoric function; syntax similar to defun"
