@@ -203,6 +203,10 @@
 ;////////////////////////////////////////////////////////////
 ;///////////////////////////////////////////end lol.lisp
 
+;////////////////////////////////////////////////////////////
+;////////////////////////////////////////////////////////////
+;everything below is from Paul Graham's On Lisp
+
 (defmacro! acond (&rest clauses)
  "works just like cond, but stores the 
   value of each condition as 'it', which is accessable in the code
@@ -215,6 +219,28 @@
 		   (declare (ignorable it)) 
 		   ,@(cdr cl1))
 		 (acond ,@(cdr clauses)))))))
+
+(defmacro aand (&rest args) 
+  (cond ((null args) t)
+	((null (cdr args)) (car args)) 
+	(t `(aif ,(car args) (aand ,@(cdr args))))))
+
+(defmacro while (test &body body)
+  "loops through body, evaluating test each time until test returns false"
+  `(do ()
+       ((not ,test)) 
+     ,@body))
+
+(defmacro push-to-end (item place)
+  "analogous to the push macro; just places 'item' at the end of 'place', instead of the front"
+  `(setf ,place (nconc ,place (list ,item))))
+	    
+(defmacro mklst (item)
+  "makes a list out of item, if necessary; does not alter the empty list 'nil'"
+  `(if (not (listp ,item)) (setf ,item (list ,item))))
+
+;////////////////////////////////////////////////////////////
+;///////////////////////////////////////////end of 'on lisp'
 
 ;FIXME; need to look at internals of defun, to try and mimick more of defun here
 (defmacro defpun (name largs pargs &rest body)
@@ -233,20 +259,6 @@
   `(handler-case ,form (error (condition) 
 			 (declare (ignorable condition))
 			 ,on-error)))
-
-(defmacro push-to-end (item place)
-  "analogous to the push macro; just places 'item' at the end of 'place', instead of the front"
-  `(setf ,place (nconc ,place (list ,item))))
-	    
-(defmacro while (test &body body)
-  "loops through body, evaluating test each time until test returns false"
-  `(do ()
-       ((not ,test)) 
-     ,@body))
-
-(defmacro mklst (item)
-  "makes a list out of item, if necessary; does not alter the empty list 'nil'"
-  `(if (not (listp ,item)) (setf ,item (list ,item))))
 
 (defmacro verbose (&rest lst)
   "echoes the unevaluated forms in lst to *error-output* before evaluating them"
