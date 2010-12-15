@@ -24,8 +24,7 @@
 ;pandoric function that stores names for mm-specific variables and output files
 (defpun mods () ((mm_out "mm_out.txt")
 		 (mm_fraction_done "mm_fraction_done.txt")
-		 (mm_bold_out "mm_bold_out.txt")
-		 (mm_complete "mm_complete.txt")))
+		 (mm_bold_out "mm_bold_out.txt")))
 
 (defclass mm-work-class (work-class) 
   () 
@@ -149,13 +148,6 @@ before launching the model for those IVs, etc.
 	     (format out "~a" (with-output-to-string (*standard-output*)
 				(predict-bold-response))))))))))
 
-(defclass mm-session-collector-class (session-collector-class)
-  ((out :accessor out :initarg :out :initform (get-pandoric 'mods 'mm_complete))))
-
-(defmethod print-collector ((obj mm-session-collector-class))
-  (with-open-file (out (out obj) :direction :output :if-exists :supersede :if-does-not-exist :create)
-    (format out "finished-without-error")))
-
 (defun build-mm-session ()
   "top-level mm function called by letf that builds the session object"
   
@@ -164,8 +156,7 @@ before launching the model for those IVs, etc.
    :collector-instance (make-instance 'mm-collector-class)
    :work-instance (make-instance 'mm-work-class)
    :process-output-str-instance (make-instance 'mm-process-output-str-class)
-   :run-collector-instance (make-instance 'mm-run-collector-class)
-   :session-collector-instance (make-instance 'mm-session-collector-class)))
+   :run-collector-instance (make-instance 'mm-run-collector-class)))
 
 (defmacro html-color-start (&key (color 'yellow))
   "returns a string that is html code to start tagging the text that follows in color"
