@@ -24,7 +24,8 @@
 ;pandoric function that stores names for mm-specific variables and output files
 (defpun mods () ((mm_out "mm_out.txt")
 		 (mm_fraction_done "mm_fraction_done.txt")
-		 (mm_bold_out "mm_bold_out.txt")))
+		 (mm_bold_out "mm_bold_out.txt")
+		 (mm_errors "mm_errors.txt")))
 
 (defclass mm-work-class (work-class) 
   () 
@@ -309,10 +310,13 @@ before launching the model for those IVs, etc.
       (format *error-output* "wrote ~a lines to ~a using IV ranges ~a~%" lines workFileName nums))))
 
 (defmethod% generate-header ((obj session-class))
-  "places the names of the IVs then DVs at the top of the output file, separated by tabs"
-  (with-open-file (out (get-pandoric 'mods 'mm_out) :direction :output :if-exists :supersede :if-does-not-exist :create)
-    (with-slots (cellKeys DVKeys) obj
-      (format out "~{~a~}" (sandwich #\Tab (append cellKeys DVKeys))))))
+  "places the names of the IVs then DVs at the top of the output file, separated by tabs
+   also places the names of hte IVs at the top of the errors file, separated by tabs"
+  (with-slots (cellKeys DVKeys) obj
+    (with-open-file (out (get-pandoric 'mods 'mm_out) :direction :output :if-exists :supersede :if-does-not-exist :create)
+      (format out "~{~a~}" (sandwich #\Tab (append cellKeys DVKeys))))
+    (with-open-file (out (get-pandoric 'mods 'mm_errors) :direction :output :if-exists :supersede :if-does-not-exist :create)
+      (format out "~{~a~}" (sandwich #\Tab cellKeys)))))
 
 (defmethod% print-unread-lines-html-color ((obj session-class))
   "an 'around' method that calls 'print-unread-lines' in letf, but prints the results in html color"
