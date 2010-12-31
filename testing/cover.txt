@@ -1,0 +1,13 @@
+#letf config file for testMM.lisp
+
+#loading mm.lisp so that the code can be tested
+file2load= mm.fasl
+
+#loading the UTF
+file2load= unitTestFramework.lisp
+
+#loadig the unit tests. Inside this code, there is a top-level function named 'testMM that runs the test suite
+file2load= testMM.lisp
+
+#letf.lisp will execute this top-level function, and then close
+albumBuilder= #'cover

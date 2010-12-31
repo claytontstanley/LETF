@@ -213,6 +213,11 @@
 	  )))
     (format t "~%overall: ~:[FAIL~;pass~]~%" result)))
 
+(require 'sb-cover)
+(defun cover ()
+  (testMM)
+  (sb-cover:report "../docs/cover/"))
+
 
 
 

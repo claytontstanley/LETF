@@ -1,0 +1,5 @@
+(require 'sb-cover)
+(defun compile-mm ()
+  (declaim (optimize sb-cover:store-coverage-data))
+  (compile-file "mm.lisp" :output-file "mm.fasl")
+  (declaim (optimize (sb-cover:store-coverage-data 0))))

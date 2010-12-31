@@ -1,0 +1,3 @@
+file2load= mm.lisp
+file2load= compile.lisp
+albumBuilder= #'compile-mm

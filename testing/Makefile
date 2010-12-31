@@ -1,6 +1,10 @@
 
 all: unitTest
 
+cover:
+	cd ..; make compile
+	sbcl --noinform --noprint --disable-debugger --load letf.lisp nil cover.txt nil
+
 unitTest:
 	sbcl --noinform --noprint --disable-debugger --load letf.lisp nil testMM.txt nil
 
