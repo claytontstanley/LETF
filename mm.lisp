@@ -40,64 +40,6 @@
 	:documentation "extending the base class to hold the filename where all of the results will be printed"))
   (:documentation "mm-collector-class is responsible for printing the outputs of a collapsed set of runs"))
 
-#|
-FIXME: we need to decide on how to implement the output files.
-current implementation: Each run of the model has a stdout/stderr, but those
-streams are discarded if the model run is successfull. If the run is unsuccessfull, then the
-concatenated stdout/stderr from the model is printed to letf's stderr stream
-letf's own stdout/stderr streams are piped to mm_stdout.txt & mm_stderr.txt
-
-these files are the only log/output files sent back to the server. This means that for every successfull run,
-the model's stderr and stdout is not saved. Some modelers might want this output. If they do, how do we want to 
-implement providing that output to them. But we shouldn't give it for everyone. If the modeler is running a million
-runs, and each stdout/stderr is concatenated to a single output file, that file will be (at least) gigs in size.
-
-here's a thought:
-mm_stdout.txt & mm_stderr.txt stay the same; they keep track of letf's logs to stdout/stderr, and in the case that the
-lisp process crashes, these files will have the last dying comments, so they'll be useful then
-so we upload these files to the server (as before), but only append their data to mm_stdout.txt & mm_stderr.txt in the jobs 
-directory if they came from a lisp process that crashed. Otherwise, discard their output. This keeps mm_stdout.txt & mm_stderr.txt
-in the jobs dir with stdout/stderr data from only crashed model runs (crashed lisp processes)
-
-we then have two additional output files when the modeler wants stdout/stderr from every model run. Call these mm_model_stdout.txt & mm_model_stderr.txt
-these will have the model's stdout/stderr from each run. 
-
-so, five output files total:
-[1]: mm_out.txt -> IVs & DVs for each run of IVs in the workfile
-[2]: mm_stdout.txt -> lisp process's stdout
-[3]: mm_stderr.txt -> lisp process's stderr
-if desired:
-[4]: mm_model_stdout.txt -> model's stdout
-[5]: mm_model_stderr.txt -> model's stderr
-
-The default will be to generate 1,2, and 3. And 4 & 5 will only be generated when the modeler really wants them. 
-
-Now, files 2-4 in the jobs directory will be concatenated versions of all 2-4's that were run on volunteers. 
-So we need a way to annotate what IVs are associated with each section in the files.
-I say we just add the IV vector string that is associated with each section before starting to print the section.
-
-So, if we have this work file:
-1 1 1
-1 1 2
-1 1 3
-1 1 4
-
-for 2 and 3, we print
-1 1 1
-1 1 2
-1 1 3
-1 1 4
-at the beginning of the file. We print all 4 runs b/c this is the lisp process's stdout/stderr, which is associated
-with running the entire work file, so all of the lines in the work file. 
-So, for these files, we just print the text in the work file at the beginning of the files.
-
-for 4 and 4, we print
-1 1 1
-before launching the model for those IVs,
-1 1 2
-before launching the model for those IVs, etc.
-|#
-
 (let ((first t))
   (defmethod print-collector ((obj mm-collector-class))
     "method will be called after each collapsed run; for the mm system, the results will be appended to mm_out.txt"

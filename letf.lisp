@@ -242,7 +242,7 @@
 ;////////////////////////////////////////////////////////////
 ;///////////////////////////////////////////end of 'on lisp'
 
-;FIXME; need to look at internals of defun, to try and mimick more of defun here
+;TODO; need to look at internals of defun, to try and mimick more of defun here
 (defmacro defpun (name largs pargs &rest body)
   "defines a pandoric function; syntax similar to defun"
   `(setf (symbol-function ',name)
@@ -963,7 +963,7 @@
       (print-collector obj)
       (collect (session-collector obj) elements))))
 
-;FIXME; where is the 'runs' slot here used?
+;TODO; where is the 'runs' slot here used?
 (defclass run-collector-class (base-collector-class)
   ((runs :accessor runs :initarg :runs :initform nil)
    (collector :accessor collector :initarg :collector :initform nil
