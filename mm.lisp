@@ -23,6 +23,7 @@
 
 ;pandoric function that stores names for mm-specific variables and output files
 (defpun mods () ((mm_out "out.txt")
+		 (mm_in "in.txt")
 		 (mm_fraction_done "mm_fraction_done.txt")
 		 (mm_bold_out "mm_bold_out.txt")
 		 (mm_errors "mm_errors.txt")))
@@ -238,11 +239,11 @@
 	(assert (equal (length name) 1) nil "not 1 name in line DV=~a" line)))))
 
 (defmethod% generate-full-combinatorial ((obj session-class))
-  "method will generate the full combination of IVs in config file, and write results (line by line) to file 'workFileName=' in config file"
+  "method will generate the full combination of IVs in config file, and write results (line by line) to filename mapped to mm_in in 'mods"
   (with-pandoric (configFileWdLST) #'args
     (let ((nums (mapcar (lambda (line) (eval-objects (make-sentence (rest (get-words line)))))
 			(get-matching-lines configFileWdLST "IV=")))
-	  (workFileName (get-word (get-matching-line configFileWdLST "workFileName=")))
+	  (workFileName (get-pandoric 'mods 'mm_in))
 	  (lines 0))
       (with-open-file (out workFileName :direction :output :if-exists :supersede :if-does-not-exist :create)
 	(funcall (comb

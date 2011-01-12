@@ -100,7 +100,8 @@
 	       `(progn
 		  (with-pandoric (configFileWdLST) #'args
 		    (setf configFileWdLST
-			  (format nil "~a~%workFileName=~a~%outFileName=\"~a\"~%DV=DV1~%DV=DV2~%" ,IVPiece ,workFileName ,outFileName))
+			  (format nil "~a~%outFileName=\"~a\"~%DV=DV1~%DV=DV2~%" ,IVPiece ,outFileName))
+		    (setf (get-pandoric 'mods 'mm_in) ,workFileName)
 		    (if ,outFileName
 			(with-open-file (out ,outFileName :direction :output :if-exists :supersede :if-does-not-exist :create)
 			  (format out "~a~%" ,completedPoints)))
