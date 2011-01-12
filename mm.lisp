@@ -22,7 +22,7 @@
 		 (cons item (sandwich item (cdr lst)))))))
 
 ;pandoric function that stores names for mm-specific variables and output files
-(defpun mods () ((mm_out "mm_out.txt")
+(defpun mods () ((mm_out "out.txt")
 		 (mm_fraction_done "mm_fraction_done.txt")
 		 (mm_bold_out "mm_bold_out.txt")
 		 (mm_errors "mm_errors.txt")))
@@ -42,7 +42,7 @@
 
 (let ((first t))
   (defmethod print-collector ((obj mm-collector-class))
-    "method will be called after each collapsed run; for the mm system, the results will be appended to mm_out.txt"
+    "method will be called after each collapsed run; for the mm system, the results will be appended to out.txt"
     (with-open-file (out (out obj) :direction :output :if-exists (if first :supersede :append) :if-does-not-exist :create)
       (if first (setf first nil) (format out "~%")) ;print a fresh line
       (labels ((printIt (str)
