@@ -26,7 +26,7 @@
 		 (mm_in "in.txt")
 		 (mm_fraction_done "mm_fraction_done.txt")
 		 (mm_bold_out "mm_bold_out.txt")
-		 (mm_errors "mm_errors.txt")))
+		 (mm_errors "errors.txt")))
 
 (defclass mm-work-class (work-class) 
   () 
