@@ -71,9 +71,11 @@
     (deftest-vfc (list (list "IV=" "speed" "1" "2" "4")) t) ;should fail b/c min incrementing by range doesn't hit max
     (deftest-vfc (list (list "IV=" "speed" "3" ".1" "2")) t) ;should fail b/c min>max
     (deftest-vfc (list (list "IV=" "speed" "help" "1" "4")) t) ;should fail b/c min is not a number
+    (deftest-vfc (list (list "IV=" "noise" ".9" ".1" "1.2")) nil) ;should not fail
     (deftest-vfc (list (list "IV=" "noise" "1" "1" "3") ; should not fail
 		       (list "IV=speed" "1.0" "0.1" "2.0")) nil)
-    (deftest-vfc (list (list "IV=" "noise" "1" "1/2" "2")) nil))) ;should not fail; checking that code can read fractions
+    (deftest-vfc (list (list "IV=" "noise" "1" "1/2" "2")) nil) ;should not fail; checking that code can read fractions
+    ))
 
 (deftest test-generate-header ()
   "unit tests for generate-header"
