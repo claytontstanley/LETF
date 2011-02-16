@@ -37,6 +37,12 @@
 	  nil)
    (equal (funcall (comb) (list '(1 1 3)))
 	  (list '(1) '(2) '(3)))
+   ;end overshoots 12, but should round down to 12
+   (equal (funcall (comb) (list '(10 1 12.00000000001)))
+	  (list '(10) '(11) '(12)))
+   ;end undershoots 12, but should round up to 12
+   (equal (funcall (comb) (list '(10 1 11.99999999999)))
+	  (list '(10) '(11) '(12)))
    (equal (funcall (comb) (list '(1 1 1))) (list '(1)))
    (equal (funcall (comb) (list '(1 1 2) '(2 1 3) '(3 1 4)))
 	  (list '(1 2 3) '(1 2 4) '(1 3 3) '(1 3 4) '(2 2 3) '(2 2 4) '(2 3 3) '(2 3 4)))))

@@ -163,7 +163,7 @@
 	       ;increasing the count after each iteraction
 	       (count 0 (+ count 1)))
 	      ;the check that stops the loop (if point is past the end point)
-	      ((equal count (+ 1 (ceiling (- (third element) (first element)) (second element)))) out)
+	      ((eq count (+ 1 (round (- (third element) (first element)) (second element)))) out)
 	   ;append the current solutions to the solutions that you generate by recursing; then, return the solutions
 	   (setf out (append out (self (cdr rangeList) (append trail (list point))))))
 	 ;base case
