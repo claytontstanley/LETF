@@ -208,6 +208,58 @@
   (check (equal (sandwich #\Tab (list "ha" #\g 'ksk)) (list "ha" #\Tab #\g #\Tab 'ksk)))
   (check (errors-p (sandwich #\Tab 5))))
 
+(defmacro! with-shadow ((fname fun) &body body)
+  "shadow the function named fname with fun; any call to fname within body will use fun, instead of the default function for fname"
+    `(let ((,g!fname-orig (symbol-function ',fname)))
+       (setf (symbol-function ',fname) ,fun)
+       ,@body
+       (setf (symbol-function ',fname) ,g!fname-orig)))
+
+(deftest test-wrapper-execute-johnny5-run-class ()
+  "unit tests for wrapper-execute on the run class when short circuiting"
+  (macrolet ((test ((expected returned) &body body)
+	       `(progn
+		  ;mock up the file-string function & set the configFilePath/workFilePath to the values normally returned by 'file-string 
+		  ;(instead of the path) so that files aren't necessary to build a mm-session object
+		  (with-pandoric (configFilePath workFilePath) 'args
+		    (setf configFilePath
+			  (format nil "~{~a~%~}" (cons "IV=FirstIV" (mapcar (lambda (x) (format nil "DV=~a" x)) ',expected))))
+		    (setf workFilePath "0"))
+                  ;build a mm-session object that has one johnny5-run-class object
+		  (let ((obj))
+		    (with-shadow (file-string #'identity) 
+		      (args)
+		      (setf obj (build-mm-session)))
+                    ;take that object, execute it, and evaluate body, which will make sure that the results are as expected
+		    ;mock up get-DVs, so that an actual model doesn't have to be executed
+		    (with-shadow (get-DVs (lambda (obj &optional (process) (apps))
+					    (declare (ignore obj process apps))
+					    (mapcar (lambda (x) (cons (string x) "0")) ',returned)))
+			,@body)
+		    (delete-file (get-pandoric 'mods 'mm_out))
+		    (delete-file (get-pandoric 'mods 'mm_fraction_done))))))
+    (with-pandoric (mm_out) 'mods
+      (test ((x y) (x y)) ;check that if returned DVs are exactly the ones expected...
+	    (let ((str (with-output-to-string (*error-output*)
+			 (check (not (errors-p (wrapper-execute obj))))))) ;no error is thrown after the run
+	      (check (string-equal str "")) ;nothing is notated
+	      (check (equalp (mapcar (lambda (x) (eval (read-from-string x))) ;and output file has no nil values
+				     (get-words (file-string mm_out)))
+			     (list 0 0 0)))))
+      (test ((x z y hello) (x)) ;check that if not all expected DVs are returned...
+	    (let ((str (with-output-to-string (*error-output*)
+			 (check (not (errors-p (wrapper-execute obj))))))) ;no error is thrown
+	      (check (search "(hello y z)" str :test #'string-equal)) ;missing DVs are notated
+	      (check (equalp (mapcar (lambda (x) (eval (read-from-string x))) ;and output file has nil values for DVs not returned
+				     (get-words (file-string mm_out))) 
+			     (list 0 0 nil nil nil)))))
+      (test ((x) (x y z hello)) ;check that if not all returned DVs are expected...
+	    (let ((str (with-output-to-string (*error-output*)
+			 (check (not (errors-p (wrapper-execute obj))))))) ;no error is thrown
+	      (check (search "(hello y z)" str :test #'string-equal)) ;extra DVs are notated
+	      (check (equalp (mapcar (lambda (x) (eval (read-from-string x))) ;and output file has values for only expected DVs
+				     (get-words (file-string mm_out)))
+			     (list 0 0))))))))
 (defun testMM ()
   "unit tests for the mm.lisp code"
   (let ((result
@@ -219,6 +271,7 @@
 	  (test-generate-full-combinatorial)
 	  (test-sandwich)
 	  (test-generate-header)
+	  (test-wrapper-execute-johnny5-run-class)
 	  )))
     (format t "~%overall: ~:[FAIL~;pass~]~%" result)))
 

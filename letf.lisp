@@ -1160,7 +1160,7 @@
 				      :quota quota
 				      :collapseHash (copy-hash collapseHash)
 				      :session-collector session-collector)))
-  (setf work-instance (append work-instance `(:workFilePath ,(get-pandoric #'args 'workFilePath))))
+  (setf work-instance (append work-instance `(:workFilePath (get-pandoric #'args 'workFilePath))))
   (setf session-collector-instance (append session-collector-instance '(:quota (* (length (lines work)) iterations))))
   (setf run-collector-instance (append run-collector-instance '(:quota 1 :collector collector)))
   (setf process-output-str-instance (append process-output-str-instance '(:quota 200)))
@@ -1328,15 +1328,17 @@
   (with-slots (DVKeys DVHash run-collector sleepTime) obj
     (let* ((necessaryDVs (necessaries DVKeys DVHash))
 	   (currentDVs (if necessaryDVs (get-DVs obj process appetizers))))
-      ;cars of currentDVs should equal necessaryDVs
-      (awhen (set-difference necessaryDVs (mapcar #'car currentDVs) :test #'string-equal)
+      ;note the expected DVs that were not returned for this trial, and set their value to nil
+      (awhen (sort (set-difference necessaryDVs (mapcar #'car currentDVs) :test #'string-equal) #'string<)
 	(format *error-output* "failed to send all DVs for this trial; missing ~a~%" it)
 	(merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) it) :toHash DVHash))
-      ;push all currentDVs onto DVHash
-      (merge-hash currentDVs :toHash DVHash)
-      ;there should be no currentDV that is not in necessaryDVs
-      (aif (set-difference (mapcar #'car currentDVs) necessaryDVs :test #'string-equal)
-	   (assert nil nil "sent extra DVs ~a for this trial~%" it))
+      ;note the returned DVs for this trial that were not expected
+      (awhen (sort (set-difference (mapcar #'car currentDVs) necessaryDVs :test #'string-equal) #'string<)
+	(format *error-output* "sent extra DVs ~a for this trial~%" it))
+      ;push all currentDVs that are in necessaryDVs onto DVHash
+      (merge-hash
+       (remove-if-not (lambda (x) (member (car x) necessaryDVs :test #'string-equal)) currentDVs)
+       :toHash DVHash)
       (collect run-collector DVHash)
       (setf DVHash nil)
       (sleep sleepTime)
