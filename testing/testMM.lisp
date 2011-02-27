@@ -28,7 +28,7 @@
        (progn
 	 ,form
 	 nil)
-     (error (,g!condition) (declare (ignore ,g!condition)) t)))
+     (error (,g!condition) ,g!condition)))
 
 (defmacro! with-shadow ((fname fun) &body body)
   "shadow the function named fname with fun; any call to fname within body will use fun, instead of the default function for fname"
@@ -264,8 +264,9 @@
 			     (list 0 0))))))))
 
 (deftest test-expect ()
-  (check (string-equal "" (with-output-to-string (*error-output*)
-			    (expect t "this shouldn't be printed ~a" "he"))))
+  "unit tests for the expect macro"
+  (check (not (errors-p (expect t "this shouldn't be printed ~a" "he"))))
+  (check (string-equal "test 5 4" (format nil "~a" (errors-p (expect nil "test ~a ~a" 5 4)))))
   (check (errors-p (expect nil ""))))
 
 (defun testMM ()
