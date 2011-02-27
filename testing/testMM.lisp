@@ -21,12 +21,21 @@
 	(plambda () (obj)
 	  ())))
 
+(setf *clean-exit-on-error* nil)
+
 (defmacro! errors-p (form)
   `(handler-case
        (progn
 	 ,form
 	 nil)
      (error (,g!condition) (declare (ignore ,g!condition)) t)))
+
+(defmacro! with-shadow ((fname fun) &body body)
+  "shadow the function named fname with fun; any call to fname within body will use fun, instead of the default function for fname"
+    `(let ((,g!fname-orig (symbol-function ',fname)))
+       (setf (symbol-function ',fname) ,fun)
+       ,@body
+       (setf (symbol-function ',fname) ,g!fname-orig)))
 
 (deftest test-comb-default ()
   "unit tests for the comb macro, when using its default behavior that returns all combinations"
@@ -208,13 +217,6 @@
   (check (equal (sandwich #\Tab (list "ha" #\g 'ksk)) (list "ha" #\Tab #\g #\Tab 'ksk)))
   (check (errors-p (sandwich #\Tab 5))))
 
-(defmacro! with-shadow ((fname fun) &body body)
-  "shadow the function named fname with fun; any call to fname within body will use fun, instead of the default function for fname"
-    `(let ((,g!fname-orig (symbol-function ',fname)))
-       (setf (symbol-function ',fname) ,fun)
-       ,@body
-       (setf (symbol-function ',fname) ,g!fname-orig)))
-
 (deftest test-wrapper-execute-johnny5-run-class ()
   "unit tests for wrapper-execute on the run class when short circuiting"
   (macrolet ((test ((expected returned) &body body)
@@ -260,6 +262,12 @@
 	      (check (equalp (mapcar (lambda (x) (eval (read-from-string x))) ;and output file has values for only expected DVs
 				     (get-words (file-string mm_out)))
 			     (list 0 0))))))))
+
+(deftest test-expect ()
+  (check (string-equal "" (with-output-to-string (*error-output*)
+			    (expect t "this shouldn't be printed ~a" "he"))))
+  (check (errors-p (expect nil ""))))
+
 (defun testMM ()
   "unit tests for the mm.lisp code"
   (let ((result
@@ -272,6 +280,7 @@
 	  (test-sandwich)
 	  (test-generate-header)
 	  (test-wrapper-execute-johnny5-run-class)
+	  (test-expect)
 	  )))
     (format t "~%overall: ~:[FAIL~;pass~]~%" result)))
 

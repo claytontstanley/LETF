@@ -248,7 +248,17 @@
   `(setf (symbol-function ',name)
 	 (plambda ,largs ,pargs 
 	   ,@body)))
-     
+
+(defvar *clean-exit-on-error* t)
+(defmacro expect (test-form datum &rest arguments)
+  `(unless ,test-form
+     (cond (*clean-exit-on-error*
+	    (format *error-output* ,datum ,@arguments)
+	    (format *error-output* "~%")
+	    (quit :unix-status 1))
+	   (t
+	    (error ,datum ,@arguments)))))
+
 (defmacro! fast-concatenate (&rest lst)
   "equivalent to writing (concatenate 'string ...), but ~5x faster"
   `(with-output-to-string (,g!stream)
@@ -269,7 +279,7 @@
   "evaluates 'fun'; before returning, evaluates the guards in body (which can access fun through the anaphor 'it')"
   `(let ((it (multiple-value-call #'list ,fun)))
      ,(if (not body)
-	  `(assert (<= (length (car it)) 1) nil 
+	  `(expect (<= (length (car it)) 1)
 		   "function ~a returned sequence ~a; default guard failed" 
 		   ,(format nil "~a" fun) it)
 	  `(progn ,@body))
@@ -299,14 +309,14 @@
 (defun gethash-ifHash (key hash)
   "gets value of key in hash table, if hash is a hash table; otherwise, return hash"
   (if (hash-table-p hash)
-      (guard (gethash key hash) (assert (key-present key hash)))
+      (guard (gethash key hash) (expect (key-present key hash) "key ~a not present in hash table" key))
       hash))
 
 (defun transpose (lst)
   "converts the rows to columns (and vice versa) in a nested list"
   (if (and lst (consp lst) (consp (car lst)))
       (let ((templst) (out))
-	(assert (equal (length (remove-duplicates (mapcar #'length lst) :test #'equal)) 1))
+	(expect (equal (length (remove-duplicates (mapcar #'length lst) :test #'equal)) 1) "should equal 1 here")
 	(dotimes (j (length (car lst)) out)
 	  (setf templst nil)
 	  (dotimes (i (length lst) (push-to-end templst out))
@@ -376,7 +386,7 @@
   "copies all of the hash tables in the list lst, and merges them"
   (let* ((fun (lambda (out key value)
 		(if (key-present key out) 
-		    (assert (equalp (gethash key out) value) nil
+		    (expect (equalp (gethash key out) value)
 			    "'~a' key already present in hash table with value '~a', which is different than the value '~a' that you're trying to add now"
 			    key (gethash key out) value))
 		(if (not (key-present key out))
@@ -428,7 +438,7 @@
 
 (defmacro assertEqualLengths (l1 l2)
   "asserts that l1 and l2 are equal in length"
-  `(assert (equal (length ,l1) (length ,l2)) nil "length ~d not equal to length ~d" (length ,l1) (length ,l2)))
+  `(expect (equal (length ,l1) (length ,l2)) "length ~d not equal to length ~d" (length ,l1) (length ,l2)))
 
 (defun median (lst &key (throwOutYerNils nil))
   "returns the median of lst, throwing out the 'nils' in list if flag is true"
@@ -499,7 +509,7 @@
   (if str (setf str (string-trim (list #\Space #\Tab) str))) ;yes, these should be hardcoded to space and tab
   (let ((out) (start) (in-the-white))
     (mklst spaceDesignators)
-    (assert spaceDesignators)
+    (expect spaceDesignators "must be some spaceDesignators")
     (if (equal (length str) 0) (return-from get-words nil))
     (setf start 0)
     (setf in-the-white (find-in-string (char str 0) spaceDesignators))
@@ -567,19 +577,19 @@
   "like get-words, returns a list of the words in str however, all words that are within brackets are lumped together as one word;
    if there are no brackets in str, then lump-brackets is equivalent to get-words"
   (if (not desigs) (return-from lump-brackets (get-words str)))
-  (assert (equal (length desigs) 2))
+  (expect (equal (length desigs) 2) "should be 2 brackets here")
   (let ((out) (in-bracket) (lump))
     (dolist (word (get-words str :spaceDesignators desigs :includeSpaceDesignators t))
       (if (not in-bracket) (setf lump nil))
       (if (find-in-string (char word 0) desigs)
 	  (progn
-	    (assert (char-equal (char word 0) (if in-bracket (second desigs) (first desigs)))
-		    nil "something is wrong with string ~a, possibly one bracket pair is nested within another bracket pair, which is not allowed" str)
+	    (expect (char-equal (char word 0) (if in-bracket (second desigs) (first desigs)))
+		    "something is wrong with string ~a, possibly one bracket pair is nested within another bracket pair, which is not allowed" str)
 	    (setf in-bracket (not in-bracket))
 	    (if include-brackets (push-to-end word lump)))
 	  (if in-bracket (push-to-end word lump)))
       (if (not in-bracket) (push-to-end (if lump (make-sentence lump :spaceDesignator "") (get-words word)) out)))
-    (assert (not in-bracket) nil "something is wrong with string ~a, possibly a stray bracket somewhere" str)
+    (expect (not in-bracket) "something is wrong with string ~a, possibly a stray bracket somewhere" str)
     (flatten out)))
 
 (defun toString (lst)
@@ -700,7 +710,8 @@
    for example: (bracket-expand \"hello1:5\") -> \"hello1 hello2 hello3 hello4 hello5\"
    (bracket-expand \"1:5hello\") -> \"1hello 2hello 3hello 4hello 5hello\""
   (labels ((num-indeces (str direction)
-	     (assert (or (string-equal direction "fromLeft") (string-equal direction "fromRight") (string-equal direction "both")))
+	     (expect (or (string-equal direction "fromLeft") (string-equal direction "fromRight") (string-equal direction "both"))
+		     "invalid direction ~a" direction)
 	     (let ((out) (numIndeces) (index -1))
 	       (dotimes (i (length str))
 		 (if (numberp (read-from-string (string (char str i))))
@@ -777,7 +788,7 @@
     (dolist (line (get-matching-lines str keys) out)
       (push-to-end
        (car (guard (get-words line) 
-		   (assert (> (length (car it)) 0) nil "no rhs for line in config file using keys ~a" keys)))
+		   (expect (> (length (car it)) 0) "no rhs for line in config file using keys ~a" keys)))
        out))))
 
 (defmacro get-matching-line (&rest lst)
@@ -795,7 +806,7 @@
       (setf collapseFn (nth i collapseFns))
       (multiple-value-bind (words val) 
 	  (guard (necessaries key hash :collapseFn collapseFn)
-		 (assert (equal (length (car it)) 0) nil
+		 (expect (equal (length (car it)) 0)
 			 "necessaries ~a left over when calling get-elements; not allowed to have any necessaries here" (car it)))
 	(declare (ignore words))
 	(push-to-end (cons key (if eval-val-p (eval (read-from-string (first val))) (first val))) out)))))
@@ -883,7 +894,7 @@
 
 (defmethod collect ((obj base-collector-class) (lst list))
   "pushes all values (cdrs lst) on the base collector, using keys (cars lst)"
-  (assert (not (> (quot obj) (quota obj))))
+  (expect (not (> (quot obj) (quota obj))) "quot ~a is higher than quota ~a" (quot obj) (quota obj))
   (if lst (if (not (consp (car lst))) (setf lst (list lst))))
   (dolist (item lst)
     (push-to-end (cdr item) (gethash (car item) (collection obj))))
@@ -941,7 +952,7 @@
 
 (defmethod initialize-instance :after ((obj collector-class) &key)
   "registers this collector object in its parent session-collector object" 
-  (assert (session-collector obj))
+  (expect (session-collector obj) "should have a session-collector here")
   (push-to-end obj (collectors (session-collector obj))))
 
 (defmethod collect :after ((obj collector-class) (lst list))
@@ -972,14 +983,14 @@
 
 (defmethod initialize-instance :after ((obj run-collector-class) &key)
   "registers this run-collector object in its parent session-collector object"
-  (assert (collector obj))
+  (expect (collector obj) "should have a collector here")
   (push-to-end obj (run-collectors (collector obj))))
 
 (defmethod collect :after ((obj run-collector-class) (lst list))
   "method will fire the print-collector method after the quota has been reached;
    also fires the collect method on the collector object"
-  (assert (equal (quot obj) 1))
-  (assert (equal (quota obj) 1))
+  (expect (equal (quot obj) 1) "should only collect once; quot is ~a" (quot obj))
+  (expect (equal (quota obj) 1) "quota should be one; quota is ~a" (quota obj))
   (print-collector obj)
   (collect (collector obj) lst))
  
@@ -1036,8 +1047,8 @@
 
 (defmethod initialize-instance :after ((obj run-class) &key)
   "registers this run-class object in its parent run-collector object"
-  (assert (run-collector obj))
-  (assert (not (runs (run-collector obj))))
+  (expect (run-collector obj) "should have a run-collector here")
+  (expect (not (runs (run-collector obj))) "should not have any run in the run-collector yet")
   (push-to-end obj (runs (run-collector obj))))
 
 (defclass number5-run-class (run-class) 
@@ -1074,10 +1085,10 @@
 		    (push-to-end key out))
 	       out)))
     (dolist (DVKey (aif DVKeys it (keys hash)))
-      (assert (key-present DVKey hash) nil "DV=~a not present in collapse hash table" DVKey)
+      (expect (key-present DVKey hash) "DV=~a not present in collapse hash table" DVKey)
       (dolist (ApplyToKey (aif ApplyToKeys it (keys (gethash DVKey hash))))
 	(if (not (key-present ApplyToKey (gethash DVKey hash)))
-	    (assert (not DVKeys) nil "ApplyToKey=~a not present in DV=~a collapse hash table" ApplyToKey DVKey)
+	    (expect (not DVKeys) "ApplyToKey=~a not present in DV=~a collapse hash table" ApplyToKey DVKey)
 	    (setf (gethash ApplyToKey (gethash DVKey hash)) collapseFn))))))
 
 (defun get-collapseHash (DVKeys DVHash configFileStr defaultCollapseFn)
@@ -1099,8 +1110,8 @@
     (dolist (line (get-matching-lines configFileStr "collapseFn=") hash)
       (setf words (get-words line :spaceDesignators (list #\; #\&)))
       (setf tmpLn (make-sentence (rest words) :spaceDesignator #\Newline))
-      (assert (equal (length (rest words)) (length (get-matching-lines tmpLn (list "DV=" "SDV=" "ApplyTo="))))
-	      nil "line ~a not valid" line)
+      (expect (equal (length (rest words)) (length (get-matching-lines tmpLn (list "DV=" "SDV=" "ApplyTo="))))
+	      "line ~a not valid" line)
       (mod-collapseHash 
        hash
        (let ((hsh (make-hash-table :test #'equalp)))
@@ -1219,7 +1230,7 @@
 				      (read-from-string (get-word it))
 				      'keys)
 				 'process))
-	   (assert (member entryFnType (if short-circuit-p (list 'keys 'hash) (list 'process))) nil "invalid entryFnType ~a" entryFnType)
+	   (expect (member entryFnType (if short-circuit-p (list 'keys 'hash) (list 'process))) "invalid entryFnType ~a" entryFnType)
 	   (setf runProcess ,run-process-instance)
 	   (setf iterations (aif (get-matching-line configFileWdLST "iterations=")
 				 (eval (read-from-string (get-word it)))
@@ -1234,7 +1245,7 @@
 	       (merge-hash
 		(mapcar #'cons
 			(guard (get-first-word-from-matching-lines configFileWdLST (list "constant=" "iv="))
-			       (assert (equal (length (car it)) (length cell-values)) nil
+			       (expect (equal (length (car it)) (length cell-values))
 				       "number of cell keys (~d) does not equal number of cell values (~d)" 
 				       (length (car it)) (length cell-values)))
 			cell-values)
@@ -1243,7 +1254,7 @@
 	     (setf mergedHash (merge-hash (list DVHash IVHash)))
 	     (if (equal line-index 0) 
 		 (guard (necessaries IVKeys IVHash)
-			(assert (not (car it)) nil 
+			(expect (not (car it))
 				"IVs '~a' that are necessary to evaluate the 'input=' lines are not present in the config file" (car it))))
 	     (while (< (incf iteration) iterations)
 	       (setf quot -1)
@@ -1266,7 +1277,7 @@
 		      (traversed (with-pandoric (traversed) #'get-matching-lines 
 				   (sort (remove-duplicates traversed :test #'equal) #'<))))
 	   (guard (apply #'+ (mapcar #'(lambda (x) (length (runs x))) (runProcesses session)))
-		  (assert (equal (quota session) (car it)) nil
+		  (expect (equal (quota session) (car it))
 			  "number of linesxiterationsxquota in work file (~d) not equal to number of run objects (~d)"	
 			  (quota session) (car it)))
 	   session)))))
@@ -1286,7 +1297,7 @@
 (defmethod get-DVs ((obj number5-run-class) &optional (process nil) (appetizers nil)) 
   "capture all the input lines that the model has sent; 
    then, remap each line as a dotted pair (key . value)"
-  (assert process)
+  (expect process "should be a process here")
   (mklst appetizers)
   (let ((currentDVs) (line))
     (while (listen (process-output process))
@@ -1319,7 +1330,7 @@
     (when error-p 
       (setf (error-p (process-output-str (runProcess obj))) error-p)
       (print-collector (process-output-str (runProcess obj))) 
-      (assert nil))
+      (expect nil ""))
     (append appetizers currentDVs)))
 
 (defmethod wrapper-execute ((obj johnny5-run-class) &optional (process nil) (appetizers nil))
@@ -1375,7 +1386,7 @@
 	;it should be really difficult not to throw an error here
 	(when (equal (process-exit-code process) 1)
 	  (print-collector (process-output-str (runProcess obj)))       
-	  (assert nil))
+	  (expect nil ""))
 	(format *error-output* "failed to send all ~a DVs left for this trial~%" it)
 	(merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) it) :toHash DVHash))
       (collect run-collector DVHash)
@@ -1385,19 +1396,19 @@
 
 (defmethod wrapper-execute ((obj johnny5-runProcess-class) &optional (process nil) (appetizers nil))
   "execute the runProcess-class object, if short circuiting"
-  (assert (not appetizers))
-  (assert (not process))
+  (expect (not appetizers) "should not have any appetizers here; have ~a" appetizers)
+  (expect (not process) "should not have a process here; have ~a" process)
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session obj)))
   (let ((leftovers))
     (dolist (run (runs obj))
       (setf leftovers (wrapper-execute run (modelProgram obj) leftovers)))
-    (assert (not leftovers) nil "should not be any leftovers after runProcess object finishes"))
+    (expect (not leftovers) "should not be any leftovers after runProcess object finishes"))
   (sleep (sleepTime obj)))
 
 (defmethod wrapper-execute ((obj number5-runProcess-class) &optional (process nil) (appetizers nil))
   "execute the runProcess-class object, if we're not short circuiting"
-  (assert (not appetizers))
-  (assert (not process))
+  (expect (not appetizers) "should not have any appetizers here; have ~a" appetizers)
+  (expect (not process) "should not have a process here; have ~a" process)
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session obj)))
   ;launch the process
   (setf (process obj)
@@ -1412,29 +1423,29 @@
 	 :output :stream 
 	 :error :output 
 	 :wait nil)) 
-  (assert (equal (process-status (process obj)) :running) nil "model process failed to start correctly")
+  (expect (equal (process-status (process obj)) :running) "model process failed to start correctly")
   ;then execute each run
   (let ((leftovers))
     (dolist (run (runs obj))
       (setf leftovers (wrapper-execute run (process obj) leftovers)))
-    (assert (not leftovers) nil "should not be any leftovers after runProcess object finishes"))
+    (expect (not leftovers) "should not be any leftovers after runProcess object finishes"))
   (sleep (sleepTime obj))
   ;a few assertions to make sure everything finished cleanly
-  (assert (not (listen (process-output (process obj))))
-	  nil "unprocessed lines remain in stdout stream of model after all DVs have been processed")
-  (assert (equal (process-status (process obj)) :exited)
-	  nil "model process failed to quit after all DVs have been processed"))
+  (expect (not (listen (process-output (process obj))))
+	  "unprocessed lines remain in stdout stream of model after all DVs have been processed")
+  (expect (equal (process-status (process obj)) :exited)
+	  "model process failed to quit after all DVs have been processed"))
 
 (defmethod wrapper-execute ((obj session-class) &optional (process nil) (appetizers nil))
   "execute the top-level session-class object"
   ;print information about the session to the terminal
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters obj))
   ;execute each runProcess
-  (assert (not process))
-  (assert (not appetizers))
+  (expect (not appetizers) "should not have any appetizers here; have ~a" appetizers)
+  (expect (not process) "should not have a process here; have ~a" process)
   (dolist (runProcess (runProcesses obj))
     (wrapper-execute runProcess process appetizers))
-  (assert 
+  (expect
    (equal 1 (apply #'* (flatten 
 		       (mapcar 
 			#'(lambda (runProcess) 
@@ -1445,7 +1456,7 @@
 					  (equal (quot (session-collector (collector (run-collector run)))) 
 						 (quota (session-collector (collector (run-collector run))))))
 				     1 0)) (runs runProcess))) (runProcesses obj)))))
-   nil "not all collectors fully executed"))
+   "not all collectors fully executed"))
 
 (defmacro methods (name &rest args)
   "shorthand for defining multiple methods that are taking advantage of dynamic dispatching;

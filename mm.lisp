@@ -15,7 +15,7 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 (defun sandwich (item lst)
   "places item in between all elements of lst, but not to the left or right of lst"
-  (assert (listp lst) nil "error; ~a not a list" lst)
+  (expect (listp lst) "error; ~a not a list" lst)
   (cond ((null lst) nil)
 	((eq (length lst) 1) lst)
 	(t (cons (car lst) 
@@ -122,11 +122,11 @@
     (html-color-stop)))
 
 ;wrapping html font tags around the text output from all assertions that fail
-(sb-ext:without-package-locks
-  (let ((fun (symbol-function 'sb-kernel:assert-error)))
-    (setf (symbol-function 'sb-kernel:assert-error) 
-	  (lambda (assertion places datum &rest arguments) 
-	    (apply fun (append (list assertion places (html-color datum)) arguments))))))
+;(sb-ext:without-package-locks
+;  (let ((fun (symbol-function 'sb-kernel:assert-error)))
+;    (setf (symbol-function 'sb-kernel:assert-error) 
+;	  (lambda (assertion places datum &rest arguments) 
+;	    (apply fun (append (list assertion places (html-color datum)) arguments))))))
 
 ;define a pandoric function that stores (closes over) 'DVs'
 ;you can set/get the value of DVs using 'get-pandoric or 'with-pandoric
@@ -180,7 +180,7 @@
   "works like defmethod, but fills in stub methods for the two classes not defined"
   (let* ((all-classes (list 'runprocess-class 'run-class 'session-class))
 	 (stub-methods (set-difference all-classes (flatten pattern))))
-    (assert (equal (length stub-methods) 2) nil "used defmethod% on an invalid class")
+    (expect (equal (length stub-methods) 2) "used defmethod% on an invalid class")
     `(methods ,name
 	      ,@(mapcar (lambda (stub-method) `(((obj ,stub-method)))) stub-methods)
 	      (,pattern ,@body))))
@@ -193,19 +193,18 @@
 	 (arglst (sb-introspect:function-lambda-list modelProgram))
 	 (entryFnType (entryFnType obj)))
     (when (equal entryFnType 'keys)
-      (assert (> (length IVKeys) 0) nil "at least one IV is needed in config file")
-      (assert (> (length DVKeys) 0) nil "at least one DV is needed in config file")
+      (expect (> (length IVKeys) 0) (html-color "at least one IV is needed in config file"))
+      (expect (> (length DVKeys) 0) (html-color "at least one DV is needed in config file"))
       (let ((lst (mapcar (lambda (x) (format nil "~a" (car x))) (cdr arglst))))
-	(assert (equalp (sort lst #'string<) (sort IVKeys #'string<)) nil
-		"keys ~a for entry function ~a do not match IVs ~a in config file"
+	(expect (equalp (sort lst #'string<) (sort IVKeys #'string<))
+		(html-color "keys ~a for entry function ~a do not match IVs ~a in config file")
 		lst modelProgram IVKeys)))
     (when (equal entryFnType 'hash)
       ;this assert nil nil will throw an error; only a 'keys entryFnType is allowed on MM
       ;for example (defun run-model (&key (x) (y)) ... is allowed, but
       ;(defun run-model (hash) ... is not allowed
-      (assert nil nil "not allowing hash-table style entry functions for MM yet. Keep it simple...")
-      (assert (equal (length arglst) 1) nil "problem with argument list ~a for the entry function ~a"
-	      arglst modelProgram))
+      (expect nil (html-color "not allowing hash-table style entry functions for MM yet. Keep it simple..."))
+      (expect (equal (length arglst) 1) (html-color "problem with argument list ~a for the entry function ~a") arglst modelProgram))
     ;not doing any validation when the model is launched as a separate process yet
     (when (equal entryFnType 'process)
       nil)))
@@ -214,8 +213,8 @@
   "method will validate the DVs written in the model (using send-dv) against DV names specified in the config file"
   (let ((necessary-DVs (necessaries (DVKeys obj) (DVHash obj)))
 	(supplied-DVs (get-pandoric #'DVs 'DVs)))
-    (assert (equalp (sort necessary-DVs #'string<) (sort supplied-DVs #'string<)) nil
-	    "DVKeys ~a sent using 'send-DVs' do not match necessary DVs ~a in config file"
+    (expect (equalp (sort necessary-DVs #'string<) (sort supplied-DVs #'string<))
+	    (html-color "DVKeys ~a sent using 'send-DVs' do not match necessary DVs ~a in config file")
 	    supplied-DVs necessary-DVs)))
 
 (defmethod% validate-full-combinatorial ((obj session-class))
@@ -225,19 +224,19 @@
       (let ((nums (mapcar (lambda (x) 
 			    (handler-case (eval (read-from-string x))
 			      (error (condition) 
-				(assert nil nil "error \"~a\" when parsing line IV=~a" condition line))))
+				(expect nil (html-color "error \"~a\" when parsing line IV=~a") condition line))))
 			  (get-objects (make-sentence (rest (get-words line)))))))
-	(mapc (lambda (x) (assert (numberp x) nil "~a not a number in line IV=~a" x line)) nums)
-	(assert (equal (length nums) 3) nil "not 3 numbers in line IV=~a" line)
-	(assert (< (first nums) (third nums)) nil "starting number ~a not less than ending number ~a in line IV=~a" (first nums) (third nums) line)
-	(assert (> (second nums) 0) nil "stepsize ~a not greater than zero in line IV=~a" (second nums) line)
+	(mapc (lambda (x) (expect (numberp x) (html-color "~a not a number in line IV=~a") x line)) nums)
+	(expect (equal (length nums) 3) (html-color "not 3 numbers in line IV=~a") line)
+	(expect (< (first nums) (third nums)) (html-color "starting number ~a not less than ending number ~a in line IV=~a") (first nums) (third nums) line)
+	(expect (> (second nums) 0) (html-color "stepsize ~a not greater than zero in line IV=~a") (second nums) line)
 	(format t "nums= ~a~%" nums)
 	(multiple-value-bind (q r) (fround (- (third nums) (first nums)) (second nums))
 	  (declare (ignore q))
-	  (assert (< (abs r) .000001) nil "(~a-~a)/~a not a whole number in line IV=~a" (third nums) (first nums) (second nums) line))))
+	  (expect (< (abs r) .000001) (html-color "(~a-~a)/~a not a whole number in line IV=~a") (third nums) (first nums) (second nums) line))))
     (dolist (line (get-matching-lines configFileWdLST "DV="))
       (let ((name (get-words line)))
-	(assert (equal (length name) 1) nil "not 1 name in line DV=~a" line)))))
+	(expect (equal (length name) 1) (html-color "not 1 name in line DV=~a") line)))))
 
 (defmethod% generate-full-combinatorial ((obj session-class))
   "method will generate the full combination of IVs in config file, and write results (line by line) to filename mapped to mm_in in 'mods"
