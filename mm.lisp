@@ -56,16 +56,49 @@
 					       (cdr (get-element key 
 								 collection 
 								 :collapseFns (gethash-ifhash key collapseHash)))) keys)))))))))
-  
+
+;keep track of the run object that is currently being executed
+(defvar *run* nil)
+(defmethod wrapper-execute :before ((obj run-class) &optional (process) (appetizers))  
+  "before executing a run object, store the current run object in the *run* dynamic variable (global)"
+  (declare (ignore process appetizers))
+  (setf *run* obj))
+
 (defclass mm-process-output-str-class (process-output-str-class) 
   ()
   (:documentation "mm-process-output-str class is responsible for keeping track of the last N lines printed by the model"))
 
 (defmethod print-collector ((obj mm-process-output-str-class))
-  "method will be called if the model has died; will print the last lines outputted by the model (the model's last dying comments to stderr)"
-  (format *error-output* "model unexpectedly quit... ~%~%here are the last ~a lines that were printed to stdout before the error~%~a~%"
-	  (quot obj) (make-sentence (gethash "str" (collection obj)) :spaceDesignator #\Newline))
-  (if (error-p obj) (format *error-output* "here's the error~%~a~%" (error-p obj))))
+  "method will be called if the model has died; will print the last lines outputted by the model (the model's last dying comments) to stderr
+   an example output looks like this:
+   ##########################
+   # Parameters:
+   #   FIRSTIV: FIRSTIV-val
+   #   SECONDIV: SECONDIV-val
+
+   # The error: I am a model; I crashed because of a divide by zero error
+
+   # The last 10 lines that were printed by the model before the error follows:
+   ##########################
+   line0
+   line1
+   line2
+   line3
+   line4
+   line5
+   line6
+   line7
+   line8
+   line9"
+  (format *error-output* "##########################~%")
+  (format *error-output* "# Parameters:~%")
+  (with-slots (cellKeys IVHash) *run*
+    (dolist (element (get-elements cellKeys IVHash :eval-val-p nil))
+      (format *error-output* "#   ~a: ~a~%" (car element) (cdr element))))
+  (format *error-output* "~%")
+  (if (error-p obj) (format *error-output* "# The error: ~a~%~%" (error-p obj)))
+  (format *error-output* "# The last ~a lines that were printed by the model before the error follows:~%~a~%~a~%" (quot obj) 
+	  "##########################" (make-sentence (gethash "str" (collection obj)) :spaceDesignator #\Newline)))
 
 (defclass mm-run-collector-class (run-collector-class)
   ((out :accessor out :initarg :out :initform (get-pandoric 'mods 'mm_fraction_done)
