@@ -342,14 +342,14 @@
 		  ;cleanup
 		  (attempt (delete-file (get-pandoric 'mods 'mm_out))))))
     (test (x y) (z) (z) nil ;test that output in file is correct for standard case; a few IVs and a DV
-	  (check (string-equal (format nil "'x-val~a'y-val~az-val" #\Tab #\Tab)
+	  (check (string-equal (format nil "~{~a~}" (sandwich #\Tab (list "'x-val" "'y-val" "z-val")))
 			       (file-string (get-pandoric 'mods 'mm_out)))))
     (test (x y) (z) (z) t ;test that output in file is correct for case where the model crashes
 	  (format t "~a~%" str)
 	  (check (not (string-equal str ""))) ;str should contain some output, since information about the crash is printed to stderr
 	  (check (errors-p (file-string (get-pandoric 'mods 'mm_out))))) ;the output file shouldn't exist b/c nothing should have been written to it
     (test (x y) (z1 z2 z3) (z1 z3) nil ;test that output in file is correct for case where not all DVs are returned, but some are (model didn't crash)
-	  (check (string-equal (format nil "'x-val~a'y-val~az1-val~anil~az3-val" #\Tab #\Tab #\Tab #\Tab) ;nil should be placed as value for z2
+	  (check (string-equal (format nil "~{~a~}" (sandwich #\Tab (list "'x-val" "'y-val" "z1-val" nil "z3-val"))) ;nil should be placed as value for z2
 			       (file-string (get-pandoric 'mods 'mm_out)))))))
 
 (deftest test-wrapper-execute-session-class ()
