@@ -1330,7 +1330,7 @@
     (when error-p 
       (setf (error-p (process-output-str (runProcess obj))) error-p)
       (print-collector (process-output-str (runProcess obj))) 
-      (expect nil ""))
+      (error "failed to get DVs; model crashed"))
     (append appetizers currentDVs)))
 
 (defmethod wrapper-execute ((obj johnny5-run-class) &optional (process nil) (appetizers nil))
@@ -1338,7 +1338,7 @@
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session (runProcess obj))))
   (with-slots (DVKeys DVHash run-collector sleepTime) obj
     (let* ((necessaryDVs (necessaries DVKeys DVHash))
-	   (currentDVs (if necessaryDVs (get-DVs obj process appetizers))))
+	   (currentDVs (if necessaryDVs (attempt (get-DVs obj process appetizers)))))
       ;note the expected DVs that were not returned for this trial, and set their value to nil
       (awhen (sort (set-difference necessaryDVs (mapcar #'car currentDVs) :test #'string-equal) #'string<)
 	(format *error-output* "failed to send all DVs for this trial; missing ~a~%" it)

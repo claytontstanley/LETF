@@ -22,11 +22,23 @@
 		 (cons item (sandwich item (cdr lst)))))))
 
 ;pandoric function that stores names for mm-specific variables and output files
-(defpun mods () ((mm_out "out.txt")
-		 (mm_in "in.txt")
-		 (mm_fraction_done "mm_fraction_done.txt")
-		 (mm_bold_out "mm_bold_out.txt")
-		 (mm_errors "errors.txt")))
+(defpun mods () ((mm_out)
+		 (mm_in)
+		 (mm_fraction_done)
+		 (mm_bold_out)
+		 (mm_errors)
+		 (fresh)
+		 (at-least-one-run-crashed))
+  (setf mm_out "out.txt")
+  (setf mm_in "in.txt")
+  (setf mm_fraction_done "mm_fraction_done.txt")
+  (setf mm_bold_out "mm_bold_out.txt")
+  (setf mm_errors "errors.txt")
+  (setf fresh t)
+  (setf at-least-one-run-crashed nil))
+
+;initialize the variables
+(mods)
 
 (defclass mm-work-class (work-class) 
   () 
@@ -41,21 +53,18 @@
 	:documentation "extending the base class to hold the filename where all of the results will be printed"))
   (:documentation "mm-collector-class is responsible for printing the outputs of a collapsed set of runs"))
 
-(let ((first t))
-  (defmethod print-collector ((obj mm-collector-class))
-    "method will be called after each collapsed run; for the mm system, the results will be appended to out.txt"
-    (with-open-file (out (out obj) :direction :output :if-exists (if first :supersede :append) :if-does-not-exist :create)
-      (if first (setf first nil) (format out "~%")) ;print a fresh line
-      (labels ((printIt (str)
-		 (format out "~{~a~}" (mapcar (lambda (x) (if (numberp x) (coerce x 'double-float) x)) str))))
-        ;print the IVs & DVs, with a tab sandwiched in between them
-	(with-slots (cellElements collection collapseHash keys) obj
-	  (printIt (sandwich #\Tab
-			     (append (mapcar #'cdr cellElements)
-				     (mapcar (lambda (key)
-					       (cdr (get-element key 
-								 collection 
-								 :collapseFns (gethash-ifhash key collapseHash)))) keys)))))))))
+(defmethod print-collector ((obj mm-collector-class))
+  "method will be called after each collapsed run; for the mm system, the results will be appended to out.txt"
+  (with-slots (cellElements collection collapseHash keys) obj
+    (let ((DV-Elements (get-elements keys collection :collapseFns (mapcar (lambda (x) (gethash-ifHash x collapseHash)) keys))))
+      (when (notevery #'null (mapcar #'cdr DV-Elements)) ;if all DVs are nil, then the run errored, so don't print this run
+	(with-pandoric (fresh) #'mods
+	  (with-open-file (out (out obj) :direction :output :if-exists (if fresh :supersede :append) :if-does-not-exist :create)
+	    (if fresh (setf fresh nil) (format out "~%")) ;print a fresh line
+	      ;print the IVs & DVs, with a tab sandwiched in between them
+	      (format out  "~{~a~}" (mapcar (lambda (x) (if (numberp x) (coerce x 'double-float) x))
+					    (sandwich #\Tab (append (mapcar #'cdr cellElements) (mapcar #'cdr DV-Elements)))))))))))
+			      
 
 ;keep track of the run object that is currently being executed
 (defvar *run* nil)
@@ -78,27 +87,24 @@
 
    # The error: I am a model; I crashed because of a divide by zero error
 
-   # The last 10 lines that were printed by the model before the error follows:
-   ##########################
+   # The last 10 lines that were printed by the model before the error:
    line0
    line1
    line2
-   line3
-   line4
-   line5
-   line6
-   line7
-   line8
-   line9"
+   ...
+   ##########################"
+  (format *error-output* "~%") ;print a fresh line
   (format *error-output* "##########################~%")
   (format *error-output* "# Parameters:~%")
   (with-slots (cellKeys IVHash) *run*
     (dolist (element (get-elements cellKeys IVHash :eval-val-p nil))
       (format *error-output* "#   ~a: ~a~%" (car element) (cdr element))))
-  (format *error-output* "~%")
-  (if (error-p obj) (format *error-output* "# The error: ~a~%~%" (error-p obj)))
-  (format *error-output* "# The last ~a lines that were printed by the model before the error follows:~%~a~%~a~%" (quot obj) 
-	  "##########################" (make-sentence (gethash "str" (collection obj)) :spaceDesignator #\Newline)))
+  (format *error-output* "#~%")
+  (if (error-p obj) (format *error-output* "# The error: ~a~%#~%" (error-p obj)))
+  (format *error-output* "# The last ~a lines that were printed by the model before the error:~%" (quot obj))
+  (format *error-output* "~{~a~%~}" (gethash "str" (collection obj)))
+  (format *error-output* "##########################~%")
+  (setf (get-pandoric 'mods 'at-least-one-run-crashed) t)) ;remember that a point has crashed
 
 (defclass mm-run-collector-class (run-collector-class)
   ((out :accessor out :initarg :out :initform (get-pandoric 'mods 'mm_fraction_done)
@@ -124,6 +130,10 @@
 	   (with-open-file (out (bold-out obj) :direction :output :if-exists :supersede :if-does-not-exist :create)
 	     (format out "~a" (with-output-to-string (*standard-output*)
 				(predict-bold-response))))))))))
+
+(defmethod wrapper-execute :after ((obj session-class) &optional (process nil) (appetizers nil))
+  (declare (ignore process appetizers))
+  (expect (not (get-pandoric 'mods 'at-least-one-run-crashed)) "at least one run of the model crashed; exiting with non-zero status"))
 
 (defun build-mm-session ()
   "top-level mm function called by letf that builds the session object"

@@ -239,15 +239,17 @@
 		  (let ((obj))
 		    (with-shadow (file-string #'identity) 
 		      (args)
+		      (mods)
 		      (setf obj (build-mm-session)))
                     ;take that object, execute it, and evaluate body, which will make sure that the results are as expected
 		    ;mock up get-DVs, so that an actual model doesn't have to be executed
 		    (with-shadow (get-DVs (lambda (obj &optional (process) (apps))
 					    (declare (ignore obj process apps))
 					    (mapcar (lambda (x) (cons (string x) "0")) ',returned)))
-			,@body)
-		    (delete-file (get-pandoric 'mods 'mm_out))
-		    (delete-file (get-pandoric 'mods 'mm_fraction_done))))))
+			,@body))
+		  ;cleanup
+		  (delete-file (get-pandoric 'mods 'mm_out))
+		  (delete-file (get-pandoric 'mods 'mm_fraction_done)))))
     (with-pandoric (mm_out) 'mods
       (test ((x y) (x y)) ;check that if returned DVs are exactly the ones expected...
 	    (let ((str (with-output-to-string (*error-output*)
@@ -274,18 +276,17 @@
 (deftest test-print-collector-mm-process-output-str-class ()
   "test that the printer when the model crashes works correctly
    header information and the last (up to) 200 lines printed by the model should be present"
-  (macrolet ((test (IVs DVs numModelLinesPrinted numModelLinesDisplayed)
+  (macrolet ((test (IVs numModelLinesPrinted numModelLinesDisplayed)
 	       `(progn
 		  ;mock up the file-string function & set the configFilePath/workFilePath to the values normally returned by 'file-string
 		  ;so that files are not necessary to build the mm-session object
 		  (with-pandoric (configFilePath workFilePath) 'args
-		    (setf configFilePath
-			  (format nil "~{~a~%~}" (append (mapcar (lambda (x) (format nil "IV=~a" x)) ',IVs)
-							 (mapcar (lambda (x) (format nil "DV=~a" x)) ',DVs))))
+		    (setf configFilePath (format nil "~{~a~%~}" (append (mapcar (lambda (x) (format nil "IV=~a" x)) ',IVs) (list "DV=z"))))
 		    (setf workFilePath (format nil "~{~a~}" (sandwich #\Tab (mapcar (lambda (x) (format nil "'~a-val" x)) ',IVs)))))
 		  (let ((obj))
 		    (with-shadow (file-string #'identity)
 		      (args)
+		      (mods)
 		      (setf obj (build-mm-session)))
 		    ;shadow the run-model function (the model entry function)
 		    ;have the entry function print the number of lines specified by numModelLinesPrinted before crashing
@@ -295,28 +296,80 @@
 						(format t "line~a~%" i))
 					      (error "I am a model; I crashed because of a divide by zero error")))
 		      ;attempt to execute the entry function; should crash, so wrap execution in an errors-p call, and save model output to str
-		      (let ((str) (condition))
-			(setf str
-			      (with-output-to-string (*error-output*)
-				(setf condition (errors-p (wrapper-execute obj)))))
-			;all of the information about the error is in str, not in condition
-			(check (string-equal (format nil "~a" condition) ""))
+		      (let ((str))
+			(setf str (with-output-to-string (*error-output*)
+				    (attempt (wrapper-execute obj))))
 			;the str must contain all "IV: 'IV-val" 's
 			(dolist (IV (mapcar #'string ',IVs))
 			  (check (search (format nil "~a: '~a-val" IV IV) str :test #'string-equal)))
 			;the str must contain a header saying that the last N model lines follows
-			(check (search (format nil "The last ~a lines that were printed by the model before the error follows" ,numModelLinesDisplayed)
+			(check (search (format nil "The last ~a lines that were printed by the model before the error" ,numModelLinesDisplayed)
 				       str :test #'string-equal))
 			;the str must contain all last numModelLinesDisplayed model lines
 			(loop for i from (- ,numModelLinesPrinted 1) downto (- ,numModelLinesPrinted ,numModelLinesDisplayed) do
 			     (check (search (format nil "line~a" i) str :test #'string-equal)))
 			;the str must contain the string contained when the model crashed
-			(check (search "I am a model; I crashed because of a divide by zero error" str :test #'string-equal))
-			))))))
-    (test (FirstIV secondIV thirdIV) (x y) 201 200) ;test that output is correct when model prints more than 200 lines before crashing
-    (test (x) (y z) 2000 200) ;again, more than 200 lines, but this time much more
-    (test (FirstIV secondIV) (x y) 0 0) ;test that output is correct in fringe case - when model prints no lines before crashing
-    (test (FirstIV) (x y) 10 10))) ;test that output is correct when # model lines printed is less than 200
+			(check (search "I am a model; I crashed because of a divide by zero error" str :test #'string-equal))))))))
+    (test (FirstIV secondIV thirdIV) 201 200) ;test that output is correct when model prints more than 200 lines before crashing
+    (test (x) 2000 200) ;again, more than 200 lines, but this time much more
+    (test (FirstIV secondIV) 0 0) ;test that output is correct in fringe case - when model prints no lines before crashing
+    (test (FirstIV) 10 10))) ;test that output is correct when # model lines printed is less than 200
+
+(deftest test-print-collector-mm-collector-class ()
+  "test that the printer that writes output data to mm_out works correctly
+   two main cases; when the model is successful, print tab-delimited IVs then DVs
+   when the model crashes, print nothing"
+  (macrolet ((test (IVs DVs outputted-DVs errors-p &body body)
+	       `(progn
+		  (with-pandoric (configFilePath workFilePath) 'args
+		    (setf configFilePath (format nil "~{~a~%~}" (append (mapcar (lambda (x) (format nil "IV=~a" x)) ',IVs)
+									(mapcar (lambda (x) (format nil "DV=~a" x)) ',DVs))))
+		    (setf workFilePath (format nil "~{~a~}" (sandwich #\Tab (mapcar (lambda (x) (format nil "'~a-val" x)) ',IVs)))))
+		  (let ((obj))
+		    (with-shadow (file-string #'identity)
+		      (args)
+		      (mods)
+		      (setf obj (build-mm-session)))
+		    (with-shadow (run-model (lambda (&key ,@(mapcar #'list IVs))
+					      (declare (ignore ,@IVs))
+					      (dolist (DV ',outputted-DVs)
+						(format t "~a='~a-val~%" DV DV))
+					      (if ,errors-p (error "here"))))
+		      (let ((str))
+			(setf str (with-output-to-string (*error-output*)
+				    (attempt (wrapper-execute obj))))
+			,@body)))
+		  ;cleanup
+		  (attempt (delete-file (get-pandoric 'mods 'mm_out))))))
+    (test (x y) (z) (z) nil ;test that output in file is correct for standard case; a few IVs and a DV
+	  (check (string-equal (format nil "'x-val~a'y-val~az-val" #\Tab #\Tab)
+			       (file-string (get-pandoric 'mods 'mm_out)))))
+    (test (x y) (z) (z) t ;test that output in file is correct for case where the model crashes
+	  (format t "~a~%" str)
+	  (check (not (string-equal str ""))) ;str should contain some output, since information about the crash is printed to stderr
+	  (check (errors-p (file-string (get-pandoric 'mods 'mm_out))))) ;the output file shouldn't exist b/c nothing should have been written to it
+    (test (x y) (z1 z2 z3) (z1 z3) nil ;test that output in file is correct for case where not all DVs are returned, but some are (model didn't crash)
+	  (check (string-equal (format nil "'x-val~a'y-val~az1-val~anil~az3-val" #\Tab #\Tab #\Tab #\Tab) ;nil should be placed as value for z2
+			       (file-string (get-pandoric 'mods 'mm_out)))))))
+
+(deftest test-wrapper-execute-session-class ()
+  "unit tests to make sure that the lisp process exits appropriately if at least one run of the model fails"
+  (macrolet ((test (error-p &body body)
+	       `(progn
+		  (with-pandoric (configFilePath WorkFilePath) 'args
+		    (setf configFilePath (format nil "iv=x~%dv=z"))
+		    (setf workFilePath "0"))
+		  (let ((obj))
+		    (with-shadow (file-string #'identity)
+		      (args)
+		      (mods)
+		      (setf obj (build-mm-session)))
+		    (with-shadow (run-model (lambda (&key (x))
+					      (declare (ignore x))
+					      (if ,error-p (error "here"))))
+		      ,@body)))))
+    (test t (check (errors-p (wrapper-execute obj)))) ;if a run errors the lisp process should throw an exception
+    (test nil (check (not (errors-p (wrapper-execute obj))))))) ;if the run doesn't error, then no exception should be thrown
 
 (deftest test-expect ()
   "unit tests for the expect macro"
@@ -338,6 +391,8 @@
 	  (test-wrapper-execute-johnny5-run-class)
 	  (test-expect)
 	  (test-print-collector-mm-process-output-str-class)
+	  (test-print-collector-mm-collector-class)
+	  (test-wrapper-execute-session-class)
 	  )))
     (format t "~%overall: ~:[FAIL~;pass~]~%" result)))
 
