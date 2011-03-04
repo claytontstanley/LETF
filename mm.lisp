@@ -21,21 +21,40 @@
 	(t (cons (car lst) 
 		 (cons item (sandwich item (cdr lst)))))))
 
+(defclass bad-models-class ()
+  ((num-runs-total :accessor num-runs-total :initarg :num-runs-total :initform nil)
+   (num-runs-errored :accessor num-runs-errored :initarg :num-runs-errored :initform 0)
+   (threshold :accessor threshold :initarg :threshold :initform .5))
+  (:documentation "responsible for keeping track of the failed models, and deciding if there are enough failed models to exit with a non-zero code"))
+  
+(defmethod bad-models-p ((obj bad-models-class))
+  "will return true if the number of failed models is greater than the threshold"
+  (when (num-runs-total obj)
+    (when (> (num-runs-total obj) 0)
+      (> (/ (num-runs-errored obj) (num-runs-total obj)) (threshold obj)))))
+
+(defmethod reset-collector ((obj base-collector-class))
+  "removes all items from a collection"
+  (setf (collection obj) (make-hash-table :test #'equalp))
+  (setf (quot obj) 0))
+
 ;pandoric function that stores names for mm-specific variables and output files
 (defpun mods () ((mm_out)
 		 (mm_in)
 		 (mm_fraction_done)
 		 (mm_bold_out)
 		 (mm_errors)
-		 (fresh)
-		 (at-least-one-run-crashed))
+		 (fresh-results-file)
+		 (fresh-errors-file)
+		 (bad-models-collector))
   (setf mm_out "out.txt")
   (setf mm_in "in.txt")
   (setf mm_fraction_done "mm_fraction_done.txt")
   (setf mm_bold_out "mm_bold_out.txt")
   (setf mm_errors "errors.txt")
-  (setf fresh t)
-  (setf at-least-one-run-crashed nil))
+  (setf fresh-results-file t)
+  (setf fresh-errors-file t)
+  (setf bad-models-collector (make-instance 'bad-models-class)))
 
 ;initialize the variables
 (mods)
@@ -58,9 +77,9 @@
   (with-slots (cellElements collection collapseHash keys) obj
     (let ((DV-Elements (get-elements keys collection :collapseFns (mapcar (lambda (x) (gethash-ifHash x collapseHash)) keys))))
       (when (notevery #'null (mapcar #'cdr DV-Elements)) ;if all DVs are nil, then the run errored, so don't print this run
-	(with-pandoric (fresh) #'mods
-	  (with-open-file (out (out obj) :direction :output :if-exists (if fresh :supersede :append) :if-does-not-exist :create)
-	    (if fresh (setf fresh nil) (format out "~%")) ;print a fresh line
+	(with-pandoric (fresh-results-file) #'mods
+	  (with-open-file (out (out obj) :direction :output :if-exists (if fresh-results-file :supersede :append) :if-does-not-exist :create)
+	    (if fresh-results-file (setf fresh-results-file nil) (format out "~%")) ;print a fresh line
 	      ;print the IVs & DVs, with a tab sandwiched in between them
 	      (format out  "~{~a~}" (mapcar (lambda (x) (if (numberp x) (coerce x 'double-float) x))
 					    (sandwich #\Tab (append (mapcar #'cdr cellElements) (mapcar #'cdr DV-Elements)))))))))))
@@ -71,10 +90,11 @@
 (defmethod wrapper-execute :before ((obj run-class) &optional (process) (appetizers))  
   "before executing a run object, store the current run object in the *run* dynamic variable (global)"
   (declare (ignore process appetizers))
-  (setf *run* obj))
+  (setf *run* obj)
+  (reset-collector (process-output-str (runProcess obj))))
 
-(defclass mm-process-output-str-class (process-output-str-class) 
-  ()
+(defclass mm-process-output-str-class (process-output-str-class)
+  ((out :accessor out :initarg :out :initform (get-pandoric 'mods 'mm_errors)))
   (:documentation "mm-process-output-str class is responsible for keeping track of the last N lines printed by the model"))
 
 (defmethod print-collector ((obj mm-process-output-str-class))
@@ -93,19 +113,21 @@
    line2
    ...
    ##########################"
-  (format *error-output* "~%") ;print a fresh line
-  (format *error-output* "##########################~%")
-  (format *error-output* "# Parameters:~%")
-  (with-slots (cellKeys IVHash) *run*
-    (dolist (element (get-elements cellKeys IVHash :eval-val-p nil))
-      (format *error-output* "#   ~a: ~a~%" (car element) (cdr element))))
-  (format *error-output* "#~%")
-  (if (error-p obj) (format *error-output* "# The error: ~a~%#~%" (error-p obj)))
-  (format *error-output* "# The last ~a lines that were printed by the model before the error:~%" (quot obj))
-  (format *error-output* "~{~a~%~}" (gethash "str" (collection obj)))
-  (format *error-output* "##########################~%")
-  (setf (get-pandoric 'mods 'at-least-one-run-crashed) t)) ;remember that a point has crashed
-
+  (with-pandoric (fresh-errors-file) 'mods
+    (with-open-file (strm (out obj) :direction :output :if-exists (if fresh-errors-file :supersede :append) :if-does-not-exist :create)
+      (if fresh-errors-file (setf fresh-errors-file nil) (format strm "~%")) ;print a fresh line
+      (format strm "##########################~%")
+      (format strm "# Parameters:~%")
+      (with-slots (cellKeys IVHash) *run*
+	(dolist (element (get-elements cellKeys IVHash :eval-val-p nil))
+	  (format strm "#   ~a: ~a~%" (car element) (cdr element))))
+      (format strm "#~%")
+      (if (error-p obj) (format strm "# The error: ~a~%#~%" (error-p obj)))
+      (format strm "# The last ~a lines that were printed by the model before the error:~%" (quot obj))
+      (format strm "~{~a~%~}" (gethash "str" (collection obj)))
+      (format strm "##########################~%")
+      (incf (num-runs-errored (get-pandoric 'mods 'bad-models-collector)))))) ;remember that a point has crashed
+  
 (defclass mm-run-collector-class (run-collector-class)
   ((out :accessor out :initarg :out :initform (get-pandoric 'mods 'mm_fraction_done)
 	:documentation "extending the base class to hold the file that will be touched after each run")
@@ -131,9 +153,17 @@
 	     (format out "~a" (with-output-to-string (*standard-output*)
 				(predict-bold-response))))))))))
 
-(defmethod wrapper-execute :after ((obj session-class) &optional (process nil) (appetizers nil))
+(defmethod wrapper-execute :before ((obj session-class) &optional (process) (appetizers))
+  "executes before any runs are fired off; provides the total number of runs to the bad models collector"
   (declare (ignore process appetizers))
-  (expect (not (get-pandoric 'mods 'at-least-one-run-crashed)) "at least one run of the model crashed; exiting with non-zero status"))
+  (with-pandoric (bad-models-collector) 'mods
+    (setf (num-runs-total bad-models-collector) (quota obj)))) 
+
+(defmethod wrapper-execute :after ((obj session-class) &optional (process nil) (appetizers nil))
+  "executes after all runs are fired off; determines how the lisp process will exit"
+  (declare (ignore process appetizers))
+  (with-pandoric (bad-models-collector) 'mods
+    (expect (not (bad-models-p bad-models-collector)) "at least one run of the model crashed; exiting with non-zero status")))
 
 (defun build-mm-session ()
   "top-level mm function called by letf that builds the session object"

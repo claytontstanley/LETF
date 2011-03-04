@@ -912,7 +912,7 @@
 
 (defmethod print-collector :after ((obj base-collector-class))
   "method to clear out the collection (uses garbage collection to reallocate memory)"
-  (setf (collection obj) nil))
+  (setf (collection obj) (make-hash-table :test #'equalp)))
 
 (defclass process-output-str-class (base-collector-class)
   ((error-p :accessor error-p :initarg :error-p :initform nil
