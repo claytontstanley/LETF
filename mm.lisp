@@ -167,7 +167,7 @@
   "executes after all runs are fired off; determines how the lisp process will exit"
   (declare (ignore process appetizers))
   (with-pandoric (bad-models-collector) 'mods
-    (expect (not (bad-models-p bad-models-collector)) "at least one run of the model crashed; exiting with non-zero status")))
+    (expect (not (bad-models-p bad-models-collector)) "too many runs crashed; exiting with non-zero status")))
 
 (defun build-mm-session ()
   "top-level mm function called by letf that builds the session object"
