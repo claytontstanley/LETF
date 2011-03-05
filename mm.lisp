@@ -78,7 +78,7 @@
     (let ((DV-Elements (get-elements keys collection :collapseFns (mapcar (lambda (x) (gethash-ifHash x collapseHash)) keys))))
       (when (notevery #'null (mapcar #'cdr DV-Elements)) ;if all DVs are nil, then the run errored, so don't print this run
 	(with-pandoric (fresh-results-file) #'mods
-	  (with-open-file (out (out obj) :direction :output :if-exists (if fresh-results-file :supersede :append) :if-does-not-exist :create)
+	  (with-open-file (out (out obj) :direction :output :if-exists :append :if-does-not-exist :create)
 	    (if fresh-results-file (setf fresh-results-file nil) (format out "~%")) ;print a fresh line
 	      ;print the IVs & DVs, with a tab sandwiched in between them
 	      (format out  "~{~a~}" (mapcar (lambda (x) (if (numberp x) (coerce x 'double-float) x))
@@ -114,7 +114,7 @@
    ...
    ##########################"
   (with-pandoric (fresh-errors-file) 'mods
-    (with-open-file (strm (out obj) :direction :output :if-exists (if fresh-errors-file :supersede :append) :if-does-not-exist :create)
+    (with-open-file (strm (out obj) :direction :output :if-exists :append :if-does-not-exist :create)
       (if fresh-errors-file (setf fresh-errors-file nil) (format strm "~%")) ;print a fresh line
       (format strm "##########################~%")
       (format strm "# Parameters:~%")
@@ -157,7 +157,11 @@
   "executes before any runs are fired off; provides the total number of runs to the bad models collector"
   (declare (ignore process appetizers))
   (with-pandoric (bad-models-collector) 'mods
-    (setf (num-runs-total bad-models-collector) (quota obj)))) 
+    (setf (num-runs-total bad-models-collector) (quota obj)))
+  (with-open-file (out (get-pandoric 'mods 'mm_out) :direction :output :if-exists :supersede :if-does-not-exist :create)
+    ())
+  (with-open-file (out (get-pandoric 'mods 'mm_errors) :direction :output :if-exists :supersede :if-does-not-exist :create)
+    ()))
 
 (defmethod wrapper-execute :after ((obj session-class) &optional (process nil) (appetizers nil))
   "executes after all runs are fired off; determines how the lisp process will exit"

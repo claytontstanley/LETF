@@ -358,7 +358,7 @@
     (deftest-mm test-print-collector-mm-collector-class-2 ()
       "test that output in file is correct for case where the model crashes"
       (test (x y) (z) (z) t 
-	    (check (errors-p (file-string mm_out))))) ;the output file shouldn't exist b/c nothing should have been written to it
+	    (check (string-equal "" (file-string mm_out))))) ;nothing should be in the file b/c the model crashed
     (deftest-mm test-print-collector-mm-collector-class-3 ()
       "test that output in file is correct for case where not all DVs are returned, but some are (model didn't crash)"
       (test (x y) (z1 z2 z3) (z1 z3) nil 
