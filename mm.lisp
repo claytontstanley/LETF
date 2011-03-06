@@ -44,16 +44,12 @@
 		 (mm_fraction_done)
 		 (mm_bold_out)
 		 (mm_errors)
-		 (fresh-results-file)
-		 (fresh-errors-file)
 		 (bad-models-collector))
   (setf mm_out "out.txt")
   (setf mm_in "in.txt")
   (setf mm_fraction_done "mm_fraction_done.txt")
   (setf mm_bold_out "mm_bold_out.txt")
   (setf mm_errors "errors.txt")
-  (setf fresh-results-file t)
-  (setf fresh-errors-file t)
   (setf bad-models-collector (make-instance 'bad-models-class)))
 
 ;initialize the variables
@@ -77,12 +73,10 @@
   (with-slots (cellElements collection collapseHash keys) obj
     (let ((DV-Elements (get-elements keys collection :collapseFns (mapcar (lambda (x) (gethash-ifHash x collapseHash)) keys))))
       (when (notevery #'null (mapcar #'cdr DV-Elements)) ;if all DVs are nil, then the run errored, so don't print this run
-	(with-pandoric (fresh-results-file) #'mods
-	  (with-open-file (out (out obj) :direction :output :if-exists :append :if-does-not-exist :create)
-	    (if fresh-results-file (setf fresh-results-file nil) (format out "~%")) ;print a fresh line
-	      ;print the IVs & DVs, with a tab sandwiched in between them
-	      (format out  "~{~a~}" (mapcar (lambda (x) (if (numberp x) (coerce x 'double-float) x))
-					    (sandwich #\Tab (append (mapcar #'cdr cellElements) (mapcar #'cdr DV-Elements)))))))))))
+	(with-open-file (out (out obj) :direction :output :if-exists :append :if-does-not-exist :create)
+	  ;print the IVs & DVs, with a tab sandwiched in between them, followed by a newline
+	  (format out  "~{~a~}~%" (mapcar (lambda (x) (if (numberp x) (coerce x 'double-float) x))
+					  (sandwich #\Tab (append (mapcar #'cdr cellElements) (mapcar #'cdr DV-Elements))))))))))
 			      
 
 ;keep track of the run object that is currently being executed
@@ -113,20 +107,19 @@
    line2
    ...
    ##########################"
-  (with-pandoric (fresh-errors-file) 'mods
-    (with-open-file (strm (out obj) :direction :output :if-exists :append :if-does-not-exist :create)
-      (if fresh-errors-file (setf fresh-errors-file nil) (format strm "~%")) ;print a fresh line
-      (format strm "##########################~%")
-      (format strm "# Parameters:~%")
-      (with-slots (cellKeys IVHash) *run*
-	(dolist (element (get-elements cellKeys IVHash :eval-val-p nil))
-	  (format strm "#   ~a: ~a~%" (car element) (cdr element))))
-      (format strm "#~%")
-      (if (error-p obj) (format strm "# The error: ~a~%#~%" (error-p obj)))
-      (format strm "# The last ~a lines that were printed by the model before the error:~%" (quot obj))
-      (format strm "~{~a~%~}" (gethash "str" (collection obj)))
-      (format strm "##########################~%")
-      (incf (num-runs-errored (get-pandoric 'mods 'bad-models-collector)))))) ;remember that a point has crashed
+  (with-open-file (strm (out obj) :direction :output :if-exists :append :if-does-not-exist :create)
+    (format strm "##########################~%")
+    (format strm "# Parameters:~%")
+    (with-slots (cellKeys IVHash) *run*
+      (dolist (element (get-elements cellKeys IVHash :eval-val-p nil))
+	(format strm "#   ~a: ~a~%" (car element) (cdr element))))
+    (format strm "#~%")
+    (if (error-p obj) (format strm "# The error: ~a~%#~%" (error-p obj)))
+    (format strm "# The last ~a lines that were printed by the model before the error:~%" (quot obj))
+    (format strm "~{~a~%~}" (gethash "str" (collection obj)))
+    (format strm "##########################~%")
+    (format strm "~%")
+    (incf (num-runs-errored (get-pandoric 'mods 'bad-models-collector))))) ;remember that a point has crashed
   
 (defclass mm-run-collector-class (run-collector-class)
   ((out :accessor out :initarg :out :initform (get-pandoric 'mods 'mm_fraction_done)
