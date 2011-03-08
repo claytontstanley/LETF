@@ -94,30 +94,22 @@
 (defmethod print-collector ((obj mm-process-output-str-class))
   "method will be called if the model has died; will print the last lines outputted by the model (the model's last dying comments) to stderr
    an example output looks like this:
-   ##########################
-   # Parameters:
-   #   FIRSTIV: FIRSTIV-val
-   #   SECONDIV: SECONDIV-val
+   ############################
+   # x: 1
+   # y: 2
+   #
+   # Error message: some kind of exception message caught by SBCL
 
-   # The error: I am a model; I crashed because of a divide by zero error
-
-   # The last 10 lines that were printed by the model before the error:
-   line0
-   line1
-   line2
-   ...
-   ##########################"
+   <last 200 lines of output>"
   (with-open-file (strm (out obj) :direction :output :if-exists :append :if-does-not-exist :create)
     (format strm "##########################~%")
-    (format strm "# Parameters:~%")
     (with-slots (cellKeys IVHash) *run*
       (dolist (element (get-elements cellKeys IVHash :eval-val-p nil))
-	(format strm "#   ~a: ~a~%" (car element) (cdr element))))
+	(format strm "# ~a: ~a~%" (car element) (cdr element))))
     (format strm "#~%")
-    (if (error-p obj) (format strm "# The error: ~a~%#~%" (error-p obj)))
-    (format strm "# The last ~a lines that were printed by the model before the error:~%" (quot obj))
+    (if (error-p obj) (format strm "# Error message: ~a~%" (error-p obj)))
+    (format strm "~%")
     (format strm "~{~a~%~}" (gethash "str" (collection obj)))
-    (format strm "##########################~%")
     (format strm "~%")
     (incf (num-runs-errored (get-pandoric 'mods 'bad-models-collector))))) ;remember that a point has crashed
   

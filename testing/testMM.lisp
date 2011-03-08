@@ -316,9 +316,6 @@
 		      ;the str must contain all "IV: 'IV-val" 's
 		      (dolist (IV (mapcar #'string ',IVs))
 			(check (search (format nil "~a: '~a-val" IV IV) str :test #'string-equal)))
-		      ;the str must contain a header saying that the last N model lines follows
-		      (check (search (format nil "The last ~a lines that were printed by the model before the error" ,numModelLinesDisplayed)
-				     str :test #'string-equal))
 		      ;the str must contain all last numModelLinesDisplayed model lines
 		      (loop for i from (- ,numModelLinesPrinted 1) downto (- ,numModelLinesPrinted ,numModelLinesDisplayed) do
 			   (check (search (format nil "line~a" i) str :test #'string-equal)))
