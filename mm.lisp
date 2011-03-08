@@ -300,7 +300,6 @@
 	(expect (equal (length nums) 3) (html-color "not 3 numbers in line IV=~a") line)
 	(expect (< (first nums) (third nums)) (html-color "starting number ~a not less than ending number ~a in line IV=~a") (first nums) (third nums) line)
 	(expect (> (second nums) 0) (html-color "stepsize ~a not greater than zero in line IV=~a") (second nums) line)
-	(format t "nums= ~a~%" nums)
 	(multiple-value-bind (q r) (fround (- (third nums) (first nums)) (second nums))
 	  (declare (ignore q))
 	  (expect (< (abs r) .000001) (html-color "(~a-~a)/~a not a whole number in line IV=~a") (third nums) (first nums) (second nums) line))))
