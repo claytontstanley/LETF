@@ -1551,7 +1551,7 @@
 	(format t "~a " (cdr (nth i (cellElements obj))))))
   (dolist (key (keys obj))
     (aif (cdr (get-element key (collection obj) :collapseFns (gethash-ifHash key (collapseHash obj))))
-	 (format t "~a: ~a~%" key (if (numberp it) (coerce it 'double-float) it)))))
+	 (format t "~a: ~a~%" key (if (realp it) (coerce it 'double-float) it)))))
 
 (defclass hpc-process-output-str-class (process-output-str-class) 
   ()

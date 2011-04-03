@@ -1,12 +1,8 @@
 
-all: unitTest
 
 cover:
 	cd ..; make compile
 	sbcl --noinform --noprint --disable-debugger --load letf.lisp nil cover.txt nil
-
-unitTest:
-	sbcl --noinform --noprint --disable-debugger --load letf.lisp nil testMM.txt nil
 
 MM:
 	cd ../../2009-12-15-present\ wrapping\ the\ wrapper/MindModeling/working\ directory; make
@@ -27,4 +23,4 @@ u3:
 	#should output mm_bold_out.txt and wc to terminal
 	cd unit3; make; ls | grep "mm_bold_out.txt"; wc mm_bold_out.txt
 
-deep: MM HPC C java string unitTest u3
+deep: MM HPC C java string u3
