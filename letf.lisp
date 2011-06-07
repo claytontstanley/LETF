@@ -440,13 +440,14 @@
   "asserts that l1 and l2 are equal in length"
   `(expect (equal (length ,l1) (length ,l2)) "length ~d not equal to length ~d" (length ,l1) (length ,l2)))
 
-(defun median (lst &key (throwOutYerNils nil))
+(defun median (lst% &key (throwOutYerNils nil))
   "returns the median of lst, throwing out the 'nils' in list if flag is true"
-  (mklst lst)
-  (if throwOutYerNils (setf lst (throwOutYerNils lst)))
-  (if lst
-      (let ((len (length lst))
-	    (sortedList (sort lst #'<)))
+  (mklst lst%)
+  (if throwOutYerNils (setf lst% (throwOutYerNils lst%)))
+  (if lst%
+      (let* ((lst (copy-list lst%))
+	     (len (length lst))
+	     (sortedList (sort lst #'<)))
 	(if (evenp len)
 	    (/ (+ (nth (- (/ len 2) 1) sortedList)
 		  (nth (/ len 2) sortedList))

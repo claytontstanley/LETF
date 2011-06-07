@@ -1,0 +1,3 @@
+file2load=unitTestFramework.lisp
+file2load=testLetf.lisp
+albumbuilder=#'test-letf

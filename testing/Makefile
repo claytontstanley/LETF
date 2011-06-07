@@ -1,4 +1,5 @@
-
+unit:
+	sbcl --noinform --noprint --disable-debugger --load letf.lisp nil testLetf.txt nil
 
 cover:
 	cd ..; make compile
