@@ -1,0 +1,100 @@
+#A sample configuration file: A model with two IVs & 5 DVs. All additional options will be added to this base config file.
+IV=noise
+IV=speed
+DV=rt1
+DV=rt2
+DV=rt3
+DV=rt4
+DV=rt5
+
+#Add this line to run the model N times for each IV combination, and then collapse
+collapseQuota=20
+
+This will cause the entry function to be called 20 times, and then the mean for each DV will be returned
+
+#To use a collapsing function other than the mean:
+collapseFn=#'median
+
+#To save all of the runs (instead of collapsing), but run each IV combination N times
+iterations=20
+
+#To declare constants:
+constant=pi
+
+Each constant must be listed in the work file & will be sent to the entry function along with the values for each parameter
+
+#To define an entry function other than 'run-model:
+modelProgram= #'run-mm-model
+
+#To define a non-lisp entry function:
+modelProgram= java --load model.java
+
+#To take the raw values from a work file and transform them, and then pass those values to the entry function (instead of the raw IV values):
+noise-processed= (dampen [noise])
+speed-processed= (dampen [speed])
+input= noise-processed
+input= speed-processed
+
+If no input= lines are defined, then a 1:1 mapping between the lines in the work file & the IVs is assumed, and IV names/values are passed to the entry function.
+
+#To take the raw DVs outputted by the model, and make additional DVs:
+observedRTs= (getObservedRTs)
+modelRTs= (list [rt1 rt2 rt3 rt4 rt5])
+correlRTs= (correl [observedRTs] [modelRTs])
+RMSERTs= (RMSE [observedRTs] [modelRTs])
+DV=correlRTs
+DV=RMSERTs
+
+#Note that the 'getObservedRTs function must be defined in an additional file that is loaded, which returns the 5 observed RTs
+
+#To load additional lisp files:
+file2load= extras.lisp
+
+#To run a function before any of the lines in the work file are processed
+statusPrinter=#'print-session
+statusPrinter=(lambda (obj) (declare (ignore obj)) (runPreTasks))
+
+The 'print-session function is already defined, & it prints information about what LETF read in from the config file. Useful for debugging. The second statusPrinter just shows that functions can be defined in-line, if it's easier to do so.
+
+#For lisp models, to change the entry function from default key-value pair to hash table:
+entryFnType='hash
+
+#For non-lisp models, to change the number of lines in the work file that will be executed for each spawn of the model process:
+runsPerProcess= 20
+
+In this case, each time the java model (for example) is launched, it will be passed 20 IV configurations. These configurations are sent to the standard input stream for the model process. Each config is separated by a newline.
+
+#For non-lisp models, to change the format of each config line sent on the standard input stream:
+IVStringFn=#'write-comma-delimited
+
+In this case, the modeler would define a 'write-comma-delimited function, and each IV line sent to the model process would have IV values separated by commas. The default function is 'defaultIVStringFN is already defined, which prints tab-delimited IV values
+
+#To collapse DVs differently, you define the collapsing function for each DV independently
+collapseFn= mean ; DV=correlRTs RMSERTs
+collapseFn= median ; DV=rt1 rt2 rt3 rt4 rt5
+
+
+# Few notes:
+The total number of calls to the entry function (or lines sent on stdin to the launched model process) is # lines in work file * iterations * collapseQuota
+
+The places where you see # marks for functions mean that lisp is evaling the text, so you can define functions in-line if it's easier or makes more sense to do so
+
+Brackets [] are used to enclose variable names that either [1] have values in the config file, or [2] will return values after calling the entry function.
+
+The program is expandable by loading your own .lisp file that has extra utility functions, and then calling those functions within various config options. For example, if a special central tendency function is desired, the modeler can define this function in extras.lisp (for example), and then tell LETF to load that file by writing file2load=extras.lisp. This will mean that any function inside of the extras.lisp file is available to call inside of the configuration file.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
