@@ -1,9 +1,16 @@
+DISTRO = SBCL
+ifeq (${DISTRO},SBCL)
+	CFLAGS = sbcl --noinform --noprint --disable-debugger --load letf.lisp
+else
+	CFLAGS = ccl -b -l letf.lisp --
+endif
+
 unit:
-	sbcl --noinform --noprint --disable-debugger --load letf.lisp nil testLetf.txt nil
+	${CFLAGS} nil testLetf.txt nil
 
 cover:
 	cd ..; make compile
-	sbcl --noinform --noprint --disable-debugger --load letf.lisp nil cover.txt nil
+	${CFLAGS} nil cover.txt nil
 
 MM:
 	cd ../../2009-12-15-present\ wrapping\ the\ wrapper/MindModeling/working\ directory; make

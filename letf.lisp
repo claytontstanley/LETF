@@ -255,7 +255,8 @@
      (cond (*clean-exit-on-error*
 	    (format *error-output* ,datum ,@arguments)
 	    (format *error-output* "~%")
-	    (quit :unix-status 1))
+	    #+SBCL (quit :unix-status 1)
+	    #+CCL (quit 1))
 	   (t
 	    (error ,datum ,@arguments)))))
 
