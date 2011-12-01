@@ -757,31 +757,56 @@
 			 out)))))))
       (make-sentence (flatten out)))))
   
-;returns a list of RHS's of lines that start with 'key'
-;where 'key' is any key in 'keys'
-;the list will be ordered from left to right in the string
-;keeps track of the line numbers for all of the lines that have
-;been returned from calling this function
-;you can access the line numbers using the 'with-pandoric macro
-(defpun get-matching-lines (str keys) ((traversed))
-  (mklst keys)
-  (let ((words) (out) (line) (lines))
-    (setf lines (if (consp str) str (get-lines str)))
-    (dotimes (i (length lines) (reverse out))
-      (setf line (nth i lines))
-      (setf words (if (consp line) line (get-words line)))
-      (if words
-	  (awhen (block index=
-		   (dolist (key keys nil)
-		     (if (string-equal key (subseq (first words) 0 (min (length (first words)) (length key))))
-			 (return-from index= (length key)))))
-	    (push-to-end i traversed)
-	    (push 
-	     (bracket-expand 
-	      (string-trim 
-	       (list #\Space #\tab) 
-	       (subseq (make-sentence line) it (length (make-sentence line))))) 
-	     out))))))
+(defmacro process-matching-lines (&body body)
+  "Returns a function that can be used to do some sort of processing on lines in str matched by keys
+  See the two functions below for examples on how currying is used to define different types of processing
+  that can be done on matched lines"
+  `(lambda (str keys)
+     (mklst keys)
+     (let ((words) (out) (line) (lines))
+       (setf lines (if (consp str) str (get-lines str)))
+       (dotimes (i (length lines) out)
+	 (setf line (nth i lines))
+	 (setf words (if (consp line) line (get-words line)))
+	 (if words
+	   (awhen (block index=
+			 (dolist (key keys nil)
+			   (if (string-equal key (subseq (first words) 0 (min (length (first words)) (length key))))
+			     (return-from index= (length key)))))
+		  (let ((RHS
+			  (bracket-expand 
+			    (string-trim 
+			      (list #\Space #\tab) 
+			      (subseq (make-sentence line) it (length (make-sentence line)))))))
+		    ;Section where currying is used to change the behavior of the function that will be returned
+		    ,(if body 
+		       `(progn ,@body)
+		       `(push-to-end RHS out))))))))) ;default behavior is to push the RHS match onto out, and return out
+
+;Keep track of the line numbers for all of the lines that have been
+;returned from calling the functions below
+;Do this by closing over the traversed variable, and making the two functions pandoric
+(let ((traversed))
+
+  (defpun get-matching-lines (str keys) (traversed)
+	  "Returns a list of RHS's of lines that start with 'key'
+	  where 'key' is any key in 'keys'
+	  The list will be ordered from letf to right in the string"
+	  (funcall (process-matching-lines
+		     (push-to-end i traversed)
+		     (push-to-end RHS out))
+		   str keys))
+
+  (defpun get-matching-lines-returning-linenum-lhs-rhs (str keys) (traversed)
+	  "Similar to the function above, except this one returns a few extra items for each match
+	  Returns a list of (linenum LHS RHS) of lines that start with 'key'"
+	  (funcall (process-matching-lines
+		     (push-to-end i traversed)
+		     (push-to-end (list i
+					(subseq (make-sentence line) 0 it)
+					RHS)
+				  out))
+		   str keys)))
 
 (defun get-first-word-from-matching-lines (str keys)
   "gets the RHS from lines in string 'str' where the LHS matches a key in 'keys'" 
@@ -1573,12 +1598,25 @@
    :process-output-str-instance (make-instance 'hpc-process-output-str-class)))
 ;////////////////////////////////////////////
 
+(defun load-and-eval-commands ()
+  (with-pandoric (platform configFileWdLST) #'args
+		 ;run the pre-processing commands
+		 (mapc (lambda (str) (eval-object str)) (get-matching-lines configFileWdLST "runBeforeLoad="))
+
+		 ;load the extra lisp files, and run any processing commands weaved within the loads
+		 (loop for (linenum lhs rhs) in (get-matching-lines-returning-linenum-lhs-rhs configFileWdLST '("runWithinLoad=" "file2Load="))
+		       do (cond ((string-equal lhs "runWithinLoad=") 
+				 (eval-object rhs))
+				((string-equal lhs "file2Load=") 
+				 (load-and-loaded (replace-all rhs "$1" platform :test #'string-equal)))
+				(t (expect nil "function not working as expected"))))
+
+		 ;run the post-processing commands
+		 (mapc (lambda (str) (eval-object str)) (get-matching-lines configFileWdLST "runAfterLoad="))))
+
+(load-and-eval-commands)
+
 (with-pandoric (platform configFileWdLST) #'args
-  ;run the pre-processing commands
-  (mapc (lambda (str) (eval-object str)) (get-matching-lines configFileWdLST "runBeforeLoad="))
-  ;load the extra lisp files
-  (dolist (line (get-matching-lines configFileWdLST "file2load="))
-    (load-and-loaded (replace-all line "$1" platform :test #'string-equal)))
   ;run it!
   (aif (get-matching-line configFileWdLST "albumBuilder=")
        (funcall (eval (read-from-string it)))
