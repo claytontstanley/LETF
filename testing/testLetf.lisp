@@ -18,6 +18,9 @@
 	   (check (equal (length (copy-list lst)) 5))))
 
 (deftest test-get-matching-lines ()
+	 "Tests that get-matching-lines returns the correct values when parsing the testStr config file
+	 LHS is the str to look for in the config file
+	 RHS is the list of all matches to LHS in the config file"
 	 (let ((testStr (format nil "aLine= aLineVal~%bLine=bLineVal~%aLine= ALineVal2")))
 	   (loop for (LHS RHS) in (list '("aLine=" ("aLineVal" "aLineVal2")) ;multiple matched lines; single matcher
 					'("bLine=" ("bLineVal")) ;single matched line; single matcher
@@ -28,21 +31,33 @@
 		 do (check (equalp (get-matching-lines testStr LHS)
 				   RHS)))))
 
-(deftest test-get-matching-lines-returning-linenum-lhs-rhs ()
+(deftest test-get-matching-lines-full ()
+	 "Analogous to test-get-matching-lines, except this one checks that the additional information
+	 for each match is included (i.e., the LHS for get-matching-lines-full)"
 	 (let ((testStr (format nil "aLine=aLineVal~%bLine=bLineVal~%aLine=aLineVal2")))
-	   (loop for (LHS return-val) in (list '("aLine=" ( (0 "aline=" "alineVal") (2 "aline=" "alineVal2") ))
-					       '("bLine=" ( (1 "bline=" "blineVal") ))
-					       '( ("aLine=" "bLine=") ( (0 "aline=" "alineVal") (1 "bline=" "blineVal") (2 "aline=" "alineVal2") ))
+	   (loop for (LHS return-val) in (list '("aLine=" ( ("aline=" "alineVal") ("aline=" "alineVal2") ))
+					       '("bLine=" ( ("bline=" "blineVal") ))
+					       '( ("aLine=" "bLine=") ( ("aline=" "alineVal") ("bline=" "blineVal") ("aline=" "alineVal2") ))
 					       )
-		 do (check (equalp (get-matching-lines-returning-linenum-lhs-rhs testStr LHS)
+		 do (check (equalp (get-matching-lines-full testStr LHS)
 				   return-val)))))
 
 (deftest test-load-and-eval-commands ()
+	 "Tests that runBeforeLoad, file2load, runWithinLoad, and runAfterLoad commands in the config file get parsed and processed in the correct order"
 	 (let ((testConfigFile (format nil "runBeforeLoad=(print 1)~%file2load=2~%runWithinLoad=(print 3)~%file2load=4~%runAfterLoad=(print 5)"))
 	       (configFilePath (get-pandoric #'args 'configFilePath)))
+
+	   ;Load-and-eval-commands gets the configfile from the pandoric function #'args
+	   ;In order to mock the config file with testConfigFile here, I set the path to the config file to the actual text in the mocked config file,
+	   ;And then mock the file-string function , by having it return itself
 	   (setf (get-pandoric #'args 'configFilePath) testConfigFile)
 	   (with-shadow (file-string #'identity)
 			(args))
+
+	   ;For the check, any call in the config file for file2load will try to load a file (by default). So I mock the loading function (load-and-loaded),
+	   ;and have it print the name of the file (instead of loading the file). Looking above, the name of the file is a number. The idea here is that if
+	   ;load and eval commands is working properly, the numbers 1-5 will be printed to stdout (in that order). So then I wrap what is
+	   ;outputted to stdout (should be 1 2 3 4 5) within a list, use the lisp reader to eval it, and then compare it to the list (1 2 3 4 5)
 	   (check
 	     (equal
 	       (eval (read-from-string
@@ -52,6 +67,8 @@
 									       (format t "~a " str)))
 							    (load-and-eval-commands))))))
 	       (list 1 2 3 4 5)))
+
+	   ;Return the args pandoric function back to it's default state
 	   (setf (get-pandoric #'args 'configFilePath) configFilePath)
 	   (args)))
 

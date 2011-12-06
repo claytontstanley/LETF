@@ -791,19 +791,18 @@
   (defpun get-matching-lines (str keys) (traversed)
 	  "Returns a list of RHS's of lines that start with 'key'
 	  where 'key' is any key in 'keys'
-	  The list will be ordered from letf to right in the string"
+	  The list will be ordered from left to right in the string"
 	  (funcall (process-matching-lines
 		     (push-to-end i traversed)
 		     (push-to-end RHS out))
 		   str keys))
 
-  (defpun get-matching-lines-returning-linenum-lhs-rhs (str keys) (traversed)
+  (defpun get-matching-lines-full (str keys) (traversed)
 	  "Similar to the function above, except this one returns a few extra items for each match
 	  Returns a list of (linenum LHS RHS) of lines that start with 'key'"
 	  (funcall (process-matching-lines
 		     (push-to-end i traversed)
-		     (push-to-end (list i
-					(subseq (make-sentence line) 0 it)
+		     (push-to-end (list (subseq (make-sentence line) 0 it)
 					RHS)
 				  out))
 		   str keys)))
@@ -1604,7 +1603,7 @@
 		 (mapc (lambda (str) (eval-object str)) (get-matching-lines configFileWdLST "runBeforeLoad="))
 
 		 ;load the extra lisp files, and run any processing commands weaved within the loads
-		 (loop for (linenum lhs rhs) in (get-matching-lines-returning-linenum-lhs-rhs configFileWdLST '("runWithinLoad=" "file2Load="))
+		 (loop for (lhs rhs) in (get-matching-lines-full configFileWdLST '("runWithinLoad=" "file2Load="))
 		       do (cond ((string-equal lhs "runWithinLoad=") 
 				 (eval-object rhs))
 				((string-equal lhs "file2Load=") 
