@@ -1431,27 +1431,39 @@
     (expect (not leftovers) "should not be any leftovers after runProcess object finishes"))
   (sleep (sleepTime obj)))
 
+(defmethod set-and-launch-process ((obj number5-runProcess-class) input)
+  "Launch the process"
+  (setf (process obj)
+	(run-program 
+	 (first (modelProgram obj)) 
+	 (rest (modelProgram obj))
+	 :input (make-string-input-stream input)
+	 :output :stream 
+	 :error :output 
+	 :wait nil))
+  (expect (equal (process-status (process obj)) :running) "model process failed to start correctly"))
+
+(defmethod get-leftovers ((obj number5-runProcess-class))
+  "Default behavior is to not use (or keep track of) any cached results"
+  ())
+
+(defmethod get-input-string ((obj number5-runProcess-class) leftovers)
+  "Returns the input-string to use when launching the process; any cached results are not included in input string"
+  (with-output-to-string (out)
+    (dolist (run (runs obj))
+      (unless (pop leftovers)
+	(write-string (funcall (IVStringFn (session (runProcess run))) run) out)
+	(write-string (fast-concatenate (string #\Return) (string #\LineFeed)) out)))))
+
 (defmethod wrapper-execute ((obj number5-runProcess-class) &optional (process nil) (appetizers nil))
   "execute the runProcess-class object, if we're not short circuiting"
   (expect (not appetizers) "should not have any appetizers here; have ~a" appetizers)
   (expect (not process) "should not have a process here; have ~a" process)
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session obj)))
-  ;launch the process
-  (setf (process obj)
-	(run-program 
-	 (first (modelProgram obj)) 
-	 (rest (modelProgram obj))
-	 :input (make-string-input-stream  
-		 (with-output-to-string (out)
-		   (dolist (run (runs obj))
-		     (write-string (funcall (IVStringFn (session (runProcess run))) run) out)
-		     (write-string (fast-concatenate (string #\Return) (string #\LineFeed)) out))))
-	 :output :stream 
-	 :error :output 
-	 :wait nil)) 
-  (expect (equal (process-status (process obj)) :running) "model process failed to start correctly")
-  ;then execute each run
-  (let ((leftovers))
+  (let* ((leftovers (get-leftovers obj))
+	 (input-string (get-input-string obj leftovers)))
+    (unless (string-equal input-string "")
+      (set-and-launch-process obj input-string))
     (dolist (run (runs obj))
       (setf leftovers (wrapper-execute run (process obj) leftovers)))
     (expect (not leftovers) "should not be any leftovers after runProcess object finishes"))
