@@ -32,3 +32,10 @@ u3:
 	cd unit3; make; ls | grep "mm_bold_out.txt"; wc mm_bold_out.txt
 
 deep: MM HPC C java string u3
+
+regression:
+	git co HEAD^
+	make deep > /tmp/out1.txt 2>&1
+	git co master
+	make deep > /tmp/out2.txt 2>&1
+	diff /tmp/out1.txt /tmp/out2.txt

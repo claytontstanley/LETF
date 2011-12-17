@@ -1443,15 +1443,15 @@
 	 :wait nil))
   (expect (equal (process-status (process obj)) :running) "model process failed to start correctly"))
 
-(defmethod get-leftovers ((obj number5-runProcess-class))
+(defmethod get-appetizers ((obj number5-runProcess-class))
   "Default behavior is to not use (or keep track of) any cached results"
   ())
 
-(defmethod get-input-string ((obj number5-runProcess-class) leftovers)
+(defmethod get-input-string ((obj number5-runProcess-class) appetizers)
   "Returns the input-string to use when launching the process; any cached results are not included in input string"
   (with-output-to-string (out)
     (dolist (run (runs obj))
-      (unless (pop leftovers)
+      (unless (pop appetizers)
 	(write-string (funcall (IVStringFn (session (runProcess run))) run) out)
 	(write-string (fast-concatenate (string #\Return) (string #\LineFeed)) out)))))
 
@@ -1460,13 +1460,13 @@
   (expect (not appetizers) "should not have any appetizers here; have ~a" appetizers)
   (expect (not process) "should not have a process here; have ~a" process)
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session obj)))
-  (let* ((leftovers (get-leftovers obj))
-	 (input-string (get-input-string obj leftovers)))
+  (let* ((appetizers (get-appetizers obj))
+	 (input-string (get-input-string obj appetizers)))
     (unless (string-equal input-string "")
       (set-and-launch-process obj input-string))
     (dolist (run (runs obj))
-      (setf leftovers (wrapper-execute run (process obj) leftovers)))
-    (expect (not leftovers) "should not be any leftovers after runProcess object finishes"))
+      (setf appetizers (wrapper-execute run (process obj) appetizers)))
+    (expect (not appetizers) "should not be any leftover results after runProcess object finishes"))
   (sleep (sleepTime obj))
   ;a few assertions to make sure everything finished cleanly
   (expect (not (listen (process-output (process obj))))
