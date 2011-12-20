@@ -1431,7 +1431,7 @@
     (expect (not leftovers) "should not be any leftovers after runProcess object finishes"))
   (sleep (sleepTime obj)))
 
-(defmethod set-and-launch-process ((obj number5-runProcess-class) input)
+(defmethod set-process ((obj number5-runProcess-class) input)
   "Launch the process"
   (setf (process obj)
 	(run-program 
@@ -1443,27 +1443,22 @@
 	 :wait nil))
   (expect (equal (process-status (process obj)) :running) "model process failed to start correctly"))
 
-(defmethod get-appetizers ((obj number5-runProcess-class))
-  "Default behavior is to not use (or keep track of) any cached results"
-  ())
+(defmethod get-input-line ((obj number5-run-class))
+  (funcall (IVStringFn (session (runProcess obj))) obj))
 
-(defmethod get-input-string ((obj number5-runProcess-class) appetizers)
-  "Returns the input-string to use when launching the process; any cached results are not included in input string"
-  (with-output-to-string (out)
-    (dolist (run (runs obj))
-      (unless (pop appetizers)
-	(write-string (funcall (IVStringFn (session (runProcess run))) run) out)
-	(write-string (fast-concatenate (string #\Return) (string #\LineFeed)) out)))))
+(defmethod get-process-inputs ((obj number5-runProcess-class))
+  "Returns two values: [1] Any appetizers (cached-results) and [2] the input string to send to the launched process' stdin"
+  (values nil (format nil "~{~a~%~}" (mapcar #'get-input-line (runs obj)))))
 
 (defmethod wrapper-execute ((obj number5-runProcess-class) &optional (process nil) (appetizers nil))
   "execute the runProcess-class object, if we're not short circuiting"
   (expect (not appetizers) "should not have any appetizers here; have ~a" appetizers)
   (expect (not process) "should not have a process here; have ~a" process)
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session obj)))
-  (let* ((appetizers (get-appetizers obj))
-	 (input-string (get-input-string obj appetizers)))
-    (unless (string-equal input-string "")
-      (set-and-launch-process obj input-string))
+  (let ((appetizers) (input-string))
+    (multiple-value-setq (appetizers input-string)
+      (get-process-inputs obj))
+    (set-process obj input-string)
     (dolist (run (runs obj))
       (setf appetizers (wrapper-execute run (process obj) appetizers)))
     (expect (not appetizers) "should not be any leftover results after runProcess object finishes"))
