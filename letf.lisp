@@ -36,7 +36,7 @@
 (defmacro awhen (test-form &body body)
   "anaphoric version of when; 'it' is the anaphor"
   `(aif ,test-form
-        (progn ,@body)))
+     (progn ,@body)))
 
 (defmacro alambda (parms &body body)
   "Graham's anaphoric version of lambda; 'self' is the anaphor"
@@ -81,11 +81,11 @@
          ,doc
          ,@decls
          (let ,(mapcar
-                 (lambda (s)
-                   `(,s (gensym ,(subseq
-                                   (symbol-name s)
-                                   2))))
-                 syms)
+                (lambda (s)
+                  `(,s (gensym ,(subseq
+                                  (symbol-name s)
+                                  2))))
+                syms)
            ,@forms)))))
 
 (defun o!-symbol-p (s)
@@ -256,7 +256,7 @@
              #+SBCL (quit :unix-status 1)
              #+CCL (quit 1))
            (t
-             (error ,datum ,@arguments)))))
+            (error ,datum ,@arguments)))))
 
 (defmacro! fast-concatenate (&rest lst)
   "equivalent to writing (concatenate 'string ...), but ~5x faster"
@@ -608,7 +608,7 @@
         ((symbolp lst)
          (fast-concatenate "'" (string lst)))
         (t
-          (format nil "~a" (coerce lst 'double-float)))))
+         (format nil "~a" (coerce lst 'double-float)))))
 
 (defmacro remap-string (&body body)
   "expands the string expression in body, by inserting all hash keynames written inside brackets [] in body to their values"
@@ -653,17 +653,17 @@
   returns the list of keys that aren't present"
   (mklst keys)
   (let* ((words) (str) 
-                 (traversed (make-hash-table :test #'equalp))
-                 (fun (remap-string
-                        (when (not (key-present word traversed))
-                          (if (equal (key-present word hash) bool) (push-to-end word words))		   
-                          (setf (gethash word traversed)
-                                (if (key-present word hash)
-                                  (self (gethash word hash) hash
-                                        :collapseFn collapseFn
-                                        :inside-brackets nil :key word)
-                                  word)))
-                        (push-to-end (gethash word traversed) out))))
+         (traversed (make-hash-table :test #'equalp))
+         (fun (remap-string
+                (when (not (key-present word traversed))
+                  (if (equal (key-present word hash) bool) (push-to-end word words))		   
+                  (setf (gethash word traversed)
+                        (if (key-present word hash)
+                          (self (gethash word hash) hash
+                                :collapseFn collapseFn
+                                :inside-brackets nil :key word)
+                          word)))
+                (push-to-end (gethash word traversed) out))))
     (dolist (key keys)
       (push-to-end 
         (funcall fun (fast-concatenate "[" key "]") hash :collapseFn collapseFn) 
@@ -1213,29 +1213,29 @@
                                       :entryFnType entryFnType)))
     `(progn
        (let ((session) (runProcess) (line-index) (count) (iteration) (iterations)
-                       (DVHash) (IVHash) (DVKeys) (IVKeys) (modelProgram) (cellKeys) (mergedHash)
-                       (quota) (collector) (quot) (collapseHash) (work) (session-collector) (entryFnType) (runsPerProcess) (short-circuit-p))
+             (DVHash) (IVHash) (DVKeys) (IVKeys) (modelProgram) (cellKeys) (mergedHash)
+             (quota) (collector) (quot) (collapseHash) (work) (session-collector) (entryFnType) (runsPerProcess) (short-circuit-p))
          (with-pandoric (platform configFileStr configFileLnLST configFileWDLST) #'args
            (setf work ,work-instance)
            (setf runsPerProcess (aif (get-matching-line configFileWdLST "runsPerProcess=")
-                                     (read-from-string (get-word it))
-                                     1))
+                                  (read-from-string (get-word it))
+                                  1))
            (setf session ,session-instance)
            (setf DVHash (make-hash-table :test #'equalp))
            (add-dependent-elements DVHash configFileWdLST (list "DV=" "SDV="))
            (eval-hash DVHash)
            (setf DVKeys (get-first-word-from-matching-lines configFileWdLST (list "dv=" "sdv="))
                  IVKeys (aif (get-first-word-from-matching-lines configFileWdLST "input=")
-                             it
-                             (get-first-word-from-matching-lines configFileWdLST (list "constant=" "iv=")))
+                          it
+                          (get-first-word-from-matching-lines configFileWdLST (list "constant=" "iv=")))
                  cellKeys (get-first-word-from-matching-lines configFileWdLST (list "constant=" "iv=")))
            (setf collapseHash (get-collapseHash DVKeys DVHash configFileWdLST "#'mean"))
            (setf quota (aif (get-matching-line configFileWdLST "collapseQuota=")
-                            (eval (read-from-string (get-word it)))
-                            1))
+                         (eval (read-from-string (get-word it)))
+                         1))
            (setf modelProgram (aif (get-matching-line configFileLnLST "modelProgram=")
-                                   (lump-brackets (replace-all it "$1" platform :test #'string-equal) :desigs (list #\" #\") :include-brackets nil)
-                                   (lump-brackets "'run-model" :desigs (list #\" #\") :include-brackets nil)))
+                                (lump-brackets (replace-all it "$1" platform :test #'string-equal) :desigs (list #\" #\") :include-brackets nil)
+                                (lump-brackets "'run-model" :desigs (list #\" #\") :include-brackets nil)))
            (setf short-circuit-p (let ((it (subseq (first modelProgram) 0 1)))
                                    (or (equal it "#") (equal it "'") (equal it "("))))
            (if short-circuit-p
@@ -1244,18 +1244,18 @@
            (setf (IVStringFn session)
                  (if (not short-circuit-p)
                    (aif (get-matching-line configFileWdLST "IVStringFn=")
-                        (symbol-function-safe (eval (read-from-string it)))
-                        #'defaultIVStringFn)))
+                     (symbol-function-safe (eval (read-from-string it)))
+                     #'defaultIVStringFn)))
            (setf entryFnType (if short-circuit-p
                                (aif (get-matching-line configFileWdLST "entryFnType=")
-                                    (read-from-string (get-word it))
-                                    'keys)
+                                 (read-from-string (get-word it))
+                                 'keys)
                                'process))
            (expect (member entryFnType (if short-circuit-p (list 'keys 'hash) (list 'process))) "invalid entryFnType ~a" entryFnType)
            (setf runProcess ,run-process-instance)
            (setf iterations (aif (get-matching-line configFileWdLST "iterations=")
-                                 (eval (read-from-string (get-word it)))
-                                 1)	
+                              (eval (read-from-string (get-word it)))
+                              1)	
                  count 0
                  line-index -1)
            (setf session-collector ,session-collector-instance)
@@ -1579,7 +1579,7 @@
       (format t "~a " (cdr (nth i (cellElements obj))))))
   (dolist (key (keys obj))
     (aif (cdr (get-element key (collection obj) :collapseFns (gethash-ifHash key (collapseHash obj))))
-         (format t "~a: ~a~%" key (if (realp it) (coerce it 'double-float) it)))))
+      (format t "~a: ~a~%" key (if (realp it) (coerce it 'double-float) it)))))
 
 (defclass hpc-process-output-str-class (process-output-str-class) 
   ()
@@ -1618,12 +1618,12 @@
 (with-pandoric (platform configFileWdLST) #'args
   ;run it!
   (aif (get-matching-line configFileWdLST "albumBuilder=")
-       (funcall (eval (read-from-string it)))
-       (wrapper-execute
-         (funcall 
-           (eval 
-             (read-from-string 
-               (aif (get-matching-line configFileWdLST "sessionBuilder=")  it "#'build-hpc-session")))))))
+    (funcall (eval (read-from-string it)))
+    (wrapper-execute
+      (funcall 
+        (eval 
+          (read-from-string 
+            (aif (get-matching-line configFileWdLST "sessionBuilder=")  it "#'build-hpc-session")))))))
 ;kill it!	    
 (quit)
 
