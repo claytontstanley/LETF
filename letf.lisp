@@ -1080,6 +1080,42 @@
   ()
   (:documentation "class for a single run, if short circuiting"))
 
+
+(defclass process-class ()
+  ((process :accessor process :initarg :process :initform nil)))
+
+(defmethod p-status ((obj process-class))
+  (funcall
+    #+CCL #'external-process-status
+    #-CCL #'process-status 
+    (process obj)))
+
+(defmethod p-output ((obj process-class))
+  (funcall
+    #+CCL #'external-process-output-stream
+    #-CCL #'process-output 
+    (process obj)))
+
+(defmethod p-exit-code ((obj process-class))
+  (funcall
+    #+CCL #'external-process-status
+    #-CCL #'process-exit-code 
+    (process obj)))
+
+(defmethod get-process ((obj number5-runProcess-class) input)
+  (let ((process (make-instance 'process-class)))
+    ;Launch the process
+    (setf (process process)
+          (run-program 
+            (first (modelProgram obj)) 
+            (rest (modelProgram obj))
+            :input (make-string-input-stream input)
+            :output :stream 
+            :error :output 
+            :wait nil))
+    (expect (equal (p-status process) :running) "model process failed to start correctly")
+    process))
+
 ;////helper functions and macros for build-session macro////
 
 (defun restructure (str)
@@ -1321,8 +1357,8 @@
   (expect process "should be a process here")
   (mklst appetizers)
   (let ((currentDVs) (line))
-    (while (listen (process-output process))
-      (setf line (read-line (process-output process) nil))
+    (while (listen (p-output process))
+      (setf line (read-line (p-output process) nil))
       (collect (process-output-str (runProcess obj)) (cons "str" line))
       (aif (line2element line) (push-to-end it currentDVs)))
     (append appetizers currentDVs)))
@@ -1384,7 +1420,7 @@
     (let ((necessaryDVs) (currentDVs) (currentDV) (process-alive-p t))
       (while (and (setf necessaryDVs (necessaries DVKeys DVHash))
                   process-alive-p)
-             (if (not (equal (process-status process) :running))
+             (if (not (equal (p-status process) :running))
                (setf process-alive-p nil))
              (setf currentDVs (get-DVs obj process appetizers))
              (setf appetizers nil)
@@ -1405,7 +1441,7 @@
                    (setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'string-equal))))))
       (awhen necessaryDVs
         ;it should be really difficult not to throw an error here
-        (when (equal (process-exit-code process) 1)
+        (when (equal (p-exit-code process) 1)
           (print-collector (process-output-str (runProcess obj)))       
           (expect nil ""))
         (format *error-output* "failed to send all ~a DVs left for this trial~%" it)
@@ -1426,17 +1462,6 @@
     (expect (not leftovers) "should not be any leftovers after runProcess object finishes"))
   (sleep (sleepTime obj)))
 
-(defmethod set-process ((obj number5-runProcess-class) input)
-  "Launch the process"
-  (setf (process obj)
-        (run-program 
-          (first (modelProgram obj)) 
-          (rest (modelProgram obj))
-          :input (make-string-input-stream input)
-          :output :stream 
-          :error :output 
-          :wait nil))
-  (expect (equal (process-status (process obj)) :running) "model process failed to start correctly"))
 
 (defmethod get-input-line ((obj number5-run-class))
   (funcall (IVStringFn (session (runProcess obj))) obj))
@@ -1453,15 +1478,16 @@
   (let ((appetizers) (input-string))
     (multiple-value-setq (appetizers input-string)
       (get-process-inputs obj))
-    (set-process obj input-string)
+    (setf (process obj)
+          (get-process obj input-string))
     (dolist (run (runs obj))
       (setf appetizers (wrapper-execute run (process obj) appetizers)))
     (expect (not appetizers) "should not be any leftover results after runProcess object finishes"))
   (sleep (sleepTime obj))
   ;a few assertions to make sure everything finished cleanly
-  (expect (not (listen (process-output (process obj))))
+  (expect (not (listen (p-output (process obj))))
           "unprocessed lines remain in stdout stream of model after all DVs have been processed")
-  (expect (equal (process-status (process obj)) :exited)
+  (expect (equal (p-status (process obj)) :exited)
           "model process failed to quit after all DVs have been processed"))
 
 (defmethod wrapper-execute ((obj session-class) &optional (process nil) (appetizers nil))
