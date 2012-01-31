@@ -1,5 +1,7 @@
 include ../Makefile
 
+PLATFORM = $(shell uname | tr '[:upper:]' '[:lower:]')
+
 #Overwriting default path to letf.lisp
 LETF = ../../../letf.lisp
 
@@ -58,7 +60,7 @@ HPC.7:
 	cd HPC; $(CFLAGS) 0 darwin testObservedCollapse.lisp "dsf/david-2/work files/workDavidQuick.txt"
 
 C.1:
-	cd C; $(CFLAGS) 0 nil  "letf-conf-parabola2d-search-2.txt" "workFile01.txt"
+	cd C; $(CFLAGS) 0 ${PLATFORM} "letf-conf-parabola2d-search-2.txt" "workFile01.txt"
 
 Java.1:
 	cd Java; $(CFLAGS) darwin configFile.txt workFile.txt

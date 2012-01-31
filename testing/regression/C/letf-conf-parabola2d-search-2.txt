@@ -16,7 +16,7 @@ Logs=parabola2dLogs/logs-parabola2d-search
 SamplesPerBatch=10
 
 runsPerProcess=inf 
-modelProgram= ./parabola2d nil
+modelProgram= "$1/parabola2d" nil
 statusPrinter= #'print-session
 
 
