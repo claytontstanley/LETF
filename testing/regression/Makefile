@@ -1,9 +1,8 @@
 DISTRO = SBCL
 ifeq (${DISTRO},SBCL)
-	CFLAGS = sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp
+	CFLAGS = sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp
 else
-	#CFLAGS = ccl -b -l ../../letf.lisp --
-	CFLAGS = ccl  -l ../../letf.lisp --
+	CFLAGS = ccl -b -l ../../../letf.lisp --
 endif
 
 all: MM HPC C Java String Unit3

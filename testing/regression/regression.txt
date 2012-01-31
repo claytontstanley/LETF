@@ -1,4 +1,4 @@
-cd MM; sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp nil mm_config_file.txt in.txt
+cd MM; sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp nil mm_config_file.txt in.txt
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -7288,7 +7288,7 @@ Starting model with IV vector:	100	10
 Writing IV/DV vector to output file:	100	10	10028.925
 Finished model with IV vector:	100	10
 
-cd MM; sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp nil mm_config_file2.txt in.txt
+cd MM; sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp nil mm_config_file2.txt in.txt
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -11579,7 +11579,7 @@ Starting model with IV vector:	100	10
 failed to send all DVs for this trial; missing (z)
 Finished model with IV vector:	100	10
 
-cd MM; sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp nil mm_config_file.txt nil
+cd MM; sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp nil mm_config_file.txt nil
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -11869,7 +11869,7 @@ y
 #####necessary elements for the entry function to return:
 z
 
-cd MM; sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp nil mm_valTest.txt nil
+cd MM; sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp nil mm_valTest.txt nil
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -12157,7 +12157,7 @@ y
 z
 
 success!!!
-cd MM; sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp nil mm_partialWorkTest.txt nil
+cd MM; sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp nil mm_partialWorkTest.txt nil
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -12317,7 +12317,7 @@ z
 wrote 1000 lines to in.txt using IV ranges ((1 1 100) (1 1 10))
 should be 1000
 success!!!
-cd HPC; sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp darwin "configFile01.txt" "workFile01.txt"
+cd HPC; sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp darwin "configFile01.txt" "workFile01.txt"
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -13136,7 +13136,7 @@ CorrelRT: -0.2791916811980327
 MADRT: 29009.120000000003
 CorrelLatency: 0.6805197301104069
 NormRMSEPos: 1.499028322595782e-4
-cd HPC; sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp darwin "configFile02.txt" "workFile01.txt"
+cd HPC; sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp darwin "configFile02.txt" "workFile01.txt"
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -13501,7 +13501,7 @@ CorrelRT: -0.0744838394604736
 MADRT: 601.1
 CorrelLatency: 0.6805197301104069
 NormRMSEPos: 0.001403696380109899
-cd HPC; sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp darwin "configFile03.txt" "workFile01.txt"
+cd HPC; sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp darwin "configFile03.txt" "workFile01.txt"
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -14468,7 +14468,7 @@ diff: 0.0
 madrt: 673.8
 CorrelLatency: 0.6805197301104069
 NormRMSEPos: 0.001403696380109899
-cd HPC; sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp darwin "configFile03b.txt" "workFile01.txt"
+cd HPC; sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp darwin "configFile03b.txt" "workFile01.txt"
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -15527,7 +15527,7 @@ diff: 0.0
 madrt: 490.3
 CorrelLatency: 0.6805197301104069
 NormRMSEPos: 0.001403696380109899
-cd HPC; sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp darwin "configFile04.lisp" "workFile01.txt"
+cd HPC; sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp darwin "configFile04.lisp" "workFile01.txt"
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -15859,7 +15859,7 @@ Evaluating: 6 7 1 9 10
 MaxAbsDiffCorrel: 0.0
 CorrelLatency: 0.6805197301104069
 NormRMSEPos: 0.001403696380109899
-cd HPC; sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp darwin "configFile05.txt" "workFile05.txt"
+cd HPC; sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp darwin "configFile05.txt" "workFile05.txt"
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -15950,7 +15950,7 @@ z1: 1.0
 failed to send all DVs for this trial; missing (z2 z3 z4 z5)
 Evaluating: 0 10
 z1: 1.0
-cd HPC; sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp 0 darwin testObservedCollapse.lisp "dsf/david-2/work files/workDavidQuick.txt"
+cd HPC; sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp 0 darwin testObservedCollapse.lisp "dsf/david-2/work files/workDavidQuick.txt"
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -18248,7 +18248,7 @@ estimation-enabled
 Evaluating: .5 1.0 8 .5 .2 5 10 1 1
 correlAll: 1.000000000000007
 rmseAll: 3.425027168138236e-7
-cd C; sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp 0 nil  "letf-conf-parabola2d-search-2.txt" "workFile01.txt"
+cd C; sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp 0 nil  "letf-conf-parabola2d-search-2.txt" "workFile01.txt"
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -18358,7 +18358,7 @@ Evaluating: 1 5
 height: -103.0
 height1: -52.0
 height2: 126.022
-cd Java; sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp darwin configFile.txt workFile.txt
+cd Java; sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp darwin configFile.txt workFile.txt
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -18422,7 +18422,7 @@ finished: 1.0
 Evaluating: 7 2
 line: 7 2
 finished: 1.0
-cd String; sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp darwin configFile.txt workFile.txt
+cd String; sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp darwin configFile.txt workFile.txt
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -18526,7 +18526,7 @@ rt2: world3423 world636
 hello-world: hello13109 hello14120 world3423 world636
 cd Unit3; \
 	rm -f mm_bold_out.txt; \
-        sbcl --noinform --noprint --disable-debugger --load ../../letf.lisp darwin configFile-sperling.txt workFile-sperling.txt; \
+        sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp darwin configFile-sperling.txt workFile-sperling.txt; \
 	wc mm_bold_out.txt
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO

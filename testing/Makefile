@@ -1,8 +1,8 @@
 DISTRO = SBCL
 ifeq (${DISTRO},SBCL)
-	CFLAGS = sbcl --noinform --noprint --disable-debugger --load letf.lisp
+	CFLAGS = sbcl --noinform --noprint --disable-debugger --load ../letf.lisp
 else
-	CFLAGS = ccl -b -l letf.lisp --
+	CFLAGS = ccl -b -l ../letf.lisp --
 endif
 
 unit:
