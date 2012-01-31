@@ -1,0 +1,9 @@
+file2load= model05.lisp
+
+iv=x
+iv=y
+dv=z1
+dv=z2
+dv=z3
+dv=z4
+dv=z5

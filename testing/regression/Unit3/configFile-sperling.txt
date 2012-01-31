@@ -1,0 +1,30 @@
+
+statusPrinter= #'validate-entryfn
+statusPrinter= 'print-session
+
+file2load= actr6/load-act-r-6.lisp
+file2load= mm.lisp
+			    			   			 
+sessionBuilder= 'build-mm-session
+
+IV=declarative-finst-span
+
+file2load=sperling-wrapped.lisp
+
+data= (list [condition-0.00] [condition-0.15] [condition-0.30] [condition-1.00])
+sperling-exp-data= '(3.03 2.40 2.03 1.50)
+correlation= (correl [data] [sperling-exp-data])
+mean-deviation= (RMSE [data] [sperling-exp-data])
+
+collapseQuota= 10
+
+DV=data
+DV=sperling-exp-data
+DV=correlation
+DV=mean-deviation
+
+SamplesPerBatch=1000
+CalculateVertexCommand=./sbcl --core ./sbcl.core --noinform --noprint --disable-debugger --load letf.lisp $2 $1 $3 
+Logs=logs
+Target=test	0
+Weights=	1

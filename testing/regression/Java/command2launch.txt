@@ -1,0 +1,1 @@
+./sbcl --core sbcl.core --noinform --noprint --disable-debugger --load letf.lisp darwin configFile.txt workFile.txt

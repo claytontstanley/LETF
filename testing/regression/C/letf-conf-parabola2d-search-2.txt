@@ -1,0 +1,22 @@
+Distribution=SearchSpace
+Shape=Hcube
+
+IV=x -1 1 200 
+IV=y -1 1 200
+
+SDV=height zenith -5 1 
+DV=height1 -2 1
+DV=height2 0 5
+
+CalculateVertexCommand= Darwin/sbcl --core Darwin/sbcl.core --noinform --noprint --disable-debugger --load LETF.lisp $2 $1 $3
+Logs=parabola2dLogs/logs-parabola2d-search
+
+#Tolerances=.01 .01 .01
+
+SamplesPerBatch=10
+
+runsPerProcess=inf 
+modelProgram= ./parabola2d nil
+statusPrinter= #'print-session
+
+

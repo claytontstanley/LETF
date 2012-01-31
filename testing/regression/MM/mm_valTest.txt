@@ -1,0 +1,32 @@
+#fields that were entered in the gui
+IV= x  -5 (+ 3 2) 10
+IV=y  -4 .2 5
+DV=z  
+file2load=model.lisp
+file2load=actr6/load-act-r-6.lisp
+
+
+#these will be tacked on to validate the config file
+file2load=mm.lisp
+
+statusPrinter=  #'print-unread-lines
+statusPrinter=  #'print-session
+statusPrinter=  #'validate-entryFn
+statusPrinter=  #'validate-full-combinatorial
+statusPrinter=  #'(lambda (x) (declare (ignore x)) (format t "success!!!~%"))
+
+
+#then just run this at the terminal: 
+# ./sbcl --core ./sbcl.core --noinform --noprint --disable-debugger --load letf.lisp linux mm_valTest.txt nil
+#if "success!!!" is the last line that's printed to standard output, then the config file is validated; otherwise, something's up
+
+
+#files that will need to be in the working directory to get this to work
+#sbcl (most recent linux version)
+#sbcl.core (same)
+#model.lisp (uploaded by the modeler)
+#mm.lisp (source located at ~cstanley/src/mindboinc/wrapper/mm.lisp)
+#letf.lisp (source located at ~cstanley/src/mindboinc/wrapper/letf.lisp)
+#mm_valTest.txt (will need to be created; this is the concatenation of the function that returns the config file from the user's inputs from the gui, and the function that writes all of the text in this file below "these will be tacked on to validate the config file"
+#actr6 folder
+

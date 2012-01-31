@@ -1,0 +1,15 @@
+IV= speed
+DV= rt1
+DV= rt2
+DV= hello-world
+
+#hello-world= (progn (format t "~a~%" (get-lines (file-string "workFile.txt"))) (fast-concatenate [rt1] " " [rt2]))
+hello-world= (fast-concatenate [rt1] " " [rt2])
+
+collapseQuota= 2
+collapseFn= #'make-sentence
+
+file2load= extras.lisp
+file2load= model.lisp
+statusPrinter= #'print-unread-lines
+statusPrinter= #'print-session

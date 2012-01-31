@@ -1,0 +1,15 @@
+#fields that were entered in the gui
+IV= x  1 1 100
+IV=y  1 1 10
+DV=z  
+
+
+#these will be tacked on to validate the config file
+file2load=mm.lisp
+
+statusPrinter=  #'print-unread-lines
+statusPrinter=  #'print-session
+statusPrinter=  #'generate-full-combinatorial
+statusPrinter= (lambda (x) (declare (ignore x)) (format t "should be 1000~%"))
+statusPrinter=  #'(lambda (x) (declare (ignore x)) (format t "success!!!~%"))
+

@@ -1,0 +1,66 @@
+#modelProgram= "$1/sbcl" --core $1/sbcl.core --noinform --noprint --disable-debugger --load model.lisp
+file2load= $1/actr6/load-act-r-6.lisp
+file2load=modelShortCircuited.lisp
+runsPerProcess=inf
+
+iterations=5
+collapseQuota=2
+collapseFn=#'(lambda (x) (mean x :throwOutYerNils t))
+
+Constant=num-runs 15.0
+Constant=environ-wait 8.0
+IV=blend-temperature .01 .99
+IV=bll .01 .99
+IV=ans .01 .99
+
+Obsrt1=1.1
+obsrt2=2.2
+obsrt3=3.3
+obsrt4=4.4
+obsrt5=5.5
+#ModRT=(list [rt1:2 rt3:5])
+CorrelRT=(mean (correl [ModRT] (list [obsrt1:5]) :throwOutYerNils t) :throwOutYerNils t)
+collapseFn= nil ; DV= CorrelRT
+DV=CorrelRT 0 1
+
+modrtt= (transpose [ModRT])
+
+ModRT1= (nth 0 [ModRTt])
+ModRT2= (nth 1 [modrtt])
+modrt3= (nth 2 [modrtt])
+modrt4= (nth 3 [modrtt])
+modrt5= (nth 4 [modrtt])
+
+correlrt2= (mean (correl (transpose (list [modrt1:5])) (list [obsrt1:5]) :throwoutyernils t) :throwoutyernils t)
+DV=correlrt2 0 1
+collapseFn= nil ; dv= correlRT2
+
+diff= (funcall #'(lambda (x y) (if (and x y) (abs (- x y)))) [correlrt correlrt2])
+dv= diff 0 1
+collapsefn= nil ; dv= diff
+
+statusPrinter=		 #'print-session
+
+entryFnType=hash
+madrt= (mad [modRT] (list [obsrt1:5]) :throwoutyernils t)
+dv= madrt 0 200
+
+ObsL1=1.1
+ObsL2L3=(list 2.2     3.3)
+obsL4=4.4
+obsL5=5.5
+ModLatency=(list [lat1 lat2 lat3 lat4 lat5])
+CorrelLatency=(correl (append (list [obsl1]) [obsl2l3] (list     [obsl4]      [obsl5]))     [ModLatency] :throwoutyernils t)
+DV=CorrelLatency 0 1
+
+ObsPos=(list 1.1 3.3 2.2 4.4 5.5)
+ModPos=(list [pos1 pos2 pos3 pos4 pos5])
+RMSEPos=(rmse [ObsPos] [ModPos] :throwoutyernils t)
+NormRMSEPos=(funcall #'(lambda (x) (/ 1 (+ 1 x))) [RMSEPos])
+DV=NormRMSEPos
+
+Target=someNameSpecificForThisConfigFile	1	0	1	1
+Weights=	2	1	1	1
+CalculateVertexCommand=$1/sbcl --core $1/sbcl.core --noinform --noprint --disable-debugger --load wrapper.lisp $1 $3
+
+Logs=directoryNameSpecificForThisConfigFile

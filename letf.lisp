@@ -1111,7 +1111,8 @@
             (rest (modelProgram obj))
             :input (make-string-input-stream input)
             :output :stream 
-            :error :output 
+            :error :output
+            #+SBCL :search #+SBCL t
             :wait nil))
     (expect (equal (p-status process) :running) "model process failed to start correctly")
     process))

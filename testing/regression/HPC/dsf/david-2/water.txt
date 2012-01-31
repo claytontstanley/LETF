@@ -1,0 +1,401 @@
+envWait calcTimeFac blendTemp subject step Version trend waterLevel chosenValveSetting
+8 1.0 0.5 1 1 "Linear increase" 2.08000 5.08000 1.00000 
+8 1.0 0.5 1 2 "Linear increase" 2.16000 6.21517 -1.02483 
+8 1.0 0.5 1 3 "Linear increase" 2.24000 6.92000 -1.53517 
+8 1.0 0.5 1 4 "Linear increase" 2.32000 8.66400 -0.57600 
+8 1.0 0.5 1 5 "Linear increase" 2.40000 5.40046 -5.66354 
+8 1.0 0.5 1 6 "Linear increase" 2.48000 4.79720 -3.08326 
+8 1.0 0.5 1 7 "Linear increase" 2.56000 4.83484 -2.52236 
+8 1.0 0.5 1 8 "Linear increase" 2.64000 4.59136 -2.88349 
+8 1.0 0.5 1 9 "Linear increase" 2.72000 4.90985 -2.40151 
+8 1.0 0.5 1 10 "Linear increase" 2.80000 4.53715 -3.17270 
+8 1.0 0.5 1 11 "Linear increase" 2.88000 4.47633 -2.94082 
+8 1.0 0.5 1 12 "Linear increase" 2.96000 4.16077 -3.27556 
+8 1.0 0.5 1 13 "Linear increase" 3.04000 4.02224 -3.17853 
+8 1.0 0.5 1 14 "Linear increase" 3.12000 4.10180 -3.04044 
+8 1.0 0.5 1 15 "Linear increase" 3.20000 4.15400 -3.14780 
+8 1.0 0.5 1 16 "Linear increase" 3.28000 4.41166 -3.02234 
+8 1.0 0.5 1 17 "Linear increase" 3.36000 4.28172 -3.48994 
+8 1.0 0.5 1 18 "Linear increase" 3.44000 4.22114 -3.50058 
+8 1.0 0.5 1 19 "Linear increase" 3.52000 4.27407 -3.46707 
+8 1.0 0.5 1 20 "Linear increase" 3.60000 3.77835 -4.09572 
+8 1.0 0.5 1 21 "Linear increase" 3.68000 4.13547 -3.32288 
+8 1.0 0.5 1 22 "Linear increase" 3.76000 3.90056 -3.99491 
+8 1.0 0.5 1 23 "Linear increase" 3.84000 3.84294 -3.89762 
+8 1.0 0.5 1 24 "Linear increase" 3.92000 4.09924 -3.66370 
+8 1.0 0.5 1 25 "Linear increase" 4.00000 4.16503 -3.93421 
+8 1.0 0.5 1 26 "Linear increase" 4.08000 4.30379 -3.94124 
+8 1.0 0.5 1 27 "Linear increase" 4.16000 4.23943 -4.22437 
+8 1.0 0.5 1 28 "Linear increase" 4.24000 4.14945 -4.32998 
+8 1.0 0.5 1 29 "Linear increase" 4.32000 3.94593 -4.52351 
+8 1.0 0.5 1 30 "Linear increase" 4.40000 3.92047 -4.42546 
+8 1.0 0.5 1 31 "Linear increase" 4.48000 3.59719 -4.80328 
+8 1.0 0.5 1 32 "Linear increase" 4.56000 3.67789 -4.47931 
+8 1.0 0.5 1 33 "Linear increase" 4.64000 3.97573 -4.34216 
+8 1.0 0.5 1 34 "Linear increase" 4.72000 3.72534 -4.97039 
+8 1.0 0.5 1 35 "Linear increase" 4.80000 3.70873 -4.81661 
+8 1.0 0.5 1 36 "Linear increase" 4.88000 3.64314 -4.94559 
+8 1.0 0.5 1 37 "Linear increase" 4.96000 3.79718 -4.80595 
+8 1.0 0.5 1 38 "Linear increase" 5.04000 4.04335 -4.79383 
+8 1.0 0.5 1 39 "Linear increase" 5.12000 3.61672 -5.54663 
+8 1.0 0.5 1 40 "Linear increase" 5.20000 3.60861 -5.20811 
+8 1.0 0.5 1 41 "Linear increase" 5.28000 3.24672 -5.64189 
+8 1.0 0.5 1 42 "Linear increase" 5.36000 3.72936 -4.87736 
+8 1.0 0.5 1 43 "Linear increase" 5.44000 3.57458 -5.59478 
+8 1.0 0.5 1 44 "Linear increase" 5.52000 3.38018 -5.71440 
+8 1.0 0.5 1 45 "Linear increase" 5.60000 2.67511 -6.30507 
+8 1.0 0.5 1 46 "Linear increase" 5.68000 2.85312 -5.50199 
+8 1.0 0.5 1 47 "Linear increase" 5.76000 3.15078 -5.46234 
+8 1.0 0.5 1 48 "Linear increase" 5.84000 3.16383 -5.82695 
+8 1.0 0.5 1 49 "Linear increase" 5.92000 3.00334 -6.08048 
+8 1.0 0.5 1 50 "Linear increase" 6.00000 3.26989 -5.73345 
+8 1.0 0.5 1 51 "Linear increase" 6.08000 2.98455 -6.36534 
+8 1.0 0.5 1 52 "Linear increase" 6.16000 3.09619 -6.04836 
+8 1.0 0.5 1 53 "Linear increase" 6.24000 3.15287 -6.18332 
+8 1.0 0.5 1 54 "Linear increase" 6.32000 2.95638 -6.51649 
+8 1.0 0.5 1 55 "Linear increase" 6.40000 2.96258 -6.39380 
+8 1.0 0.5 1 56 "Linear increase" 6.48000 3.14520 -6.29738 
+8 1.0 0.5 1 57 "Linear increase" 6.56000 2.93041 -6.77478 
+8 1.0 0.5 1 58 "Linear increase" 6.64000 2.80704 -6.76338 
+8 1.0 0.5 1 59 "Linear increase" 6.72000 3.00703 -6.52000 
+8 1.0 0.5 1 60 "Linear increase" 6.80000 2.86621 -6.94082 
+8 1.0 0.5 1 61 "Linear increase" 6.88000 25.21242 15.46621 
+8 1.0 0.5 1 62 "Linear increase" 6.96000 3.11686 -29.05556 
+8 1.0 0.5 1 63 "Linear increase" 7.04000 2.60797 -7.54889 
+8 1.0 0.5 1 64 "Linear increase" 7.12000 1.93289 -7.79508 
+8 1.0 0.5 1 65 "Linear increase" 7.20000 2.40586 -6.72703 
+8 1.0 0.5 1 66 "Linear increase" 7.28000 2.46862 -7.21724 
+8 1.0 0.5 1 67 "Linear increase" 7.36000 2.39950 -7.42912 
+8 1.0 0.5 1 68 "Linear increase" 7.44000 2.61059 -7.22892 
+8 1.0 0.5 1 69 "Linear increase" 7.52000 2.45932 -7.67127 
+8 1.0 0.5 1 70 "Linear increase" 7.60000 2.42954 -7.62978 
+8 1.0 0.5 1 71 "Linear increase" 7.68000 2.75101 -7.35853 
+8 1.0 0.5 1 72 "Linear increase" 7.76000 2.30750 -8.20350 
+8 1.0 0.5 1 73 "Linear increase" 7.84000 2.30644 -7.84106 
+8 1.0 0.5 1 74 "Linear increase" 7.92000 2.33628 -7.89016 
+8 1.0 0.5 1 75 "Linear increase" 8.00000 2.28098 -8.05529 
+8 1.0 0.5 1 76 "Linear increase" 8.08000 2.14721 -8.21377 
+8 1.0 0.5 1 77 "Linear increase" 8.16000 2.22591 -8.08130 
+8 1.0 0.5 1 78 "Linear increase" 8.24000 1.84499 -8.62092 
+8 1.0 0.5 1 79 "Linear increase" 8.32000 2.05951 -8.10547 
+8 1.0 0.5 1 80 "Linear increase" 8.40000 1.97605 -8.48346 
+8 1.0 0.5 1 81 "Linear increase" 8.48000 2.07913 -8.37692 
+8 1.0 0.5 1 82 "Linear increase" 8.56000 2.00828 -8.63085 
+8 1.0 0.5 1 83 "Linear increase" 8.64000 2.10790 -8.54037 
+8 1.0 0.5 1 84 "Linear increase" 8.72000 2.13726 -8.69064 
+8 1.0 0.5 1 85 "Linear increase" 8.80000 1.81225 -9.12502 
+8 1.0 0.5 1 86 "Linear increase" 8.88000 2.04421 -8.64804 
+8 1.0 0.5 1 87 "Linear increase" 8.96000 1.99766 -9.00655 
+8 1.0 0.5 1 88 "Linear increase" 9.04000 2.18310 -8.85457 
+8 1.0 0.5 1 89 "Linear increase" 9.12000 2.06938 -9.23371 
+8 1.0 0.5 1 90 "Linear increase" 9.20000 2.01697 -9.25241 
+8 1.0 0.5 1 91 "Linear increase" 9.28000 1.73286 -9.56410 
+8 1.0 0.5 1 92 "Linear increase" 9.36000 1.91322 -9.17964 
+8 1.0 0.5 1 93 "Linear increase" 9.44000 1.91049 -9.44273 
+8 1.0 0.5 1 94 "Linear increase" 9.52000 2.03708 -9.39340 
+8 1.0 0.5 1 95 "Linear increase" 9.60000 1.81470 -9.82238 
+8 1.0 0.5 1 96 "Linear increase" 9.68000 1.74165 -9.75305 
+8 1.0 0.5 1 97 "Linear increase" 9.76000 1.83197 -9.66968 
+8 1.0 0.5 1 98 "Linear increase" 9.84000 1.82107 -9.85090 
+8 1.0 0.5 1 99 "Linear increase" 9.92000 1.73765 -10.00342 
+8 1.0 0.5 1 100 "Linear increase" 10.00000 1.75323 -9.98442 
+8 1.0 0.5 1 1 "Linear decrease" 9.92000 15.82000 3.90000 
+8 1.0 0.5 1 2 "Linear decrease" 9.84000 0.00000 -31.66000 
+8 1.0 0.5 1 3 "Linear decrease" 9.76000 23.54000 13.78000 
+8 1.0 0.5 1 4 "Linear decrease" 9.68000 51.04000 17.82000 
+8 1.0 0.5 1 5 "Linear decrease" 9.60000 0.96821 -59.67179 
+8 1.0 0.5 1 6 "Linear decrease" 9.52000 1.60444 -8.88377 
+8 1.0 0.5 1 7 "Linear decrease" 9.44000 1.48178 -9.56266 
+8 1.0 0.5 1 8 "Linear decrease" 9.36000 0.00000 -11.32100 
+8 1.0 0.5 1 9 "Linear decrease" 9.28000 0.78410 -8.49590 
+8 1.0 0.5 1 10 "Linear decrease" 9.20000 0.84308 -9.14102 
+8 1.0 0.5 1 11 "Linear decrease" 9.12000 0.72567 -9.23740 
+8 1.0 0.5 1 12 "Linear decrease" 9.04000 1.52050 -8.24517 
+8 1.0 0.5 1 13 "Linear decrease" 8.96000 1.82811 -8.65239 
+8 1.0 0.5 1 14 "Linear decrease" 8.88000 2.16842 -8.53969 
+8 1.0 0.5 1 15 "Linear decrease" 8.80000 1.63920 -9.32922 
+8 1.0 0.5 1 16 "Linear decrease" 8.72000 1.00920 -9.34999 
+8 1.0 0.5 1 17 "Linear decrease" 8.64000 0.89534 -8.75386 
+8 1.0 0.5 1 18 "Linear decrease" 8.56000 4.08000 -5.37534 
+8 1.0 0.5 1 19 "Linear decrease" 8.48000 1.55002 -11.00998 
+8 1.0 0.5 1 20 "Linear decrease" 8.40000 0.57465 -9.37537 
+8 1.0 0.5 1 21 "Linear decrease" 8.32000 1.51888 -7.37577 
+8 1.0 0.5 1 22 "Linear decrease" 8.24000 5.50000 -4.25888 
+8 1.0 0.5 1 23 "Linear decrease" 8.16000 3.98000 -9.68000 
+8 1.0 0.5 1 24 "Linear decrease" 8.08000 3.96000 -8.10000 
+8 1.0 0.5 1 25 "Linear decrease" 8.00000 4.04000 -7.92000 
+8 1.0 0.5 1 26 "Linear decrease" 7.92000 4.02000 -7.94000 
+8 1.0 0.5 1 27 "Linear decrease" 7.84000 4.00000 -7.86000 
+8 1.0 0.5 1 28 "Linear decrease" 7.76000 3.98000 -7.78000 
+8 1.0 0.5 1 29 "Linear decrease" 7.68000 3.96000 -7.70000 
+8 1.0 0.5 1 30 "Linear decrease" 7.60000 4.04000 -7.52000 
+8 1.0 0.5 1 31 "Linear decrease" 7.52000 4.02000 -7.54000 
+8 1.0 0.5 1 32 "Linear decrease" 7.44000 2.50800 -8.95200 
+8 1.0 0.5 1 33 "Linear decrease" 7.36000 3.98000 -5.88800 
+8 1.0 0.5 1 34 "Linear decrease" 7.28000 3.96000 -7.30000 
+8 1.0 0.5 1 35 "Linear decrease" 7.20000 4.04000 -7.12000 
+8 1.0 0.5 1 36 "Linear decrease" 7.12000 4.02000 -7.14000 
+8 1.0 0.5 1 37 "Linear decrease" 7.04000 4.00000 -7.06000 
+8 1.0 0.5 1 38 "Linear decrease" 6.96000 3.98000 -6.98000 
+8 1.0 0.5 1 39 "Linear decrease" 6.88000 3.96000 -6.90000 
+8 1.0 0.5 1 40 "Linear decrease" 6.80000 4.04000 -6.72000 
+8 1.0 0.5 1 41 "Linear decrease" 6.72000 4.02000 -6.74000 
+8 1.0 0.5 1 42 "Linear decrease" 6.64000 4.00000 -6.66000 
+8 1.0 0.5 1 43 "Linear decrease" 6.56000 3.98000 -6.58000 
+8 1.0 0.5 1 44 "Linear decrease" 6.48000 3.96000 -6.50000 
+8 1.0 0.5 1 45 "Linear decrease" 6.40000 4.04000 -6.32000 
+8 1.0 0.5 1 46 "Linear decrease" 6.32000 4.02000 -6.34000 
+8 1.0 0.5 1 47 "Linear decrease" 6.24000 4.00000 -6.26000 
+8 1.0 0.5 1 48 "Linear decrease" 6.16000 3.98000 -6.18000 
+8 1.0 0.5 1 49 "Linear decrease" 6.08000 3.96000 -6.10000 
+8 1.0 0.5 1 50 "Linear decrease" 6.00000 0.07200 -9.88800 
+8 1.0 0.5 1 51 "Linear decrease" 5.92000 4.02000 -1.97200 
+8 1.0 0.5 1 52 "Linear decrease" 5.84000 4.00000 -5.86000 
+8 1.0 0.5 1 53 "Linear decrease" 5.76000 3.98000 -5.78000 
+8 1.0 0.5 1 54 "Linear decrease" 5.68000 3.96000 -5.70000 
+8 1.0 0.5 1 55 "Linear decrease" 5.60000 4.04000 -5.52000 
+8 1.0 0.5 1 56 "Linear decrease" 5.52000 4.02000 -5.54000 
+8 1.0 0.5 1 57 "Linear decrease" 5.44000 4.00000 -5.46000 
+8 1.0 0.5 1 58 "Linear decrease" 5.36000 3.98000 -5.38000 
+8 1.0 0.5 1 59 "Linear decrease" 5.28000 3.96000 -5.30000 
+8 1.0 0.5 1 60 "Linear decrease" 5.20000 4.04000 -5.12000 
+8 1.0 0.5 1 61 "Linear decrease" 5.12000 7.67600 -1.48400 
+8 1.0 0.5 1 62 "Linear decrease" 5.04000 4.00000 -8.71600 
+8 1.0 0.5 1 63 "Linear decrease" 4.96000 3.98000 -4.98000 
+8 1.0 0.5 1 64 "Linear decrease" 4.88000 3.96000 -4.90000 
+8 1.0 0.5 1 65 "Linear decrease" 4.80000 4.04000 -4.72000 
+8 1.0 0.5 1 66 "Linear decrease" 4.72000 4.02000 -4.74000 
+8 1.0 0.5 1 67 "Linear decrease" 4.64000 4.00000 -4.66000 
+8 1.0 0.5 1 68 "Linear decrease" 4.56000 3.98000 -4.58000 
+8 1.0 0.5 1 69 "Linear decrease" 4.48000 3.96000 -4.50000 
+8 1.0 0.5 1 70 "Linear decrease" 4.40000 4.04000 -4.32000 
+8 1.0 0.5 1 71 "Linear decrease" 4.32000 4.02000 -4.34000 
+8 1.0 0.5 1 72 "Linear decrease" 4.24000 4.00000 -4.26000 
+8 1.0 0.5 1 73 "Linear decrease" 4.16000 3.98000 -4.18000 
+8 1.0 0.5 1 74 "Linear decrease" 4.08000 3.96000 -4.10000 
+8 1.0 0.5 1 75 "Linear decrease" 4.00000 4.04000 -3.92000 
+8 1.0 0.5 1 76 "Linear decrease" 3.92000 4.02000 -3.94000 
+8 1.0 0.5 1 77 "Linear decrease" 3.84000 4.00000 -3.86000 
+8 1.0 0.5 1 78 "Linear decrease" 3.76000 3.98000 -3.78000 
+8 1.0 0.5 1 79 "Linear decrease" 3.68000 5.07000 -2.59000 
+8 1.0 0.5 1 80 "Linear decrease" 3.60000 4.04000 -4.63000 
+8 1.0 0.5 1 81 "Linear decrease" 3.52000 4.02000 -3.54000 
+8 1.0 0.5 1 82 "Linear decrease" 3.44000 2.96200 -4.49800 
+8 1.0 0.5 1 83 "Linear decrease" 3.36000 3.98000 -2.34200 
+8 1.0 0.5 1 84 "Linear decrease" 3.28000 3.96000 -3.30000 
+8 1.0 0.5 1 85 "Linear decrease" 3.20000 4.04000 -3.12000 
+8 1.0 0.5 1 86 "Linear decrease" 3.12000 4.02000 -3.14000 
+8 1.0 0.5 1 87 "Linear decrease" 3.04000 4.00000 -3.06000 
+8 1.0 0.5 1 88 "Linear decrease" 2.96000 3.98000 -2.98000 
+8 1.0 0.5 1 89 "Linear decrease" 2.88000 3.96000 -2.90000 
+8 1.0 0.5 1 90 "Linear decrease" 2.80000 4.04000 -2.72000 
+8 1.0 0.5 1 91 "Linear decrease" 2.72000 4.02000 -2.74000 
+8 1.0 0.5 1 92 "Linear decrease" 2.64000 4.00000 -2.66000 
+8 1.0 0.5 1 93 "Linear decrease" 2.56000 3.98000 -2.58000 
+8 1.0 0.5 1 94 "Linear decrease" 2.48000 3.96000 -2.50000 
+8 1.0 0.5 1 95 "Linear decrease" 2.40000 4.04000 -2.32000 
+8 1.0 0.5 1 96 "Linear decrease" 2.32000 4.02000 -2.34000 
+8 1.0 0.5 1 97 "Linear decrease" 2.24000 4.00000 -2.26000 
+8 1.0 0.5 1 98 "Linear decrease" 2.16000 3.98000 -2.18000 
+8 1.0 0.5 1 99 "Linear decrease" 2.08000 3.96000 -2.10000 
+8 1.0 0.5 1 100 "Linear decrease" 2.00000 4.04000 -1.92000 
+8 1.0 0.5 1 1 "Non Linear increase" 0.00000 0.00000 -2.00000 
+8 1.0 0.5 1 2 "Non Linear increase" 1.50515 5.50515 4.00000 
+8 1.0 0.5 1 3 "Non Linear increase" 2.38561 3.37531 -4.51545 
+8 1.0 0.5 1 4 "Non Linear increase" 3.01030 3.73909 -2.64652 
+8 1.0 0.5 1 5 "Non Linear increase" 3.49485 3.87425 -3.35969 
+8 1.0 0.5 1 6 "Non Linear increase" 3.89076 4.28745 -3.47756 
+8 1.0 0.5 1 7 "Non Linear increase" 4.22549 3.94398 -4.56896 
+8 1.0 0.5 1 8 "Non Linear increase" 4.51545 3.96447 -4.49496 
+8 1.0 0.5 1 9 "Non Linear increase" 4.77121 3.94031 -4.79537 
+8 1.0 0.5 1 10 "Non Linear increase" 5.00000 3.95757 -4.98274 
+8 1.0 0.5 1 11 "Non Linear increase" 5.20696 4.00696 -5.15757 
+8 1.0 0.5 1 12 "Non Linear increase" 5.39591 3.98198 -5.42089 
+8 1.0 0.5 1 13 "Non Linear increase" 5.56972 3.97790 -5.57379 
+8 1.0 0.5 1 14 "Non Linear increase" 5.73064 3.99121 -5.71734 
+8 1.0 0.5 1 15 "Non Linear increase" 5.88046 4.01917 -5.85249 
+8 1.0 0.5 1 16 "Non Linear increase" 6.02060 5.17570 -4.86407 
+8 1.0 0.5 1 17 "Non Linear increase" 6.15224 4.01105 -7.31690 
+8 1.0 0.5 1 18 "Non Linear increase" 6.27636 3.97187 -6.31553 
+8 1.0 0.5 1 19 "Non Linear increase" 6.39377 4.04104 -6.32460 
+8 1.0 0.5 1 20 "Non Linear increase" 6.50515 4.01761 -6.52858 
+8 1.0 0.5 1 21 "Non Linear increase" 6.61110 9.31475 -1.31396 
+8 1.0 0.5 1 22 "Non Linear increase" 6.71211 3.98992 -12.03695 
+8 1.0 0.5 1 23 "Non Linear increase" 6.80864 3.98441 -6.81415 
+8 1.0 0.5 1 24 "Non Linear increase" 6.90106 3.98378 -6.90169 
+8 1.0 0.5 1 25 "Non Linear increase" 6.98970 3.98759 -6.98589 
+8 1.0 0.5 1 26 "Non Linear increase" 7.07487 3.99547 -7.06699 
+8 1.0 0.5 1 27 "Non Linear increase" 7.15682 4.00708 -7.14520 
+8 1.0 0.5 1 28 "Non Linear increase" 7.23579 4.02215 -7.22072 
+8 1.0 0.5 1 29 "Non Linear increase" 7.31199 4.04041 -7.29373 
+8 1.0 0.5 1 30 "Non Linear increase" 7.38561 3.96163 -7.46439 
+8 1.0 0.5 1 31 "Non Linear increase" 7.45681 3.98560 -7.43284 
+8 1.0 0.5 1 32 "Non Linear increase" 7.52575 4.01213 -7.49921 
+8 1.0 0.5 1 33 "Non Linear increase" 7.59257 4.04107 -7.56363 
+8 1.0 0.5 1 34 "Non Linear increase" 7.65739 3.97226 -7.72621 
+8 1.0 0.5 1 35 "Non Linear increase" 7.72034 4.00555 -7.68704 
+8 1.0 0.5 1 36 "Non Linear increase" 7.78151 4.04083 -7.74623 
+8 1.0 0.5 1 37 "Non Linear increase" 7.84101 3.97798 -7.90386 
+8 1.0 0.5 1 38 "Non Linear increase" 7.89892 4.01690 -7.86000 
+8 1.0 0.5 1 39 "Non Linear increase" 7.95532 3.95749 -8.01473 
+8 1.0 0.5 1 40 "Non Linear increase" 8.01030 3.99965 -7.96813 
+8 1.0 0.5 1 41 "Non Linear increase" 8.06392 4.04332 -8.02025 
+8 1.0 0.5 1 42 "Non Linear increase" 8.11625 3.98841 -8.17116 
+8 1.0 0.5 1 43 "Non Linear increase" 8.16734 4.03485 -8.12090 
+8 1.0 0.5 1 44 "Non Linear increase" 8.21726 3.98258 -8.26953 
+8 1.0 0.5 1 45 "Non Linear increase" 8.26606 4.03154 -8.21711 
+8 1.0 0.5 1 46 "Non Linear increase" 8.31379 3.98166 -8.36366 
+8 1.0 0.5 1 47 "Non Linear increase" 8.36049 4.03291 -8.30924 
+8 1.0 0.5 1 48 "Non Linear increase" 8.40621 3.98523 -8.45389 
+8 1.0 0.5 1 49 "Non Linear increase" 8.45098 4.03857 -8.39764 
+8 1.0 0.5 1 50 "Non Linear increase" 8.49485 3.99289 -8.54053 
+8 1.0 0.5 1 51 "Non Linear increase" 8.53785 4.04815 -8.48259 
+8 1.0 0.5 1 52 "Non Linear increase" 8.58002 4.00431 -8.62385 
+8 1.0 0.5 1 53 "Non Linear increase" 8.62138 3.96135 -8.66435 
+8 1.0 0.5 1 54 "Non Linear increase" 8.66197 4.01921 -8.60410 
+8 1.0 0.5 1 55 "Non Linear increase" 8.70181 3.97788 -8.74315 
+8 1.0 0.5 1 56 "Non Linear increase" 8.74094 4.03731 -8.68150 
+8 1.0 0.5 1 57 "Non Linear increase" 8.77937 3.99749 -8.81919 
+8 1.0 0.5 1 58 "Non Linear increase" 8.81714 3.95839 -8.85624 
+8 1.0 0.5 1 59 "Non Linear increase" 8.85426 5.77851 -7.03414 
+8 1.0 0.5 1 60 "Non Linear increase" 8.89076 3.98224 -10.68703 
+8 1.0 0.5 1 61 "Non Linear increase" 8.92665 4.04514 -8.86375 
+8 1.0 0.5 1 62 "Non Linear increase" 8.96196 4.00866 -8.99843 
+8 1.0 0.5 1 63 "Non Linear increase" 8.99670 3.97279 -9.03258 
+8 1.0 0.5 1 64 "Non Linear increase" 9.03090 4.03749 -8.96619 
+8 1.0 0.5 1 65 "Non Linear increase" 9.06457 4.00277 -9.09929 
+8 1.0 0.5 1 66 "Non Linear increase" 9.09772 3.96859 -9.13190 
+8 1.0 0.5 1 67 "Non Linear increase" 9.13037 4.03493 -9.06403 
+8 1.0 0.5 1 68 "Non Linear increase" 9.16254 4.00180 -9.19568 
+8 1.0 0.5 1 69 "Non Linear increase" 9.19425 3.96916 -9.22688 
+8 1.0 0.5 1 70 "Non Linear increase" 9.22549 4.03700 -9.15765 
+8 1.0 0.5 1 71 "Non Linear increase" 9.25629 4.00531 -9.28798 
+8 1.0 0.5 1 72 "Non Linear increase" 9.28666 3.97408 -9.31790 
+8 1.0 0.5 1 73 "Non Linear increase" 9.31661 4.04329 -9.24740 
+8 1.0 0.5 1 74 "Non Linear increase" 9.34616 4.01293 -9.37652 
+8 1.0 0.5 1 75 "Non Linear increase" 9.37531 3.98299 -9.40525 
+8 1.0 0.5 1 76 "Non Linear increase" 9.40407 3.95346 -9.43360 
+8 1.0 0.5 1 77 "Non Linear increase" 9.43245 4.02432 -9.36159 
+8 1.0 0.5 1 78 "Non Linear increase" 9.46047 3.99557 -9.48922 
+8 1.0 0.5 1 79 "Non Linear increase" 9.48814 3.96719 -9.51651 
+8 1.0 0.5 1 80 "Non Linear increase" 9.51545 4.03918 -9.44346 
+8 1.0 0.5 1 81 "Non Linear increase" 9.54243 4.01153 -9.57008 
+8 1.0 0.5 1 82 "Non Linear increase" 9.56907 3.98422 -9.59638 
+8 1.0 0.5 1 83 "Non Linear increase" 9.59539 3.95725 -9.62236 
+8 1.0 0.5 1 84 "Non Linear increase" 9.62140 4.03062 -9.54803 
+8 1.0 0.5 1 85 "Non Linear increase" 9.64709 4.00430 -9.67341 
+8 1.0 0.5 1 86 "Non Linear increase" 9.67249 3.97830 -9.69849 
+8 1.0 0.5 1 87 "Non Linear increase" 9.69760 3.95261 -9.72329 
+8 1.0 0.5 1 88 "Non Linear increase" 9.72241 4.02722 -9.64781 
+8 1.0 0.5 1 89 "Non Linear increase" 9.74695 4.00212 -9.77205 
+8 1.0 0.5 1 90 "Non Linear increase" 9.77121 3.97731 -9.79602 
+8 1.0 0.5 1 91 "Non Linear increase" 9.79521 3.95278 -9.81974 
+8 1.0 0.5 1 92 "Non Linear increase" 9.81894 4.02853 -9.74320 
+8 1.0 0.5 1 93 "Non Linear increase" 9.84241 4.00454 -9.86640 
+8 1.0 0.5 1 94 "Non Linear increase" 9.86564 3.98081 -9.88937 
+8 1.0 0.5 1 95 "Non Linear increase" 9.88862 3.95734 -9.91209 
+8 1.0 0.5 1 96 "Non Linear increase" 9.91136 4.03412 -9.83458 
+8 1.0 0.5 1 97 "Non Linear increase" 9.93386 4.01115 -9.95683 
+8 1.0 0.5 1 98 "Non Linear increase" 9.95613 3.98841 -9.97886 
+8 1.0 0.5 1 99 "Non Linear increase" 9.97818 3.96592 -10.00067 
+8 1.0 0.5 1 100 "Non Linear increase" 10.00000 4.04365 -9.92227 
+8 1.0 0.5 1 1 "Non Linear decrease" 10.00000 18.00000 6.00000 
+8 1.0 0.5 1 2 "Non Linear decrease" 9.97818 0.00000 -34.00000 
+8 1.0 0.5 1 3 "Non Linear decrease" 9.95613 23.91248 13.95635 
+8 1.0 0.5 1 4 "Non Linear decrease" 9.93386 23.84612 -10.00022 
+8 1.0 0.5 1 5 "Non Linear decrease" 9.91136 1.82249 -31.93499 
+8 1.0 0.5 1 6 "Non Linear decrease" 9.88862 0.00000 -13.84333 
+8 1.0 0.5 1 7 "Non Linear decrease" 9.86564 0.00000 -13.92295 
+8 1.0 0.5 1 8 "Non Linear decrease" 9.84241 0.00000 -11.13209 
+8 1.0 0.5 1 9 "Non Linear decrease" 9.81894 4.03411 -5.78483 
+8 1.0 0.5 1 10 "Non Linear decrease" 9.79521 3.95733 -9.87199 
+8 1.0 0.5 1 11 "Non Linear decrease" 9.77121 3.98080 -9.74774 
+8 1.0 0.5 1 12 "Non Linear decrease" 9.74695 4.00453 -9.72322 
+8 1.0 0.5 1 13 "Non Linear decrease" 9.72241 4.02851 -9.69843 
+8 1.0 0.5 1 14 "Non Linear decrease" 9.69760 3.95277 -9.77334 
+8 1.0 0.5 1 15 "Non Linear decrease" 9.67249 3.97730 -9.64796 
+8 1.0 0.5 1 16 "Non Linear decrease" 9.64709 4.00211 -9.62228 
+8 1.0 0.5 1 17 "Non Linear decrease" 9.62140 4.02721 -9.59630 
+8 1.0 0.5 1 18 "Non Linear decrease" 9.59539 3.95260 -9.67000 
+8 1.0 0.5 1 19 "Non Linear decrease" 9.56907 3.97829 -9.54338 
+8 1.0 0.5 1 20 "Non Linear decrease" 9.54243 4.00429 -9.51643 
+8 1.0 0.5 1 21 "Non Linear decrease" 9.51545 4.03060 -9.48914 
+8 1.0 0.5 1 22 "Non Linear decrease" 9.48814 3.95724 -9.56150 
+8 1.0 0.5 1 23 "Non Linear decrease" 9.46047 3.98420 -9.43351 
+8 1.0 0.5 1 24 "Non Linear decrease" 9.43245 4.01151 -9.40515 
+8 1.0 0.5 1 25 "Non Linear decrease" 9.40407 4.03916 -9.37641 
+8 1.0 0.5 1 26 "Non Linear decrease" 9.37531 3.96717 -9.44730 
+8 1.0 0.5 1 27 "Non Linear decrease" 9.34616 3.99555 -9.31778 
+8 1.0 0.5 1 28 "Non Linear decrease" 9.31661 3.09551 -10.21665 
+8 1.0 0.5 1 29 "Non Linear decrease" 9.28666 3.95343 -8.42874 
+8 1.0 0.5 1 30 "Non Linear decrease" 9.25629 3.98297 -9.22676 
+8 1.0 0.5 1 31 "Non Linear decrease" 9.22549 4.01291 -9.19555 
+8 1.0 0.5 1 32 "Non Linear decrease" 9.19425 4.04326 -9.16389 
+8 1.0 0.5 1 33 "Non Linear decrease" 9.16254 3.97405 -9.23176 
+8 1.0 0.5 1 34 "Non Linear decrease" 9.13037 4.00529 -9.09914 
+8 1.0 0.5 1 35 "Non Linear decrease" 9.09772 4.03697 -9.06603 
+8 1.0 0.5 1 36 "Non Linear decrease" 9.06457 3.96913 -9.13241 
+8 1.0 0.5 1 37 "Non Linear decrease" 9.03090 4.00177 -8.99826 
+8 1.0 0.5 1 38 "Non Linear decrease" 8.99670 4.03490 -8.96357 
+8 1.0 0.5 1 39 "Non Linear decrease" 8.96196 3.96855 -9.02831 
+8 1.0 0.5 1 40 "Non Linear decrease" 8.92665 4.00273 -8.89247 
+8 1.0 0.5 1 41 "Non Linear decrease" 8.89076 4.03746 -8.85603 
+8 1.0 0.5 1 42 "Non Linear decrease" 8.85426 3.97275 -8.91897 
+8 1.0 0.5 1 43 "Non Linear decrease" 8.81714 2.25237 -10.53752 
+8 1.0 0.5 1 44 "Non Linear decrease" 8.77937 4.04510 -6.98665 
+8 1.0 0.5 1 45 "Non Linear decrease" 8.74094 3.98219 -8.80384 
+8 1.0 0.5 1 46 "Non Linear decrease" 8.70181 4.01993 -8.66407 
+8 1.0 0.5 1 47 "Non Linear decrease" 8.66197 3.95834 -8.72356 
+8 1.0 0.5 1 48 "Non Linear decrease" 8.62138 3.99744 -8.58228 
+8 1.0 0.5 1 49 "Non Linear decrease" 8.58002 4.03726 -8.54020 
+8 1.0 0.5 1 50 "Non Linear decrease" 8.53785 3.97782 -8.59729 
+8 1.0 0.5 1 51 "Non Linear decrease" 8.49485 4.01915 -8.45352 
+8 1.0 0.5 1 52 "Non Linear decrease" 8.45098 3.96128 -8.50885 
+8 1.0 0.5 1 53 "Non Linear decrease" 8.40621 4.00425 -8.36324 
+8 1.0 0.5 1 54 "Non Linear decrease" 8.36049 4.04808 -8.31666 
+8 1.0 0.5 1 55 "Non Linear decrease" 8.31379 3.99281 -8.36905 
+8 1.0 0.5 1 56 "Non Linear decrease" 8.26606 4.03848 -8.22039 
+8 1.0 0.5 1 57 "Non Linear decrease" 8.21726 3.98514 -8.27061 
+8 1.0 0.5 1 58 "Non Linear decrease" 8.16734 4.03282 -8.11966 
+8 1.0 0.5 1 59 "Non Linear decrease" 8.11625 3.98156 -8.16750 
+8 1.0 0.5 1 60 "Non Linear decrease" 8.06392 4.03143 -8.01405 
+8 1.0 0.5 1 61 "Non Linear decrease" 8.01030 3.98246 -8.05926 
+8 1.0 0.5 1 62 "Non Linear decrease" 7.95532 4.03472 -7.90306 
+8 1.0 0.5 1 63 "Non Linear decrease" 7.89892 3.98827 -7.94537 
+8 1.0 0.5 1 64 "Non Linear decrease" 7.84101 4.04317 -7.78611 
+8 1.0 0.5 1 65 "Non Linear decrease" 7.78151 3.99949 -7.82519 
+8 1.0 0.5 1 66 "Non Linear decrease" 7.72034 3.95732 -7.76252 
+8 1.0 0.5 1 67 "Non Linear decrease" 7.65739 4.01671 -7.59800 
+8 1.0 0.5 1 68 "Non Linear decrease" 7.59257 3.97778 -7.63150 
+8 1.0 0.5 1 69 "Non Linear decrease" 7.52575 4.04061 -7.46292 
+8 1.0 0.5 1 70 "Non Linear decrease" 7.45681 4.00531 -7.49211 
+8 1.0 0.5 1 71 "Non Linear decrease" 7.38561 3.23010 -8.16082 
+8 1.0 0.5 1 72 "Non Linear decrease" 7.31199 4.04078 -6.50131 
+8 1.0 0.5 1 73 "Non Linear decrease" 7.23579 4.01181 -7.26476 
+8 1.0 0.5 1 74 "Non Linear decrease" 7.15682 6.85860 -4.31003 
+8 1.0 0.5 1 75 "Non Linear decrease" 7.07487 3.96123 -9.97223 
+8 1.0 0.5 1 76 "Non Linear decrease" 6.98970 4.03997 -6.91096 
+8 1.0 0.5 1 77 "Non Linear decrease" 6.90106 4.02166 -6.91937 
+8 1.0 0.5 1 78 "Non Linear decrease" 6.80864 1.27702 -9.55328 
+8 1.0 0.5 1 79 "Non Linear decrease" 6.71211 3.99483 -3.99430 
+8 1.0 0.5 1 80 "Non Linear decrease" 6.61110 3.98687 -6.61906 
+8 1.0 0.5 1 81 "Non Linear decrease" 6.50515 3.98296 -6.50906 
+8 1.0 0.5 1 82 "Non Linear decrease" 6.39377 3.98347 -6.39326 
+8 1.0 0.5 1 83 "Non Linear decrease" 6.27636 3.98883 -6.27100 
+8 1.0 0.5 1 84 "Non Linear decrease" 6.15224 6.45614 -3.68493 
+8 1.0 0.5 1 85 "Non Linear decrease" 6.02060 4.01611 -8.46063 
+8 1.0 0.5 1 86 "Non Linear decrease" 5.88046 4.03926 -5.85731 
+8 1.0 0.5 1 87 "Non Linear decrease" 5.73064 3.96973 -5.80017 
+8 1.0 0.5 1 88 "Non Linear decrease" 5.56972 4.00844 -5.53101 
+8 1.0 0.5 1 89 "Non Linear decrease" 5.39591 2.32211 -7.08223 
+8 1.0 0.5 1 90 "Non Linear decrease" 5.20696 4.01515 -3.51392 
+8 1.0 0.5 1 91 "Non Linear decrease" 5.00000 3.98607 -5.02908 
+8 1.0 0.5 1 92 "Non Linear decrease" 4.77121 3.97121 -4.78607 
+8 1.0 0.5 1 93 "Non Linear decrease" 4.51545 3.97303 -4.51364 
+8 1.0 0.5 1 94 "Non Linear decrease" 4.22549 3.99459 -4.20393 
+8 1.0 0.5 1 95 "Non Linear decrease" 3.89076 1.55611 -6.32924 
+8 1.0 0.5 1 96 "Non Linear decrease" 3.49485 3.91334 -1.13762 
+8 1.0 0.5 1 97 "Non Linear decrease" 3.01030 1.11939 -5.80425 
+8 1.0 0.5 1 98 "Non Linear decrease" 2.38561 3.86501 0.36001 
+8 1.0 0.5 1 99 "Non Linear decrease" 1.50515 3.73394 -1.63622 
+8 1.0 0.5 1 100 "Non Linear decrease" 0.00000 3.38970 -0.34424 

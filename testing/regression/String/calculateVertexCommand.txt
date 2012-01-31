@@ -1,0 +1,2 @@
+sbcl --noinform --noprint --disable-debugger --load LETF.lisp  Darwin  configFile.txt "workFile.txt"
+

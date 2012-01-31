@@ -1,0 +1,7 @@
+
+#launch letf with a test work file
+Darwin/sbcl --core Darwin/sbcl.core --noinform --noprint --disable-debugger --load LETF.lisp 0 Darwin  "letf-conf-parabola2d-search-2.txt" "workFile01.txt"
+
+#launch cell, which calls letf for each work file cell creates
+./Cell letf-conf-parabola2d-search.txt
+
