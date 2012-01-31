@@ -1,9 +1,7 @@
-DISTRO = SBCL
-ifeq (${DISTRO},SBCL)
-	CFLAGS = sbcl --noinform --noprint --disable-debugger --load ../../../letf.lisp
-else
-	CFLAGS = ccl -b -l ../../../letf.lisp --
-endif
+include ../Makefile
+
+#Overwriting default path to letf.lisp
+LETF = ../../../letf.lisp
 
 all: MM HPC C Java String Unit3
 
