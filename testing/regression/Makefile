@@ -7,6 +7,7 @@ all: MM HPC C Java String Unit3
 
 regression:
 	make all > regression.txt 2>&1
+	make all DISTRO=ccl >> regression.txt 2>&1
 
 MM: MM.1 MM.2 MM.3 MM.4 MM.5
 
