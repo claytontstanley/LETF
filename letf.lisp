@@ -1221,7 +1221,11 @@
                           (work-instance `(make-instance 'work-class))
                           (session-collector-instance `(make-instance 'session-collector-class))
                           (process-output-str-instance `(make-instance 'process-output-str-class))
-                          (run-collector-instance `(make-instance 'run-collector-class)))
+                          (run-collector-instance `(make-instance 'run-collector-class))
+                          (johnny5-runProcess-instance `(make-instance 'johnny5-runProcess-class))
+                          (number5-runProcess-instance `(make-instance 'number5-runProcess-class))
+                          (johnny5-run-instance `(make-instance 'johnny5-run-class))
+                          (number5-run-instance `(make-instance 'number5-run-class)))
   "generates the code that generates the session object that will be executed"
   (setf collector-instance (append collector-instance
                                    '(:cellElements (get-elements cellKeys IVHash :eval-val-p nil)
@@ -1233,21 +1237,25 @@
   (setf session-collector-instance (append session-collector-instance '(:quota (* (length (lines work)) iterations))))
   (setf run-collector-instance (append run-collector-instance '(:quota 1 :collector collector)))
   (setf process-output-str-instance (append process-output-str-instance '(:quota 200)))
-  (let ((session-instance `(make-instance 'session-class))
-        (run-process-instance `(make-instance (if short-circuit-p 'johnny5-runProcess-class 'number5-runProcess-class) 
-                                              :modelProgram modelProgram :platform platform
-                                              :process-output-str ,process-output-str-instance
-                                              :session session))
-        (run-instance `(make-instance (if short-circuit-p 'johnny5-run-class 'number5-run-class)
-                                      :IVHash (copy-hash IVHash)
-                                      :DVHash (copy-hash mergedHash)
-                                      :IVKeys IVKeys
-                                      :DVKeys DVKeys
-                                      :quot (+ 1 count)
-                                      :cellKeys cellKeys
-                                      :run-collector ,run-collector-instance
-                                      :runProcess runProcess
-                                      :entryFnType entryFnType)))
+  (let* ((session-instance `(make-instance 'session-class))
+         (run-process-default-initargs `(:modelProgram modelProgram :platform platform
+                                         :process-output-str ,process-output-str-instance
+                                         :session session))
+         (run-process-instance `(if short-circuit-p
+                                  ,(append johnny5-runProcess-instance run-process-default-initargs)
+                                  ,(append number5-runProcess-instance run-process-default-initargs)))
+         (run-default-initargs `(:IVHash (copy-hash IVHash)
+                                 :DVHash (copy-hash mergedHash)
+                                 :IVKeys IVKeys
+                                 :DVKeys DVKeys
+                                 :quot (+ 1 count)
+                                 :cellKeys cellKeys
+                                 :run-collector ,run-collector-instance
+                                 :runProcess runProcess
+                                 :entryFnType entryFnType))
+         (run-instance `(if short-circuit-p
+                          ,(append johnny5-run-instance run-default-initargs)
+                          ,(append number5-run-instance run-default-initargs))))
     `(progn
        (let ((session) (runProcess) (line-index) (count) (iteration) (iterations)
              (DVHash) (IVHash) (DVKeys) (IVKeys) (modelProgram) (cellKeys) (mergedHash)
