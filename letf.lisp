@@ -1284,7 +1284,7 @@
            (setf short-circuit-p (let ((it (subseq (first modelProgram) 0 1)))
                                    (or (equal it "#") (equal it "'") (equal it "("))))
            (if short-circuit-p
-             (setf modelProgram (symbol-function-safe (eval (read-from-string (make-sentence modelProgram))))
+             (setf modelProgram (eval (read-from-string (make-sentence modelProgram)))
                    runsPerProcess (read-from-string "inf")))
            (setf (IVStringFn session)
                  (if (not short-circuit-p)
