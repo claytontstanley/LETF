@@ -2,7 +2,7 @@ DISTRO = SBCL
 LETF = ../letf.lisp
 
 ifeq (${DISTRO},SBCL)
-	CFLAGS = sbcl --noinform --noprint --disable-debugger --load ${LETF}
+	CFLAGS = sbcl --noinform --noprint --load ${LETF}
 else
 	CFLAGS = ccl -b -l ../../../letf.lisp --
 endif

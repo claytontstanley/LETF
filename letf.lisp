@@ -1581,14 +1581,11 @@
 
 (defmethod defaultIVStringFn ((obj run-class))
   "defines how an IV vector will look when sent across stdin, when the model is launched as a separate process"
-  (with-output-to-string (line)
-    (let ((elementCount 0) 
-          (elements (get-elements (IVKeys obj) (IVHash obj) :eval-val-p nil)))
-      (dolist (element elements)
-        (incf elementCount)
-        (write-string (cdr element) line)
-        (if (not (equal elementCount (length elements)))
-          (write-string (string #\Tab) line))))))
+  (format nil "~{~a~^	~}"
+          (mapcar #'cdr (get-elements 
+                          (IVKeys obj) 
+                          (IVHash obj) 
+                          :eval-val-p nil))))
 
 ;////////////////////////////////////////////
 ;hpc-specific classes, methods, and functions; all of this is to define the custom 'build-hpc-session
