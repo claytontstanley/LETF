@@ -1290,7 +1290,7 @@
                  (if (not short-circuit-p)
                    (aif (get-matching-line configFileWdLST "IVStringFn=")
                      (symbol-function-safe (eval (read-from-string it)))
-                     #'defaultIVStringFn)))
+                     #'IV-string-fn)))
            (setf entryFnType (if short-circuit-p
                                (aif (get-matching-line configFileWdLST "entryFnType=")
                                  (read-from-string (get-word it))
@@ -1579,7 +1579,7 @@
      (mapc (lambda (x) (format strm "~a~%" x)) (necessaries (DVKeys obj) (DVHash obj)))
      (format strm "~%"))))
 
-(defmethod defaultIVStringFn ((obj run-class))
+(defmethod IV-string-fn ((obj run-class))
   "defines how an IV vector will look when sent across stdin, when the model is launched as a separate process"
   (format nil "~{~a~^	~}"
           (mapcar #'cdr (get-elements 

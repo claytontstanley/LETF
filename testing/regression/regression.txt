@@ -41,7 +41,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 STYLE-WARNING: redefining COMMON-LISP-USER::WHILE in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
@@ -7332,7 +7332,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 STYLE-WARNING: redefining COMMON-LISP-USER::WHILE in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
@@ -11624,7 +11624,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 STYLE-WARNING: redefining COMMON-LISP-USER::WHILE in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
@@ -11915,7 +11915,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 
 
 ; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/MM/model.lisp
@@ -12204,7 +12204,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 STYLE-WARNING: Implicitly creating new generic function BAD-MODELS-P.
 STYLE-WARNING: Implicitly creating new generic function RESET-COLLECTOR.
 
@@ -12365,7 +12365,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 
 printing uncommented lines in configuration file that were not read:
 collapseEvalAt=end
@@ -13184,7 +13184,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 STYLE-WARNING: redefining COMMON-LISP-USER::WHILE in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
@@ -13549,7 +13549,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 STYLE-WARNING: redefining COMMON-LISP-USER::WHILE in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
@@ -14516,7 +14516,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 STYLE-WARNING: redefining COMMON-LISP-USER::WHILE in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
@@ -15575,7 +15575,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 STYLE-WARNING: redefining COMMON-LISP-USER::WHILE in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
@@ -15907,7 +15907,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 
 ; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/model05.lisp
 ; in: DEFUN RUN-MODEL
@@ -15998,7 +15998,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 
 
 ; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/misc-utils.lisp
@@ -18296,7 +18296,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 
 printing session status:
 #####entry function: linux/parabola2d nil
@@ -18406,7 +18406,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 Evaluating: 11 1
 line: 11 1
 finished: 1.0
@@ -18470,7 +18470,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 
 printing uncommented lines in configuration file that were not read:
 
@@ -18575,7 +18575,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
-STYLE-WARNING: Implicitly creating new generic function DEFAULTIVSTRINGFN.
+STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 STYLE-WARNING: redefining COMMON-LISP-USER::WHILE in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO

@@ -67,7 +67,7 @@ In this case, each time the java model (for example) is launched, it will be pas
 #For non-lisp models, to change the format of each config line sent on the standard input stream:
 IVStringFn=#'write-comma-delimited
 
-In this case, the modeler would define a 'write-comma-delimited function, and each IV line sent to the model process would have IV values separated by commas. The default function is 'defaultIVStringFN is already defined, which prints tab-delimited IV values
+In this case, the modeler would define a 'write-comma-delimited function, and each IV line sent to the model process would have IV values separated by commas. The default function is 'IV-string-fn is already defined, which prints tab-delimited IV values
 
 #To collapse DVs differently, you define the collapsing function for each DV independently
 collapseFn= mean ; DV=correlRTs RMSERTs

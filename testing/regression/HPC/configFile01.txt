@@ -24,7 +24,7 @@ collapseEvalAt=end
 statusPrinter= 'print-unread-lines
 statusPrinter='print-session
 
-IVStringFn=#'defaultIVStringFn
+IVStringFn=#'IV-string-fn
 
 Constant= num-runs 15.0   
 Constant=environ-wait 8.0

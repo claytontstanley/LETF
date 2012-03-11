@@ -38,7 +38,7 @@
     ;so a workaround is to copy lst, and then check if the length of that list is equal to what is expected
     (check (equal (length (copy-list lst)) 5))))
 
-(deftest test-defaultIVStringFn ()
+(deftest test-IV-string-fn ()
   (labels ((test (IV-lst)
              (let* ((keys (mapcar #'car IV-lst))
                     (vals (mapcar #'cdr IV-lst))
@@ -47,7 +47,7 @@
                            :workFileStr (format nil "~{~a ~}~%" vals))))
                (check
                  (string-equal
-                   (defaultIVStringFn (first-run-class obj))
+                   (IV-string-fn (first-run-class obj))
                    (format nil "~{~a~^	~}" vals ))))))
     (test '(("IV1" . 5) ("IV2" . 4)))
     (test '(("IVa" . 'a)))
