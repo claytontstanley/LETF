@@ -1,16 +1,17 @@
 In order to interface a non-lisp model, you must [1] launch your model from the command line, [2] accept model inputs on standard input (stdin), and [3] print model outputs to standard output (stdout).
 
-For example, suppose you have a model that has two independent variables (IVs) and two dependent variables (DVs). First, generate a 'work file' that has a row for each set of independent variables that you want to run.
+For example, suppose you have a model that has two independent variables (IVs) and two dependent variables (DVs). First, generate a 'work file' that has a row for each set of independent variables that you want to run. Each row should be in JSON IV-name IV-val format:
 
 For this example:
-$ cat workFile.txt 
-11 1
-2 1
-3 1
-4 1
-5 2
-6 3
-7 2
+$ cat workfile.txt 
+{"IV1":1,"IV2":1}
+{"IV1":2,"IV2":1}
+{"IV1":3,"IV2":1}
+{"IV1":4,"IV2":1}
+{"IV1":5,"IV2":2}
+{"IV1":6,"IV2":3}
+{"IV1":7,"IV2":2}
+
 
 This workfile says that you want to run a model with two IVs through a set of 7 different IV runs. 
 
@@ -25,13 +26,17 @@ For this example, here's a python model (pythonModel.py):
 #!/usr/bin/python
 
 import sys
+import json
 
 def doWork(line):
-        inputVariables=line.strip().split()
-        IV1=inputVariables[0]
-        IV2=inputVariables[1]
-        print "line" + "=" + line
-        print "finished" + "=" + "1"
+        IVStr = json.loads(line)
+        print 'IVStr=' + str(IVStr) # For general info and debugging only; not required for interfacing
+        for key, value in IVStr.iteritems():
+                exec( key + '=' + str(value) )
+        DV1 = IV1 * IV1 + IV2 * IV2
+        DV2 = IV1 + IV2
+        print "DV1" + "=" + str(DV1)
+        print "DV2" + "=" + str(DV2)
 
 while True:
         line=sys.stdin.readline().strip()
@@ -39,27 +44,32 @@ while True:
                 break
         doWork(line)
 
-
 //////////////////
 
 To execute the model, launch the model from the command line, and get standard input from the workfile, like this:
 
-Java model:
-$ python pythonModel.py < workFile.txt  
-line=11 1
-finished=1
-line=2 1
-finished=1
-line=3 1
-finished=1
-line=4 1
-finished=1
-line=5 2
-finished=1
-line=6 3
-finished=1
-line=7 2
-finished=1
+Python model:
+$ python model.py < workfile.txt 
+IVStr={u'IV1': 1, u'IV2': 1}
+DV1=2
+DV2=2
+IVStr={u'IV1': 2, u'IV2': 1}
+DV1=5
+DV2=3
+IVStr={u'IV1': 3, u'IV2': 1}
+DV1=10
+DV2=4
+IVStr={u'IV1': 4, u'IV2': 1}
+DV1=17
+DV2=5
+IVStr={u'IV1': 5, u'IV2': 2}
+DV1=29
+DV2=7
+IVStr={u'IV1': 6, u'IV2': 3}
+DV1=45
+DV2=9
+IVStr={u'IV1': 7, u'IV2': 2}
+DV1=53
+DV2=9
 
-
-
+Note that there is extraneous output (IVStr line), but that's OK. The system will filter the output and look for only what is needed. Also note that there doesn't need to be any sort of break statement between runs. The system will keep track of which DV vals map to which runs.
