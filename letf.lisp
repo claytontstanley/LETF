@@ -1033,12 +1033,12 @@
     then there will only be 1 instance of this class; if we're launching the model as a separate process, then
     the number of instances will be (ceiling (total runs / runs per process))"))
 
-(defclass number5-runProcess-class (runProcess-class)
+(defclass nonlisp-model-runProcess-class (runProcess-class)
   ((sleepTime :accessor sleepTime :initarg :sleepTime :initform .2
               :documentation "amount of time (in seconds) the program will sleep between checking the strm for model output (using a polling solution)"))
   (:documentation "class for a single process if we're not short circuiting"))
 
-(defclass johnny5-runProcess-class (runProcess-class)
+(defclass lisp-model-runProcess-class (runProcess-class)
   ((sleepTime :accessor sleepTime :initarg :sleepTime :initform 0
               :documentation "should be 0s when short circuiting b/c all of the model's output will be on the strm on the first check of strm"))
   (:documentation "class for a single process if we're short circuiting"))
@@ -1072,11 +1072,11 @@
   (expect (not (runs (run-collector obj))) "should not have any run in the run-collector yet")
   (push-to-end obj (runs (run-collector obj))))
 
-(defclass number5-run-class (run-class) 
+(defclass nonlisp-model-run-class (run-class) 
   ()
   (:documentation "class for a single run, if not short circuiting"))
 
-(defclass johnny5-run-class (run-class) 
+(defclass lisp-model-run-class (run-class) 
   ()
   (:documentation "class for a single run, if short circuiting"))
 
@@ -1102,7 +1102,7 @@
     #-CCL #'process-exit-code 
     (process obj)))
 
-(defmethod get-process ((obj number5-runProcess-class) input)
+(defmethod get-process ((obj nonlisp-model-runProcess-class) input)
   (let ((process (make-instance 'process-class)))
     ;Launch the process
     (setf (process process)
@@ -1222,10 +1222,10 @@
                           (session-collector-instance `(make-instance 'session-collector-class))
                           (process-output-str-instance `(make-instance 'process-output-str-class))
                           (run-collector-instance `(make-instance 'run-collector-class))
-                          (johnny5-runProcess-instance `(make-instance 'johnny5-runProcess-class))
-                          (number5-runProcess-instance `(make-instance 'number5-runProcess-class))
-                          (johnny5-run-instance `(make-instance 'johnny5-run-class))
-                          (number5-run-instance `(make-instance 'number5-run-class)))
+                          (lisp-model-runProcess-instance `(make-instance 'lisp-model-runProcess-class))
+                          (nonlisp-model-runProcess-instance `(make-instance 'nonlisp-model-runProcess-class))
+                          (lisp-model-run-instance `(make-instance 'lisp-model-run-class))
+                          (nonlisp-model-run-instance `(make-instance 'nonlisp-model-run-class)))
   "generates the code that generates the session object that will be executed"
   (setf collector-instance (append collector-instance
                                    '(:cellElements (get-elements cellKeys IVHash :eval-val-p nil)
@@ -1242,8 +1242,8 @@
                                          :process-output-str ,process-output-str-instance
                                          :session session))
          (run-process-instance `(if short-circuit-p
-                                  ,(append johnny5-runProcess-instance run-process-default-initargs)
-                                  ,(append number5-runProcess-instance run-process-default-initargs)))
+                                  ,(append lisp-model-runProcess-instance run-process-default-initargs)
+                                  ,(append nonlisp-model-runProcess-instance run-process-default-initargs)))
          (run-default-initargs `(:IVHash (copy-hash IVHash)
                                  :DVHash (copy-hash mergedHash)
                                  :IVKeys IVKeys
@@ -1254,8 +1254,8 @@
                                  :runProcess runProcess
                                  :entryFnType entryFnType))
          (run-instance `(if short-circuit-p
-                          ,(append johnny5-run-instance run-default-initargs)
-                          ,(append number5-run-instance run-default-initargs))))
+                          ,(append lisp-model-run-instance run-default-initargs)
+                          ,(append nonlisp-model-run-instance run-default-initargs))))
     `(progn
        (let ((session) (runProcess) (line-index) (count) (iteration) (iterations)
              (DVHash) (IVHash) (DVKeys) (IVKeys) (modelProgram) (cellKeys) (mergedHash)
@@ -1360,7 +1360,7 @@
         ;(format t "key=~a value=~a~%" (first key) (first value))
         (cons (first key) (make-sentence value))))))
 
-(defmethod get-DVs ((obj number5-run-class) &optional (process nil) (appetizers nil)) 
+(defmethod get-DVs ((obj nonlisp-model-run-class) &optional (process nil) (appetizers nil)) 
   "capture all the input lines that the model has sent; 
   then, remap each line as a dotted pair (key . value)"
   (expect process "should be a process here")
@@ -1372,7 +1372,7 @@
       (aif (line2element line) (push-to-end it currentDVs)))
     (append appetizers currentDVs)))
 
-(defmethod get-DVs ((obj johnny5-run-class) &optional (process nil) (appetizers nil))
+(defmethod get-DVs ((obj lisp-model-run-class) &optional (process nil) (appetizers nil))
   "capture all the input lines that the model has sent; 
   then, remap each line as a dotted pair (key . value)"
   (mklst appetizers)  
@@ -1399,7 +1399,7 @@
       (error "failed to get DVs; model crashed"))
     (append appetizers currentDVs)))
 
-(defmethod wrapper-execute ((obj johnny5-run-class) &optional (process nil) (appetizers nil))
+(defmethod wrapper-execute ((obj lisp-model-run-class) &optional (process nil) (appetizers nil))
   (mklst appetizers)
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session (runProcess obj))))
   (with-slots (DVKeys DVHash run-collector sleepTime) obj
@@ -1422,7 +1422,7 @@
       ;not returning any leftovers
       nil)))
 
-(defmethod wrapper-execute ((obj number5-run-class) &optional (process) (appetizers))
+(defmethod wrapper-execute ((obj nonlisp-model-run-class) &optional (process) (appetizers))
   (mklst appetizers)
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session (runProcess obj))))
   (with-slots (DVKeys DVHash run-collector sleepTime) obj
@@ -1460,7 +1460,7 @@
       (sleep sleepTime)
       currentDVs)))
 
-(defmethod wrapper-execute ((obj johnny5-runProcess-class) &optional (process nil) (appetizers nil))
+(defmethod wrapper-execute ((obj lisp-model-runProcess-class) &optional (process nil) (appetizers nil))
   "execute the runProcess-class object, if short circuiting"
   (expect (not appetizers) "should not have any appetizers here; have ~a" appetizers)
   (expect (not process) "should not have a process here; have ~a" process)
@@ -1472,14 +1472,14 @@
   (sleep (sleepTime obj)))
 
 
-(defmethod get-input-line ((obj number5-run-class))
+(defmethod get-input-line ((obj nonlisp-model-run-class))
   (funcall (IVStringFn (session (runProcess obj))) obj))
 
-(defmethod get-process-inputs ((obj number5-runProcess-class))
+(defmethod get-process-inputs ((obj nonlisp-model-runProcess-class))
   "Returns two values: [1] Any appetizers (cached-results) and [2] the input string to send to the launched process' stdin"
   (values nil (format nil "~{~a~%~}" (mapcar #'get-input-line (runs obj)))))
 
-(defmethod wrapper-execute ((obj number5-runProcess-class) &optional (process nil) (appetizers nil))
+(defmethod wrapper-execute ((obj nonlisp-model-runProcess-class) &optional (process nil) (appetizers nil))
   "execute the runProcess-class object, if we're not short circuiting"
   (expect (not appetizers) "should not have any appetizers here; have ~a" appetizers)
   (expect (not process) "should not have a process here; have ~a" process)
