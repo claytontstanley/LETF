@@ -19,30 +19,25 @@ Next, configure your model. It needs to accept IV values on standard input, exec
 
 Each DV outputted should be printed to stdout in the form: "[DVName]=[DVVAL]\n". That is, the name of the DV, and equal sign, the DV's value, and then a newline character.
 
-For this example, here's a python model (pythonModel.py):
+For this example, here's a python model (model.py):
 
 //////////////////
 
 #!/usr/bin/python
 
-import sys
-import json
-
-def doWork(line):
-        IVStr = json.loads(line)
-        print 'IVStr=' + str(IVStr) # For general info and debugging only; not required for interfacing
-        for key, value in IVStr.iteritems():
-                exec( key + '=' + str(value) )
+#parameter names below must be capitalized/spelled the same way as in the workfile
+def runModel(IV1,IV2):
         DV1 = IV1 * IV1 + IV2 * IV2
         DV2 = IV1 + IV2
         print "DV1" + "=" + str(DV1)
         print "DV2" + "=" + str(DV2)
 
-while True:
-        line=sys.stdin.readline().strip()
-        if len(line) == 0:
-                break
-        doWork(line)
+if __name__=='__main__':
+        from sys import stdin; from json import loads
+        for line in stdin: 
+                print "Line=" + line.strip() #Not required; just for debugging purposes
+                runModel(**loads(line))
+
 
 //////////////////
 
@@ -50,26 +45,26 @@ To execute the model, launch the model from the command line, and get standard i
 
 Python model:
 $ python model.py < workfile.txt 
-IVStr={u'IV1': 1, u'IV2': 1}
+Line={"IV1":1,"IV2":1}
 DV1=2
 DV2=2
-IVStr={u'IV1': 2, u'IV2': 1}
+Line={"IV1":2,"IV2":1}
 DV1=5
 DV2=3
-IVStr={u'IV1': 3, u'IV2': 1}
+Line={"IV1":3,"IV2":1}
 DV1=10
 DV2=4
-IVStr={u'IV1': 4, u'IV2': 1}
+Line={"IV1":4,"IV2":1}
 DV1=17
 DV2=5
-IVStr={u'IV1': 5, u'IV2': 2}
+Line={"IV1":5,"IV2":2}
 DV1=29
 DV2=7
-IVStr={u'IV1': 6, u'IV2': 3}
+Line={"IV1":6,"IV2":3}
 DV1=45
 DV2=9
-IVStr={u'IV1': 7, u'IV2': 2}
+Line={"IV1":7,"IV2":2}
 DV1=53
 DV2=9
 
-Note that there is extraneous output (IVStr line), but that's OK. The system will filter the output and look for only what is needed. Also note that there doesn't need to be any sort of break statement between runs. The system will keep track of which DV vals map to which runs.
+Note that there is extraneous output (Line=), but that's OK. The system will filter the output and look for only what is needed. Also note that there doesn't need to be any sort of break statement between runs. The system will keep track of which DV vals map to which runs.
