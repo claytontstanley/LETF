@@ -1098,7 +1098,10 @@
 
 (defmethod p-exit-code ((obj process-class))
   (funcall
-    #+CCL #'external-process-status
+    #+CCL (lambda (process)
+            (multiple-value-bind (status exit-code) (process-status (process obj))
+              (declare (ignore status))
+              exit-code))
     #-CCL #'process-exit-code 
     (process obj)))
 
@@ -1448,11 +1451,9 @@
                  (progn
                    (merge-hash currentDV :toHash DVHash)
                    (setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'string-equal))))))
+      (when (equal (p-exit-code process) 1)
+        (print-collector (process-output-str (runProcess obj))))
       (awhen necessaryDVs
-        ;it should be really difficult not to throw an error here
-        (when (equal (p-exit-code process) 1)
-          (print-collector (process-output-str (runProcess obj)))       
-          (expect nil ""))
         (format *error-output* "failed to send all ~a DVs left for this trial~%" it)
         (merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) it) :toHash DVHash))
       (collect run-collector DVHash)

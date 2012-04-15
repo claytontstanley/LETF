@@ -1,3 +1,4 @@
+make[1]: Entering directory `/home/cstanley/src/gridportal/submodules/LETF/testing/regression'
 cd MM; sbcl --noinform --noprint --load ../../../letf.lisp nil mm_config_file.txt in.txt
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
@@ -11917,7 +11918,7 @@ STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
 STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/MM/model.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/MM/model.lisp
 ; in: DEFUN RUN-MODEL
 ;     (ACT-R-RANDOM 1000)
 ; 
@@ -12208,7 +12209,7 @@ STYLE-WARNING: Implicitly creating new generic function BAD-MODELS-P.
 STYLE-WARNING: Implicitly creating new generic function RESET-COLLECTOR.
 
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/MM/mm.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/MM/mm.lisp
 ; in: DEFMETHOD PRINT-COLLECTOR (MM-RUN-COLLECTOR-CLASS)
 ;     (GET-MODULE BOLD)
 ; 
@@ -15908,7 +15909,7 @@ STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
 STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/model05.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/model05.lisp
 ; in: DEFUN RUN-MODEL
 ;     (DEFUN RUN-MODEL (&KEY (X) (Y)) (FORMAT T "z1=1~%"))
 ; --> PROGN SB-INT:NAMED-LAMBDA 
@@ -16000,7 +16001,7 @@ STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
 STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/misc-utils.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/misc-utils.lisp
 ; in: DEFUN SPLICE-INTO-LIST
 ;     (ACT-UP::SPLICE-INTO-LIST-DES ACT-UP::TEMP POSITION ACT-UP::ITEM)
 ; 
@@ -16058,12 +16059,12 @@ STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 ;   caught 1 STYLE-WARNING condition
 STYLE-WARNING: Implicitly creating new generic function STRING-TO-LINES.
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/actr6-compatibility.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/actr6-compatibility.lisp
 ; in: DEFMACRO DEFINE-MODULE-FCT
 ;     (DEFMACRO ACT-UP::DEFINE-MODULE-FCT (&REST ACT-UP::ARGS) NIL)
 ; --> MULTIPLE-VALUE-PROG1 PROGN PROGN FUNCTION MULTIPLE-VALUE-PROG1 PROGN LET* 
 ; ==>
-;   (LET* ((ACT-UP::ARGS (CDR #:WHOLE1781)))
+;   (LET* ((ACT-UP::ARGS (CDR #:WHOLE1602)))
 ;     (BLOCK ACT-UP::DEFINE-MODULE-FCT NIL))
 ; 
 ; caught STYLE-WARNING:
@@ -16072,7 +16073,7 @@ STYLE-WARNING: Implicitly creating new generic function STRING-TO-LINES.
 ; compilation unit finished
 ;   caught 1 STYLE-WARNING condition
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/random.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/random.lisp
 ; in: DEFSTRUCT MERSENNE-TWISTER
 ;     (MAKE-ARRAY 624 :ELEMENT-TYPE 'BIGNUM)
 ; --> LOCALLY 
@@ -16097,7 +16098,7 @@ STYLE-WARNING:
 the usual naming convention (names like *FOO*) for special variables
 
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/random.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/random.lisp
 ; in: DEFUN CREATE-RANDOM-MODULE
 ;     (ACT-UP::INIT-RANDOM-STATE-FROM-SEED ACT-UP::STATE
 ;      (ACT-UP::MT-INITIAL-SEED ACT-UP::STATE))
@@ -16111,7 +16112,7 @@ the usual naming convention (names like *FOO*) for special variables
 ;   caught 1 STYLE-WARNING condition
 
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/actr-aux.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/actr-aux.lisp
 ; in: DEFUN SAY
 ;     (ACT-UP::META-PROCESS-NAME ACT-UP::*CURRENT-ACTUP-META-PROCESS*)
 ; 
@@ -16222,7 +16223,7 @@ the usual naming convention (names like *FOO*) for special variables
 ;   caught 1 WARNING condition
 ;   caught 1 STYLE-WARNING condition
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/actr-aux.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/actr-aux.lisp
 ; in: DEFUN RUN-MONITOR-BASE-LEVELS
 ;     (LAMBDA (ACT-UP::X) NIL)
 ; ==>
@@ -16250,7 +16251,7 @@ the usual naming convention (names like *FOO*) for special variables
 ; --> DOLIST BLOCK LET TAGBODY UNLESS IF PROGN LET* TAGBODY LET IF IF LET SETF 
 ; --> LET* MULTIPLE-VALUE-BIND LET FUNCALL 
 ; ==>
-;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-CURRENT-MODEL) #:NEW3 #:TMP4)
+;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-CURRENT-MODEL) #:NEW3 #:G4)
 ; 
 ; caught STYLE-WARNING:
 ;   undefined function: (SETF META-P-CURRENT-MODEL)
@@ -16346,7 +16347,7 @@ the usual naming convention (names like *FOO*) for special variables
 ;             (+ TIME (ACT-UP::META-P-TIME (ACT-UP::CURRENT-MP))))
 ; --> LET* MULTIPLE-VALUE-BIND LET FUNCALL 
 ; ==>
-;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-TIME) #:NEW0 #:TMP1)
+;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-TIME) #:NEW0 #:G1)
 ; 
 ; caught STYLE-WARNING:
 ;   undefined function: (SETF META-P-TIME)
@@ -16388,7 +16389,7 @@ the usual naming convention (names like *FOO*) for special variables
 ; --> DOLIST BLOCK LET TAGBODY UNLESS IF PROGN LET* TAGBODY LET IF IF LET SETF 
 ; --> LET* MULTIPLE-VALUE-BIND LET FUNCALL 
 ; ==>
-;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-CURRENT-MODEL) #:NEW3 #:TMP4)
+;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-CURRENT-MODEL) #:NEW3 #:G4)
 ; 
 ; caught STYLE-WARNING:
 ;   undefined function: (SETF META-P-CURRENT-MODEL)
@@ -16465,7 +16466,7 @@ the usual naming convention (names like *FOO*) for special variables
 ; --> DOLIST BLOCK LET TAGBODY UNLESS IF PROGN LET* TAGBODY LET IF IF LET SETF 
 ; --> LET* MULTIPLE-VALUE-BIND LET FUNCALL 
 ; ==>
-;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-CURRENT-MODEL) #:NEW3 #:TMP4)
+;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-CURRENT-MODEL) #:NEW3 #:G4)
 ; 
 ; caught STYLE-WARNING:
 ;   undefined function: (SETF META-P-CURRENT-MODEL)
@@ -16537,7 +16538,7 @@ the usual naming convention (names like *FOO*) for special variables
 ; --> DOLIST BLOCK LET TAGBODY UNLESS IF PROGN LET* TAGBODY LET IF IF LET SETF 
 ; --> LET* MULTIPLE-VALUE-BIND LET FUNCALL 
 ; ==>
-;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-CURRENT-MODEL) #:NEW7 #:TMP8)
+;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-CURRENT-MODEL) #:NEW7 #:G8)
 ; 
 ; caught STYLE-WARNING:
 ;   undefined function: (SETF META-P-CURRENT-MODEL)
@@ -16545,7 +16546,7 @@ the usual naming convention (names like *FOO*) for special variables
 ;     (SETF (ACT-UP::META-P-DELAYED (ACT-UP::CURRENT-MP)) NIL)
 ; --> LET* MULTIPLE-VALUE-BIND LET FUNCALL 
 ; ==>
-;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-DELAYED) #:NEW2 #:TMP3)
+;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-DELAYED) #:NEW2 #:G3)
 ; 
 ; caught STYLE-WARNING:
 ;   undefined function: (SETF META-P-DELAYED)
@@ -16553,7 +16554,7 @@ the usual naming convention (names like *FOO*) for special variables
 ;     (SETF (ACT-UP::META-P-EVENTS (ACT-UP::CURRENT-MP)) NIL)
 ; --> LET* MULTIPLE-VALUE-BIND LET FUNCALL 
 ; ==>
-;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-EVENTS) #:NEW0 #:TMP1)
+;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-EVENTS) #:NEW0 #:G1)
 ; 
 ; caught STYLE-WARNING:
 ;   undefined function: (SETF META-P-EVENTS)
@@ -16631,7 +16632,7 @@ the usual naming convention (names like *FOO*) for special variables
 ; --> DOLIST BLOCK LET TAGBODY UNLESS IF PROGN LET* TAGBODY LET IF IF LET SETF 
 ; --> LET* MULTIPLE-VALUE-BIND LET FUNCALL 
 ; ==>
-;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-CURRENT-MODEL) #:NEW3 #:TMP4)
+;   (SB-C::%FUNCALL #'(SETF ACT-UP::META-P-CURRENT-MODEL) #:NEW3 #:G4)
 ; 
 ; caught STYLE-WARNING:
 ;   undefined function: (SETF META-P-CURRENT-MODEL)
@@ -16730,7 +16731,7 @@ the usual naming convention (names like *FOO*) for special variables
 ;     VECTOR-ADD
 ;   caught 1 STYLE-WARNING condition
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/act-up.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/act-up.lisp
 ; in: DEFUN UPDATE-CHUNK-REFERENCES
 ;     (DEFUN ACT-UP::UPDATE-CHUNK-REFERENCES (ACT-UP:CHUNK)
 ;       (PRINT "update-chunk-references: not implemented"))
@@ -16748,7 +16749,7 @@ the usual naming convention (names like *FOO*) for special variables
 ;   caught 1 STYLE-WARNING condition
 
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/act-up.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/act-up.lisp
 ; in: DEFUN SHOW-CHUNKS
 ;     (ACT-UP::SEARCH-FOR-CHUNKS ACT-UP::MODEL ACT-UP::CONSTRAINTS)
 ; 
@@ -16857,7 +16858,7 @@ the usual naming convention (names like *FOO*) for special variables
 ;     CHUNK-GET-BASE-LEVEL-ACTIVATION CHUNK-GET-SPREADING-ACTIVATION
 ;   caught 2 STYLE-WARNING conditions
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/act-up.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/act-up.lisp
 ; in: DEFUN BLEND
 ;     (FORMAT
 ;      "blend: Found chunk of different types ~a and ~a, and no CHUNK-TYPE given."
@@ -16910,7 +16911,7 @@ the usual naming convention (names like *FOO*) for special variables
 ;   caught 4 WARNING conditions
 ;   caught 1 STYLE-WARNING condition
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/act-up.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/act-up.lisp
 ; in: DEFUN CHUNK-GET-FAN
 ;     (LET* ((ACT-UP::J-AL (ACT-UP::STRUCTURE-ALIST ACT-UP::J))
 ;            (ACT-UP::J-LEN (LENGTH ACT-UP::J-AL)))
@@ -16980,7 +16981,7 @@ the usual naming convention (names like *FOO*) for special variables
 ;     VALUE-GET-SIMILARITY
 ;   caught 1 STYLE-WARNING condition
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/act-up.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/act-up.lisp
 ; in: DEFUN ACTUP-RULE-END
 ;     (DEFUN ACT-UP::ACTUP-RULE-END (ACT-UP::_NAME ACT-UP::_RESULT)
 ;       (ACT-UP:ACTUP-PASS-TIME 0.05d0))
@@ -17022,7 +17023,7 @@ the usual naming convention (names like *FOO*) for special variables
 ;     *IU*
 ;   caught 1 WARNING condition
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/act-up.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/act-up.lisp
 ; in: DEFUN ASSIGN-REWARD
 ;     (LET ((TIME (ACT-UP:ACTUP-TIME)) (ACT-UP::LAST-TIME (ACT-UP:ACTUP-TIME)))
 ;       (LOOP ACT-UP::FOR ACT-UP::RC ACT-UP::IN ACT-UP::*ACTUP-RULE-QUEUE*
@@ -17041,7 +17042,7 @@ the usual naming convention (names like *FOO*) for special variables
 ; compilation unit finished
 ;   caught 1 STYLE-WARNING condition
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/act-up.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/act-up.lisp
 ; in: DEFUN TEST-REWARD-ASSIGNMENT => DEFRULE RULE3
 ;     (ACT-UP:DEFRULE ACT-UP::RULE3 (ACT-UP::ARG3 ACT-UP::ARG4) :GROUP ACT-UP::G2
 ;                     (PRINT ACT-UP::ARG3))
@@ -17119,7 +17120,7 @@ the usual naming convention (names like *FOO*) for special variables
 ;   caught 5 STYLE-WARNING conditions
 
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/act-up-experiments.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/act-up-experiments.lisp
 ; in: DEFUN SAY
 ;     (ACT-UP-EXPERIMENTS::META-PROCESS-NAME
 ;      ACT-UP-EXPERIMENTS::*CURRENT-ACTUP-META-PROCESS*)
@@ -17195,7 +17196,7 @@ the usual naming convention (names like *FOO*) for special variables
 ;     AGGREGATE-VARIANCE-2
 ;   caught 1 STYLE-WARNING condition
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/act-up-experiments.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/act-up-experiments.lisp
 ; in: DEFUN AGGREGATE-VARIANCE-2
 ;     (ACT-UP-EXPERIMENTS::VEC-OP
 ;      '(LAMBDA (ACT-UP-EXPERIMENTS::X) (EXPT ACT-UP-EXPERIMENTS::X 2))
@@ -17224,7 +17225,7 @@ the usual naming convention (names like *FOO*) for special variables
 ;   caught 3 STYLE-WARNING conditions
 
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/uni-files.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/uni-files.lisp
 ; in: DEFUN UNI-WAIT-FOR
 ;     (UNI-PROCESS-SYSTEM-EVENTS)
 ; 
@@ -17236,7 +17237,7 @@ the usual naming convention (names like *FOO*) for special variables
 ;     UNI-PROCESS-SYSTEM-EVENTS
 ;   caught 1 STYLE-WARNING condition
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/uni-files.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/uni-files.lisp
 ; in: DEFUN UNI-WAIT-FOR-CHAR
 ;     (UNI-REPORT-ERROR "Connection closed while waitiing for a character.~%")
 ; 
@@ -17250,7 +17251,7 @@ STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/misc-utils.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/misc-utils.lisp
 ; in: DEFUN SPLICE-INTO-LIST
 ;     (SPLICE-INTO-LIST-DES TEMP POSITION ITEM)
 ; 
@@ -17309,12 +17310,12 @@ STYLE-WARNING: redefining COMMON-LISP-USER::FLATTEN in DEFUN
 ;   caught 1 STYLE-WARNING condition
 STYLE-WARNING: Implicitly creating new generic function STRING-TO-LINES.
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/actr6-compatibility.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/actr6-compatibility.lisp
 ; in: DEFMACRO DEFINE-MODULE-FCT
 ;     (DEFMACRO DEFINE-MODULE-FCT (&REST ARGS) NIL)
 ; --> MULTIPLE-VALUE-PROG1 PROGN PROGN FUNCTION MULTIPLE-VALUE-PROG1 PROGN LET* 
 ; ==>
-;   (LET* ((ARGS (CDR #:WHOLE2037)))
+;   (LET* ((ARGS (CDR #:WHOLE1858)))
 ;     (BLOCK DEFINE-MODULE-FCT NIL))
 ; 
 ; caught STYLE-WARNING:
@@ -17323,7 +17324,7 @@ STYLE-WARNING: Implicitly creating new generic function STRING-TO-LINES.
 ; compilation unit finished
 ;   caught 1 STYLE-WARNING condition
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/random.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/random.lisp
 ; in: DEFSTRUCT MERSENNE-TWISTER
 ;     (MAKE-ARRAY 624 :ELEMENT-TYPE 'BIGNUM)
 ; --> LOCALLY 
@@ -17348,7 +17349,7 @@ STYLE-WARNING:
 the usual naming convention (names like *FOO*) for special variables
 
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/random.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/random.lisp
 ; in: DEFUN CREATE-RANDOM-MODULE
 ;     (INIT-RANDOM-STATE-FROM-SEED STATE (MT-INITIAL-SEED STATE))
 ; 
@@ -17367,14 +17368,14 @@ STYLE-WARNING: Implicitly creating new generic function SET-NEXT-SEGMENT.
 STYLE-WARNING: Implicitly creating new generic function GET-NEXT-SEGMENT.
 
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/water-tank.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/water-tank.lisp
 ; in: DEFMETHOD UPDATE-TRANSDUCER (DAVID-TRANSDUCER)
 ;     (PUSH *CURRENT-TREND-CHUNK* (CURRENT-TREND-CHUNK OBJ))
 ; ==>
 ;   (LET* ((#:G14 *CURRENT-TREND-CHUNK*)
-;          (#:TMP13 OBJ)
-;          (#:NEW12 (CONS #:G14 (CURRENT-TREND-CHUNK #:TMP13))))
-;     (FUNCALL #'(SETF CURRENT-TREND-CHUNK) #:NEW12 #:TMP13))
+;          (#:OBJ13 OBJ)
+;          (#:NEW12 (CONS #:G14 (CURRENT-TREND-CHUNK #:OBJ13))))
+;     (FUNCALL #'(SETF CURRENT-TREND-CHUNK) #:NEW12 #:OBJ13))
 ; 
 ; caught WARNING:
 ;   undefined variable: *CURRENT-TREND-CHUNK*
@@ -17382,9 +17383,9 @@ STYLE-WARNING: Implicitly creating new generic function GET-NEXT-SEGMENT.
 ;     (PUSH *LAST-ASSUMED-TREND* (LAST-ASSUMED-TREND OBJ))
 ; ==>
 ;   (LET* ((#:G11 *LAST-ASSUMED-TREND*)
-;          (#:TMP10 OBJ)
-;          (#:NEW9 (CONS #:G11 (LAST-ASSUMED-TREND #:TMP10))))
-;     (FUNCALL #'(SETF LAST-ASSUMED-TREND) #:NEW9 #:TMP10))
+;          (#:OBJ10 OBJ)
+;          (#:NEW9 (CONS #:G11 (LAST-ASSUMED-TREND #:OBJ10))))
+;     (FUNCALL #'(SETF LAST-ASSUMED-TREND) #:NEW9 #:OBJ10))
 ; 
 ; caught WARNING:
 ;   undefined variable: *LAST-ASSUMED-TREND*
@@ -17475,7 +17476,7 @@ STYLE-WARNING: DECLAIM where DECLARE was probably intended
 ;     COGN-CALCULATE
 ;   caught 1 STYLE-WARNING condition
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/HPC/dsf/david-2/water-tank.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/HPC/dsf/david-2/water-tank.lisp
 ; in: DEFUN RUN-TRACE
 ;     (DEFUN RUN-TRACE (&OPTIONAL NUM-SUBJECTS)
 ;       (LET ((DATA-INPUT
@@ -18253,7 +18254,7 @@ estimation-enabled
 Evaluating: .5 1.0 8 .5 .2 5 10 1 1
 correlAll: 1.000000000000007
 rmseAll: 3.425027168138236e-7
-cd C; sbcl --noinform --noprint --load ../../../letf.lisp 0 darwin "letf-conf-parabola2d-search-2.txt" "workFile01.txt"
+cd C; sbcl --noinform --noprint --load ../../../letf.lisp 0 linux "letf-conf-parabola2d-search-2.txt" "workFile01.txt"
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -18298,7 +18299,7 @@ STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
 STYLE-WARNING: Implicitly creating new generic function IV-STRING-FN.
 
 printing session status:
-#####entry function: darwin/parabola2d nil
+#####entry function: linux/parabola2d nil
 #####total calls to entry function: 10
 #####calls to entry function per model process (runsPerProcess=): INF
 #####number of lines in the work file: 10
@@ -18530,9 +18531,9 @@ rt1: hello13109 hello14120
 rt2: world3423 world636
 hello-world: hello13109 hello14120 world3423 world636
 cd Unit3; \
-	rm -f mm_bold_out.txt; \
+rm -f mm_bold_out.txt; \
         sbcl --noinform --noprint --load ../../../letf.lisp darwin configFile-sperling.txt workFile-sperling.txt; \
-	wc mm_bold_out.txt
+wc mm_bold_out.txt
 STYLE-WARNING: redefining ANAPHORA:AIF in DEFMACRO
 STYLE-WARNING: redefining ANAPHORA:AWHEN in DEFMACRO
 STYLE-WARNING: redefining COMMON-LISP-USER::ALAMBDA in DEFMACRO
@@ -18714,7 +18715,7 @@ STYLE-WARNING:
    Implicitly creating new generic function PRINT-SESSION-HTML-COLOR.
 
 
-; file: /Users/claytonstanley/Desktop/2009-present wpafb research/2010-09-09 LETF/testing/regression/Unit3/sperling-wrapped.lisp
+; file: /home/cstanley/src/gridportal/submodules/LETF/testing/regression/Unit3/sperling-wrapped.lisp
 ; in: DEFUN RUN-MODEL
 ;     (RUN-BLOCK)
 ; 
@@ -18747,7 +18748,6 @@ STYLE-WARNING:
 
 Slots dir:
 
-.DS_Store
 .gitignore
 Makefile
 actr6/
@@ -18860,4 +18860,5 @@ Starting model with IV vector:	10
 Writing IV/DV vector to output file:	10	(4 2 2 2)	(3.03 2.4 2.03 1.5)	0.8187297830513651	0.5813346712522831
 Finished model with IV vector:	10
 
-      61     720   12301 mm_bold_out.txt
+   61   720 12301 mm_bold_out.txt
+make[1]: Leaving directory `/home/cstanley/src/gridportal/submodules/LETF/testing/regression'
