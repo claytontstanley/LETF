@@ -1099,7 +1099,7 @@
 (defmethod p-exit-code ((obj process-class))
   (funcall
     #+CCL (lambda (process)
-            (multiple-value-bind (status exit-code) (external-process-status (process obj))
+            (multiple-value-bind (status exit-code) (external-process-status process)
               (declare (ignore status))
               exit-code))
     #-CCL #'process-exit-code 

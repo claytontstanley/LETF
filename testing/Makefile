@@ -4,7 +4,7 @@ LETF = ../letf.lisp
 ifeq (${DISTRO},SBCL)
 	CFLAGS = sbcl --noinform --noprint --load ${LETF}
 else
-	CFLAGS = ccl -b -l ../../../letf.lisp --
+	CFLAGS = ccl -b -l ${LETF} --
 endif
 
 unit:
