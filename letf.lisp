@@ -1452,6 +1452,7 @@
                    (merge-hash currentDV :toHash DVHash)
                    (setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'string-equal))))))
       (when (aand (p-exit-code process) (> it 0))
+        (format *error-output* "Model process crashed with nonzero exit status; p-exit-code=~a~%" (p-exit-code process))
         (print-collector (process-output-str (runProcess obj))))
       (awhen necessaryDVs
         (format *error-output* "failed to send all ~a DVs left for this trial~%" it)
