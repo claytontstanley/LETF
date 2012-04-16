@@ -1451,7 +1451,7 @@
                  (progn
                    (merge-hash currentDV :toHash DVHash)
                    (setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'string-equal))))))
-      (when (equal (p-exit-code process) 1)
+      (when (aand (p-exit-code process) (> it 0))
         (print-collector (process-output-str (runProcess obj))))
       (awhen necessaryDVs
         (format *error-output* "failed to send all ~a DVs left for this trial~%" it)
