@@ -1,31 +1,13 @@
-(defun make-test-session-object (&key (configFileStr) (workFileStr))
-  "Takes strings for a config file and work file, and builds a session object"
-  (let ((out) (orig-configFilePath) (orig-workFilePath))
-    (with-pandoric (configFilePath workFilePath) 'args
-      (setf orig-configFilePath configFilePath)
-      (setf orig-workFilePath workFilePath)
-      (setf configFilePath configFileStr)
-      (setf workFilePath workFileStr)
-      ; mock up the file-string function & set the configFilePath/workFilePath to the values normally returned by 'file-string
-      ; (instead of the path) so that files aren't necessary to build a mm-session object
-      (with-shadow (file-string #'identity)
-        (args)
-        (setf out (build-hpc-session)))
-      (setf configFilePath orig-configFilePath)
-      (setf workFilePath orig-workFilePath))
-    (args)
-    out))
-
 (defmethod first-run-class ((obj session-class))
   (first (runs (first (runProcesses obj)))))
 
-(deftest test-mean ()
+(deftest-hpc test-mean ()
   (check (equal (mean '(1 2 3 4)) 5/2))
   (check (equal (mean '(1)) 1))
   (check (equal (mean '(4 3 2 1)) 5/2))
   (check (equal (mean nil) nil)))
 
-(deftest test-median ()
+(deftest-hpc test-median ()
   (check (equal (median '(1 2 3 4 5)) 3))
   (check (equal (median '(1 2 3 4)) 5/2))
   (check (equal (median '(1)) 1))
@@ -38,7 +20,7 @@
     ;so a workaround is to copy lst, and then check if the length of that list is equal to what is expected
     (check (equal (length (copy-list lst)) 5))))
 
-(deftest test-IV-string-fn ()
+(deftest-hpc test-IV-string-fn ()
   (labels ((test (IV-lst)
              (let* ((keys (mapcar #'car IV-lst))
                     (vals (mapcar #'cdr IV-lst))
@@ -53,7 +35,7 @@
     (test '(("IVa" . 'a)))
     (test '(("IV1" . 5) ("IV2" . 4) ("IV3" . 3)))))
 
-(deftest test-get-matching-lines ()
+(deftest-hpc test-get-matching-lines ()
   "Tests that get-matching-lines returns the correct values when parsing the testStr config file
          LHS is the str to look for in the config file
          RHS is the list of all matches to LHS in the config file"
@@ -67,7 +49,7 @@
                  do (check (equalp (get-matching-lines testStr LHS)
                                    RHS)))))
 
-(deftest test-get-matching-lines-full ()
+(deftest-hpc test-get-matching-lines-full ()
   "Analogous to test-get-matching-lines, except this one checks that the additional information
          for each match is included (i.e., the LHS for get-matching-lines-full)"
          (let ((testStr (format nil "aLine=aLineVal~%bLine=bLineVal~%aLine=aLineVal2")))
@@ -78,7 +60,7 @@
                  do (check (equalp (get-matching-lines-full testStr LHS)
                                    return-val)))))
 
-(deftest test-load-and-eval-commands ()
+(deftest-hpc test-load-and-eval-commands ()
   "Tests that runBeforeLoad, file2load, runWithinLoad, and runAfterLoad commands in the config file get parsed and processed in the correct order"
   (let ((testConfigFile (format nil "runBeforeLoad=(print 1)~%file2load=2~%runWithinLoad=(print 3)~%file2load=4~%runAfterLoad=(print 5)"))
         (configFilePath (get-pandoric #'args 'configFilePath)))
@@ -103,7 +85,3 @@
     ;Return the args pandoric function back to it's default state
     (setf (get-pandoric #'args 'configFilePath) configFilePath)
     (args)))
-
-(defun test-letf ()
-  (format t "~%overall: ~:[FAIL~;pass~]~%" (run-all-tests)))
-

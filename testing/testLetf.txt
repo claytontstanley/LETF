@@ -1,3 +1,5 @@
 file2load=../Lisp-Unit-Testing-Framework/unitTestFramework.lisp
+file2load=letf-utf.lisp
+file2load=bootstrap.lisp
 file2load=testLetf.lisp
-albumbuilder=#'test-letf
+albumbuilder=#'test-suite
