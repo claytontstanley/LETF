@@ -1117,7 +1117,6 @@
             :error :output
             #+SBCL :search #+SBCL t
             :wait nil))
-    (expect (equal (p-status process) :running) "model process failed to start correctly")
     process))
 
 ;////helper functions and macros for build-session macro////
