@@ -20,6 +20,35 @@
     ;so a workaround is to copy lst, and then check if the length of that list is equal to what is expected
     (check (equal (length (copy-list lst)) 5))))
 
+(defclass dummy-process ()
+  ((p-status :accessor p-status :initarg :p-status :initform :exited)
+   (p-output :accessor p-output :initarg :p-output :initform (make-string-input-stream ""))
+   (p-exit-code :accessor p-exit-code :initarg :p-exit-code :initform 0)))
+
+(deftest-hpc test-nonlisp-dv-parsing ()
+  (labels ((test (dvs expected)
+             (let ((output)
+                   (obj (make-test-session-object
+                          :configfilestr (format nil "~{~a~%~}" (list "modelProgram=python" "iv=x" "dv=a" "dv=b" "runsPerProcess=2"))
+                          :workfilestr (format nil "1~%2~%"))))
+               (with-shadow (get-process (lambda (obj input)
+                                           (declare (ignore obj input))
+                                           (make-instance 'dummy-process 
+                                                          :p-output (make-string-input-stream (format nil dvs))))) 
+                            (setf output (capture-output nil (wrapper-execute obj))))
+               (let ((s (cl-ppcre:create-scanner 
+                          expected
+                          :case-insensitive-mode t 
+                          :single-line-mode t)))
+                 (check (cl-ppcre:scan s output)))))
+           (dvs (&rest lst)
+             (format nil "~{~a=1~%~}" lst)))
+    (test (dvs 'a 'b 'a 'b) ".*")
+    (test (dvs 'a 'b 'b) "failed to send.*(a).*left")
+    (test (dvs 'a) "failed to send.*(b).*failed to send.*(a b)")
+    (test (dvs 'a 'c 'b 'a 'b) "sent extra dv.*(c.*)")
+    (test (dvs 'a 'a 'b) "sent a.*next.*before sending all.*(b).*this")))
+
 (deftest-hpc test-IV-string-fn ()
   (labels ((test (IV-lst)
              (let* ((keys (mapcar #'car IV-lst))
@@ -37,28 +66,28 @@
 
 (deftest-hpc test-get-matching-lines ()
   "Tests that get-matching-lines returns the correct values when parsing the testStr config file
-         LHS is the str to look for in the config file
-         RHS is the list of all matches to LHS in the config file"
-         (let ((testStr (format nil "aLine= aLineVal~%bLine=bLineVal~%aLine= ALineVal2")))
-           (loop for (LHS RHS) in (list '("aLine=" ("aLineVal" "aLineVal2")) ;multiple matched lines; single matcher
-                                        '("bLine=" ("bLineVal")) ;single matched line; single matcher
-                                        '(("aLine=" "bline=") ("aLineVal" "bLineVal" "aLineVal2")) ;multiple matches lines; multiple matchers
-                                        '("bline=" ("blineval")) ;not case sensitive
-                                        '("notPresent=" ()) ; no match
-                                        )
-                 do (check (equalp (get-matching-lines testStr LHS)
-                                   RHS)))))
+   LHS is the str to look for in the config file
+   RHS is the list of all matches to LHS in the config file"
+   (let ((testStr (format nil "aLine= aLineVal~%bLine=bLineVal~%aLine= ALineVal2")))
+     (loop for (LHS RHS) in (list '("aLine=" ("aLineVal" "aLineVal2")) ;multiple matched lines; single matcher
+                                  '("bLine=" ("bLineVal")) ;single matched line; single matcher
+                                  '(("aLine=" "bline=") ("aLineVal" "bLineVal" "aLineVal2")) ;multiple matches lines; multiple matchers
+                                  '("bline=" ("blineval")) ;not case sensitive
+                                  '("notPresent=" ()) ; no match
+                                  )
+           do (check (equalp (get-matching-lines testStr LHS)
+                             RHS)))))
 
 (deftest-hpc test-get-matching-lines-full ()
   "Analogous to test-get-matching-lines, except this one checks that the additional information
-         for each match is included (i.e., the LHS for get-matching-lines-full)"
-         (let ((testStr (format nil "aLine=aLineVal~%bLine=bLineVal~%aLine=aLineVal2")))
-           (loop for (LHS return-val) in (list '("aLine=" ( ("aline=" "alineVal") ("aline=" "alineVal2") ))
-                                               '("bLine=" ( ("bline=" "blineVal") ))
-                                               '( ("aLine=" "bLine=") ( ("aline=" "alineVal") ("bline=" "blineVal") ("aline=" "alineVal2") ))
-                                               )
-                 do (check (equalp (get-matching-lines-full testStr LHS)
-                                   return-val)))))
+   for each match is included (i.e., the LHS for get-matching-lines-full)"
+   (let ((testStr (format nil "aLine=aLineVal~%bLine=bLineVal~%aLine=aLineVal2")))
+     (loop for (LHS return-val) in (list '("aLine=" ( ("aline=" "alineVal") ("aline=" "alineVal2") ))
+                                         '("bLine=" ( ("bline=" "blineVal") ))
+                                         '( ("aLine=" "bLine=") ( ("aline=" "alineVal") ("bline=" "blineVal") ("aline=" "alineVal2") ))
+                                         )
+           do (check (equalp (get-matching-lines-full testStr LHS)
+                             return-val)))))
 
 (deftest-hpc test-load-and-eval-commands ()
   "Tests that runBeforeLoad, file2load, runWithinLoad, and runAfterLoad commands in the config file get parsed and processed in the correct order"

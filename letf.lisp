@@ -1027,20 +1027,22 @@
    (platform :accessor platform :initarg :platform :initform nil
              :documentation "stores the platform that the program is running on")
    (process-output-str :accessor process-output-str :initarg :process-output-str :initform nil
-                       :documentation "stores the process-output-str object that is keeping track of the last N lines printed by the process (model)"))
+                       :documentation "stores the process-output-str object that is keeping track of the last N lines printed by the process (model)")
+   (sleepTime :accessor sleepTime :initarg :sleepTime :initform 0
+              :documentation "amount of time to sleep after the runProcess is completed"))
   (:documentation 
    "class for a single process; if we're short-circuiting (i.e., calling a lisp-native model using an entry function)
     then there will only be 1 instance of this class; if we're launching the model as a separate process, then
     the number of instances will be (ceiling (total runs / runs per process))"))
 
 (defclass nonlisp-model-runProcess-class (runProcess-class)
-  ((sleepTime :accessor sleepTime :initarg :sleepTime :initform .2
-              :documentation "amount of time (in seconds) the program will sleep between checking the strm for model output (using a polling solution)"))
+  ()
+  (:default-initargs :sleepTime .2)
   (:documentation "class for a single process if we're not short circuiting"))
 
 (defclass lisp-model-runProcess-class (runProcess-class)
-  ((sleepTime :accessor sleepTime :initarg :sleepTime :initform 0
-              :documentation "should be 0s when short circuiting b/c all of the model's output will be on the strm on the first check of strm"))
+  ()
+  (:default-initargs :sleepTime 0)
   (:documentation "class for a single process if we're short circuiting"))
 
 (defclass run-class ()
@@ -1053,11 +1055,11 @@
    (DVKeys :accessor DVKeys :initarg :DVKeys :initform nil
            :documentation "stores a list of keynames for the DVs")
    (quot :accessor quot :initarg :quot :initform nil
-         :documentation "counter for the number of runs contained in the class (should equal 1 after the run finishes)")
+         :documentation "run number out of all of the runs in the session")
    (cellKeys :accessor cellKeys :initarg :cellKeys :initform nil
              :documentation "stores a list of keynames for the raw IVs in the work file")
    (sleepTime :accessor sleepTime :initarg :sleepTime :initform 0
-              :documentation "amount of time to sleep after the run is completed (should be zero)")
+              :documentation "amount of time to sleep after the run is completed")
    (run-collector :accessor run-collector :initarg :run-collector :initform nil
                   :documentation "stores the run-collector object that this run-class is part of")
    (runProcess :accessor runProcess :initarg :runProcess :initform nil
@@ -1074,12 +1076,13 @@
 
 (defclass nonlisp-model-run-class (run-class) 
   ()
+  (:default-initargs :sleepTime 0)
   (:documentation "class for a single run, if not short circuiting"))
 
 (defclass lisp-model-run-class (run-class) 
   ()
+  (:default-initargs :sleepTime 0)
   (:documentation "class for a single run, if short circuiting"))
-
 
 (defclass process-class ()
   ((process :accessor process :initarg :process :initform nil)))
@@ -1424,6 +1427,16 @@
       ;not returning any leftovers
       nil)))
 
+(defmethod get-necessary-dvs ((obj run-class))
+  (with-slots (DVKeys DVHash) obj
+    (necessaries DVKeys DVHash)))
+
+(defun next (item)
+  (first (rest item)))
+
+(defmethod get-next ((obj run-class))
+  (next (member obj (runs (runProcess obj)))))
+
 (defmethod wrapper-execute ((obj nonlisp-model-run-class) &optional (process) (appetizers))
   (mklst appetizers)
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session (runProcess obj))))
@@ -1437,19 +1450,21 @@
              (setf appetizers nil)
              (while (and necessaryDVs currentDVs)
                (setf currentDV (pop currentDVs))
-               (if (not (member (car currentDV) necessaryDVs :test #'string-equal))
-                 (progn
-                   ;log it
-                   (format *error-output* "sent ~a DV for the next trial, before sending all ~a DVs left for this trial~%" (car currentDV) necessaryDVs)
-                   ;make sure currentDVs is correct (undo the pop)
-                   (push currentDV currentDVs)
-                   ;merge nils for all necessaryDVs to the dvhash
-                   (merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) necessaryDVs) :toHash DVHash)
-                   ;set necessaryDVs to nil
-                   (setf necessaryDVs nil))
-                 (progn
-                   (merge-hash currentDV :toHash DVHash)
-                   (setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'string-equal))))))
+               (cond ((member (car currentDV) necessaryDVs :test #'string-equal)
+                      (merge-hash currentDV :toHash DVHash)
+                      (setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'string-equal)))
+                     ((aand (get-next obj)
+                            (member (car currentDV) (get-necessary-dvs it) :test #'string-equal))
+                      ;log it
+                      (format *error-output* "sent ~a DV for the next trial, before sending all ~a DVs left for this trial~%" (car currentDV) necessaryDVs)
+                      ;make sure currentDVs is correct (undo the pop)
+                      (push currentDV currentDVs)
+                      ;merge nils for all necessaryDVs to the dvhash
+                      (merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) necessaryDVs) :toHash DVHash)
+                      ;set necessaryDVs to nil
+                      (setf necessaryDVs nil))
+                     (t
+                      (format *error-output* "sent extra DV ~a for this trial~%" currentDV)))))
       (when (aand (p-exit-code process) (> it 0))
         (format *error-output* "Model process crashed with nonzero exit status; p-exit-code=~a~%" (p-exit-code process))
         (print-collector (process-output-str (runProcess obj))))
