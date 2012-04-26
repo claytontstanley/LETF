@@ -27,23 +27,26 @@
 
 (deftest-hpc test-nonlisp-dv-parsing ()
   (labels ((test (dvs expected)
-             (let ((output)
-                   (obj (make-test-session-object
-                          :configfilestr (format nil "~{~a~%~}" (list "modelProgram=python" "iv=x" "dv=a" "dv=b" "runsPerProcess=2"))
-                          :workfilestr (format nil "1~%2~%"))))
-               (with-shadow (get-process (lambda (obj input)
-                                           (declare (ignore obj input))
-                                           (make-instance 'dummy-process 
-                                                          :p-output (make-string-input-stream (format nil dvs))))) 
-                            (setf output (capture-output nil (wrapper-execute obj))))
-               (let ((s (cl-ppcre:create-scanner 
-                          expected
-                          :case-insensitive-mode t 
-                          :single-line-mode t)))
-                 (check (cl-ppcre:scan s output)))))
+             (with-test-cleanup
+               (let ((output)
+                     (obj (make-test-session-object
+                            :configfilestr (format nil "~{~a~%~}" (list "modelProgram=python" "iv=x" "dv=a" "dv=b" "runsPerProcess=2"))
+                            :workfilestr (format nil "1~%2~%"))))
+                 (with-shadow (get-process (lambda (obj input)
+                                             (declare (ignore obj input))
+                                             (make-instance 'dummy-process 
+                                                            :p-output (make-string-input-stream (format nil dvs))))) 
+                              (setf output (capture-output t (wrapper-execute obj))))
+                 (let ((s (cl-ppcre:create-scanner 
+                            expected
+                            :case-insensitive-mode t 
+                            :single-line-mode t)))
+                   (check (cl-ppcre:scan s output))))))
            (dvs (&rest lst)
              (format nil "~{~a=1~%~}" lst)))
     (test (dvs 'a 'b 'a 'b) ".*")
+    (test (dvs 'a 'b 'a 'b 'c) "evaluating.*sent extra dv.*(c.*).*evaluating")
+    (test (dvs 'a 'b 'c 'b 'a) "sent extra dv.*(c.*).*evaluating.*evaluating")
     (test (dvs 'a 'b 'b) "failed to send.*(a).*left")
     (test (dvs 'a) "failed to send.*(b).*failed to send.*(a b)")
     (test (dvs 'a 'c 'b 'a 'b) "sent extra dv.*(c.*)")

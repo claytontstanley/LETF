@@ -1441,14 +1441,14 @@
   (mklst appetizers)
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session (runProcess obj))))
   (with-slots (DVKeys DVHash run-collector sleepTime) obj
-    (let ((necessaryDVs) (currentDVs) (currentDV) (process-alive-p t))
+    (let ((necessaryDVs) (currentDVs) (currentDV) (process-alive-p t) (this-trial-p t))
       (while (and (setf necessaryDVs (necessaries DVKeys DVHash))
                   process-alive-p)
              (if (not (equal (p-status process) :running))
                (setf process-alive-p nil))
              (setf currentDVs (get-DVs obj process appetizers))
              (setf appetizers nil)
-             (while (and necessaryDVs currentDVs)
+             (while (and currentDVs this-trial-p)
                (setf currentDV (pop currentDVs))
                (cond ((member (car currentDV) necessaryDVs :test #'string-equal)
                       (merge-hash currentDV :toHash DVHash)
@@ -1456,7 +1456,9 @@
                      ((aand (get-next obj)
                             (member (car currentDV) (get-necessary-dvs it) :test #'string-equal))
                       ;log it
-                      (format *error-output* "sent ~a DV for the next trial, before sending all ~a DVs left for this trial~%" (car currentDV) necessaryDVs)
+                      (when necessaryDVs
+                        (format *error-output* "sent ~a DV for the next trial, before sending all ~a DVs left for this trial~%" (car currentDV) necessaryDVs))
+                      (setf this-trial-p nil)
                       ;make sure currentDVs is correct (undo the pop)
                       (push currentDV currentDVs)
                       ;merge nils for all necessaryDVs to the dvhash
