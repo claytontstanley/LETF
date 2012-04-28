@@ -38,6 +38,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
@@ -7330,6 +7331,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
@@ -11623,6 +11625,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
@@ -11915,6 +11918,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
@@ -12205,6 +12209,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
@@ -12367,6 +12372,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
@@ -13187,6 +13193,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
@@ -13553,6 +13560,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
@@ -14521,6 +14529,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
@@ -15581,6 +15590,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
@@ -15914,6 +15924,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
@@ -16006,6 +16017,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
@@ -18305,6 +18317,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
@@ -18416,6 +18429,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
@@ -18481,6 +18495,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
@@ -18587,6 +18602,7 @@ STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function GET-START-MARKER.
 STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.

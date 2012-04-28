@@ -1434,8 +1434,14 @@
   "Returns two values: [1] Any appetizers (cached-results) and [2] the input string to send to the launched process' stdin"
   (values nil (format nil "~{~a~%~}" (mapcar #'get-input-line (runs obj)))))
 
+(defun start-marker ()
+  "IVs")
+
+(defmethod get-start-marker ((obj nonlisp-model-run-class))
+  (cons (start-marker) (get-input-line obj)))
+
 (defun start-marker-p (DV)
-  (string-equal (car DV) "IVs"))
+  (string-equal (car DV) (start-marker)))
 
 (defun strip-whitespace (str)
   (make-sentence (get-words str) :spaceDesignator ""))
