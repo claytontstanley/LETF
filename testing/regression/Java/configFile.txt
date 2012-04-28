@@ -1,7 +1,7 @@
 IV=noise
 IV=speed
 
-modelProgram= java -jar HelloWorld.jar 
+modelProgram= java HelloWorld
 
 runsPerProcess=inf
 DV=line

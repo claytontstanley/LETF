@@ -36,6 +36,7 @@ int main( int argc, char **argv ) {
 	char buffer[ BUFFER_SIZE ];
 	double x, y;
 	while( fgets( buffer, BUFFER_SIZE, fp ) != NULL ) {
+		printf( "IVs=%s\n", buffer );
 //		sleep( 1 );
 		sscanf( buffer, "%lg %lg\n", &x, &y );
 
@@ -49,7 +50,6 @@ int main( int argc, char **argv ) {
 		nanosleep( &ratp, NULL );
  */
 #endif
-		
 		printf( "Evaluating %lg %lg\n", x, y );
 		printf( "height=%lg\n", 1 - (4*x*x+4*y*y));
 		printf( "height1=%lg\n", 1- (2*(x+.5)*x+2*y*y));

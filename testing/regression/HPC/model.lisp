@@ -141,6 +141,7 @@
   (setf *not-sending-some-dvs-p* t)
 
   (dolist (inputLine (get-lines *input-lines*))
+    (format t "IVs=~a~%" inputLine)
     (let ((tbl (make-hash-table :test 'equalp))
 	  (i -1))
       (mapc 

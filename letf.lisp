@@ -1427,52 +1427,64 @@
       ;not returning any leftovers
       nil)))
 
-(defmethod get-necessary-dvs ((obj run-class))
-  (with-slots (DVKeys DVHash) obj
-    (necessaries DVKeys DVHash)))
+(defmethod get-input-line ((obj nonlisp-model-run-class))
+  (funcall (IVStringFn (session (runProcess obj))) obj))
 
-(defun next (item)
-  (first (rest item)))
+(defmethod get-process-inputs ((obj nonlisp-model-runProcess-class))
+  "Returns two values: [1] Any appetizers (cached-results) and [2] the input string to send to the launched process' stdin"
+  (values nil (format nil "~{~a~%~}" (mapcar #'get-input-line (runs obj)))))
 
-(defmethod get-next ((obj run-class))
-  (next (member obj (runs (runProcess obj)))))
+(defun start-marker-p (DV)
+  (string-equal (car DV) "IVs"))
+
+(defmethod correct-start-marker-p ((obj nonlisp-model-run-class) DV)
+  (string-equal
+    (make-sentence (get-words (cdr DV)))
+    (make-sentence (get-words (get-input-line obj)))))
 
 (defmethod wrapper-execute ((obj nonlisp-model-run-class) &optional (process) (appetizers))
   (mklst appetizers)
   (mapc #'(lambda (x) (funcall x obj)) (statusPrinters (session (runProcess obj))))
   (with-slots (DVKeys DVHash run-collector sleepTime) obj
-    (let ((necessaryDVs) (currentDVs) (currentDV) (process-alive-p t) (this-trial-p t))
+    (let ((necessaryDVs) (currentDVs) (currentDV) (process-alive-p t) (state 'before))
       (while (and (setf necessaryDVs (necessaries DVKeys DVHash))
                   process-alive-p)
              (if (not (equal (p-status process) :running))
                (setf process-alive-p nil))
              (setf currentDVs (get-DVs obj process appetizers))
              (setf appetizers nil)
-             (while (and currentDVs this-trial-p)
+             (while (and currentDVs (not (eq state 'after)))
                (setf currentDV (pop currentDVs))
-               (cond ((member (car currentDV) necessaryDVs :test #'string-equal)
-                      (merge-hash currentDV :toHash DVHash)
-                      (setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'string-equal)))
-                     ((aand (get-next obj)
-                            (member (car currentDV) (get-necessary-dvs it) :test #'string-equal))
-                      ;log it
-                      (when necessaryDVs
-                        (format *error-output* "sent ~a DV for the next trial, before sending all ~a DVs left for this trial~%" (car currentDV) necessaryDVs))
-                      (setf this-trial-p nil)
-                      ;make sure currentDVs is correct (undo the pop)
-                      (push currentDV currentDVs)
-                      ;merge nils for all necessaryDVs to the dvhash
-                      (merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) necessaryDVs) :toHash DVHash)
-                      ;set necessaryDVs to nil
-                      (setf necessaryDVs nil))
-                     (t
-                      (format *error-output* "sent extra DV ~a for this trial~%" currentDV)))))
+               (cond ((eq state 'before)
+                      (cond ((start-marker-p currentDV)
+                             (setf state 'during)
+                             (expect (correct-start-marker-p obj currentDV) 
+                                     "unexpected value for start marker; expected/received:~%~a~%~a~%" (get-input-line obj) (cdr currentDV)))
+                            (t
+                             (format *error-output* "sent ~a DV before sending a trial start marker; this DV val will be discarded~%" currentDV))))
+                     ((eq state 'during)
+                      (cond ((member (car currentDV) necessaryDVs :test #'string-equal)
+                             (merge-hash currentDV :toHash DVHash)
+                             (setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'string-equal)))
+                            ((start-marker-p currentDV)
+                             ;log it
+                             (when necessaryDVs
+                               (format *error-output* "sent trial start marker for next trial, before sending all ~a DVs left for this trial~%" necessaryDVs))
+                             (setf state 'after)
+                             ;make sure currentDVs is correct (undo the pop)
+                             (push currentDV currentDVs)
+                             ;merge nils for all necessaryDVs to the dvhash
+                             (merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) necessaryDVs) :toHash DVHash)
+                             ;set necessaryDVs to nil
+                             (setf necessaryDVs nil))
+                            (t
+                             (format *error-output* "sent extra DV ~a for this trial~%" currentDV)))))))
       (when (aand (p-exit-code process) (> it 0))
         (format *error-output* "Model process crashed with nonzero exit status; p-exit-code=~a~%" (p-exit-code process))
         (print-collector (process-output-str (runProcess obj))))
       (awhen necessaryDVs
-        (format *error-output* "failed to send all ~a DVs left for this trial~%" it)
-        (merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) it) :toHash DVHash))
+             (format *error-output* "failed to send all ~a DVs left for this trial~%" it)
+             (merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) it) :toHash DVHash))
       (collect run-collector DVHash)
       (setf DVHash nil)
       (sleep sleepTime)
@@ -1488,14 +1500,6 @@
       (setf leftovers (wrapper-execute run (modelProgram obj) leftovers)))
     (expect (not leftovers) "should not be any leftovers after runProcess object finishes"))
   (sleep (sleepTime obj)))
-
-
-(defmethod get-input-line ((obj nonlisp-model-run-class))
-  (funcall (IVStringFn (session (runProcess obj))) obj))
-
-(defmethod get-process-inputs ((obj nonlisp-model-runProcess-class))
-  "Returns two values: [1] Any appetizers (cached-results) and [2] the input string to send to the launched process' stdin"
-  (values nil (format nil "~{~a~%~}" (mapcar #'get-input-line (runs obj)))))
 
 (defmethod wrapper-execute ((obj nonlisp-model-runProcess-class) &optional (process nil) (appetizers nil))
   "execute the runProcess-class object, if we're not short circuiting"

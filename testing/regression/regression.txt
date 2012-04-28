@@ -36,10 +36,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
@@ -7329,10 +7328,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
@@ -11623,10 +11621,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
@@ -11916,10 +11913,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
@@ -12207,10 +12203,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
@@ -12370,10 +12365,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
@@ -12448,706 +12442,706 @@ pos3
 pos4
 pos5
 
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: (* 100 2) 2 3 4 5
 CorrelRT: 0.05120256978135922
 MADRT: 28028.52
 CorrelLatency: 0.7502700296500597
 NormRMSEPos: 2.4113783292705082e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: '5 7 20 (eval (read-from-string "9")) 10
 CorrelRT: 0.43411664786042065
 MADRT: 29894.920000000002
 CorrelLatency: 0.7435215817544787
 NormRMSEPos: 4.268878700887569e-6
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 5 9 10
 CorrelRT: -0.6842682264636749
 MADRT: 32163.32
 CorrelLatency: 0.8444847748854369
 NormRMSEPos: 2.4177218539900934e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 7 9 10
 CorrelRT: -0.22325300995966949
 MADRT: 31418.32
 CorrelLatency: 0.9302731493976069
 NormRMSEPos: 2.413415767683462e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 9 9 10
 CorrelRT: -0.6184524600316087
 MADRT: 29779.120000000003
 CorrelLatency: 0.9698688273850299
 NormRMSEPos: 2.3952251911197482e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 11 9 10
 CorrelRT: 0.43084566037613836
 MADRT: 29531.32
 CorrelLatency: 0.7024143802344696
 NormRMSEPos: 1.379167998972764e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 10 9 10
 CorrelRT: 0.8117627925398135
 MADRT: 31385.920000000002
 CorrelLatency: 0.9878551207095281
 NormRMSEPos: 2.3790490034365314e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 2 9 10
 CorrelRT: 0.10235143694662534
 MADRT: 29241.32
 CorrelLatency: 0.7152981775146139
 NormRMSEPos: 2.4503510842033614e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 3 9 10
 CorrelRT: 0.4456267155679501
 MADRT: 30510.72
 CorrelLatency: 0.7603443623128913
 NormRMSEPos: 2.428689651418441e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 7 9 10
 CorrelRT: 0.032806694665074326
 MADRT: 28516.920000000002
 CorrelLatency: 0.9152204376311999
 NormRMSEPos: 2.4128907543787533e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 9 9 10
 CorrelRT: -0.6295426684683182
 MADRT: 31802.52
 CorrelLatency: 0.9819482069366515
 NormRMSEPos: 2.41081848151833e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 3 9 10
 CorrelRT: 0.9810019811022743
 MADRT: 30753.120000000003
 CorrelLatency: 0.7617707793080367
 NormRMSEPos: 2.430351099026702e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 1 9 10
 CorrelRT: -0.09513947007213171
 MADRT: 30087.72
 CorrelLatency: 0.6805197301104069
 NormRMSEPos: 1.313220154936356e-4
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 5 9 10
 CorrelRT: -0.30168366958110565
 MADRT: 27996.52
 CorrelLatency: 0.8241269357285829
 NormRMSEPos: 2.4292486050220875e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 8 9 10
 CorrelRT: -0.4893914364850309
 MADRT: 28511.72
 CorrelLatency: 0.9787347805933476
 NormRMSEPos: 2.4162673128726763e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 6 9 10
 CorrelRT: 0.5518329528234296
 MADRT: 29372.120000000003
 CorrelLatency: 0.881343784129776
 NormRMSEPos: 2.429941472767845e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 5 9 10
 CorrelRT: 0.2643928151501167
 MADRT: 30194.32
 CorrelLatency: 0.866250392817612
 NormRMSEPos: 2.4119632070764354e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 Evaluating: 6 7 2 9 10
 CorrelRT: 0.5692182863617885
 MADRT: 28296.120000000003
 CorrelLatency: 0.7236040666225421
 NormRMSEPos: 2.4392584592782365e-5
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
-sent lat1 DV for the next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
+sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 failed to send all (pos1) DVs left for this trial
 Evaluating: 6 7 1 9 10
 CorrelRT: -0.2791916811980327
@@ -13191,10 +13185,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
@@ -13558,10 +13551,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
@@ -14527,10 +14519,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
@@ -15588,10 +15579,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
@@ -15922,10 +15912,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
@@ -16015,10 +16004,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
@@ -16088,7 +16076,7 @@ STYLE-WARNING: Implicitly creating new generic function STRING-TO-LINES.
 ;     (DEFMACRO ACT-UP::DEFINE-MODULE-FCT (&REST ACT-UP::ARGS) NIL)
 ; --> MULTIPLE-VALUE-PROG1 PROGN PROGN FUNCTION MULTIPLE-VALUE-PROG1 PROGN LET* 
 ; ==>
-;   (LET* ((ACT-UP::ARGS (CDR #:WHOLE1607)))
+;   (LET* ((ACT-UP::ARGS (CDR #:WHOLE1602)))
 ;     (BLOCK ACT-UP::DEFINE-MODULE-FCT NIL))
 ; 
 ; caught STYLE-WARNING:
@@ -17339,7 +17327,7 @@ STYLE-WARNING: Implicitly creating new generic function STRING-TO-LINES.
 ;     (DEFMACRO DEFINE-MODULE-FCT (&REST ARGS) NIL)
 ; --> MULTIPLE-VALUE-PROG1 PROGN PROGN FUNCTION MULTIPLE-VALUE-PROG1 PROGN LET* 
 ; ==>
-;   (LET* ((ARGS (CDR #:WHOLE1863)))
+;   (LET* ((ARGS (CDR #:WHOLE1858)))
 ;     (BLOCK DEFINE-MODULE-FCT NIL))
 ; 
 ; caught STYLE-WARNING:
@@ -18315,10 +18303,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
@@ -18427,10 +18414,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
@@ -18493,10 +18479,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
@@ -18600,10 +18585,9 @@ STYLE-WARNING: Implicitly creating new generic function MOD-COLLAPSEHASH.
 STYLE-WARNING: redefining COMMON-LISP-USER::UPLOAD-TO in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function GET-DVS.
 STYLE-WARNING: Implicitly creating new generic function WRAPPER-EXECUTE.
-STYLE-WARNING: Implicitly creating new generic function GET-NECESSARY-DVS.
-STYLE-WARNING: Implicitly creating new generic function GET-NEXT.
 STYLE-WARNING: Implicitly creating new generic function GET-INPUT-LINE.
 STYLE-WARNING: Implicitly creating new generic function GET-PROCESS-INPUTS.
+STYLE-WARNING: Implicitly creating new generic function CORRECT-START-MARKER-P.
 STYLE-WARNING: redefining COMMON-LISP-USER::METHODS in DEFMACRO
 STYLE-WARNING: Implicitly creating new generic function PRINT-UNREAD-LINES.
 STYLE-WARNING: Implicitly creating new generic function PRINT-SESSION.
