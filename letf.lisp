@@ -1437,10 +1437,13 @@
 (defun start-marker-p (DV)
   (string-equal (car DV) "IVs"))
 
+(defun strip-whitespace (str)
+  (make-sentence (get-words str) :spaceDesignator ""))
+
 (defmethod correct-start-marker-p ((obj nonlisp-model-run-class) DV)
   (string-equal
-    (make-sentence (get-words (cdr DV)))
-    (make-sentence (get-words (get-input-line obj)))))
+    (strip-whitespace (cdr DV))
+    (strip-whitespace (get-input-line obj))))
 
 (defmethod wrapper-execute ((obj nonlisp-model-run-class) &optional (process) (appetizers))
   (mklst appetizers)
