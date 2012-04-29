@@ -17,9 +17,9 @@ This workfile says that you want to run a model with two IVs through a set of 7 
 
 Next, configure your model. It needs to accept IV values on standard input, execute the model for each IV set, and for each IV set, output the dependent variable values to stdout.
 
-Each DV outputted should be printed to stdout in the form: "[DVName]=[DVVAL]\n". That is, the name of the DV, and equal sign, the DV's value, and then a newline character.
-
 Before DVs for each run are printed, a trial start marker needs to be printed to stdout in the form: "IVs=[line received on stdin]\n". This help the wrapper ensure that the outputted DVs are associated with the correct IVs
+
+Each DV outputted should be printed to stdout in the form: "[DVName]=[DVVAL]\n". That is, the name of the DV, and equal sign, the DV's value, and then a newline character.
 
 For this example, here's a python model (model.py):
 
@@ -47,24 +47,25 @@ To execute the model, launch the model from the command line, and get standard i
 
 Python model:
 $ python model.py < workfile.txt 
-Line={"IV1":1,"IV2":1}
+IVs={"IV1":1,"IV2":1}
 DV1=2
 DV2=2
-Line={"IV1":2,"IV2":1}
+IVs={"IV1":2,"IV2":1}
 DV1=5
 DV2=3
-Line={"IV1":3,"IV2":1}
+IVs={"IV1":3,"IV2":1}
 DV1=10
 DV2=4
-Line={"IV1":4,"IV2":1}
+IVs={"IV1":4,"IV2":1}
 DV1=17
 DV2=5
-Line={"IV1":5,"IV2":2}
+IVs={"IV1":5,"IV2":2}
 DV1=29
 DV2=7
-Line={"IV1":6,"IV2":3}
+IVs={"IV1":6,"IV2":3}
 DV1=45
 DV2=9
-Line={"IV1":7,"IV2":2}
+IVs={"IV1":7,"IV2":2}
 DV1=53
 DV2=9
+
