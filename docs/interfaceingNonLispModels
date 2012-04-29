@@ -19,6 +19,8 @@ Next, configure your model. It needs to accept IV values on standard input, exec
 
 Each DV outputted should be printed to stdout in the form: "[DVName]=[DVVAL]\n". That is, the name of the DV, and equal sign, the DV's value, and then a newline character.
 
+Before DVs for each run are printed, a trial start marker needs to be printed to stdout in the form: "IVs=[line received on stdin]\n". This help the wrapper ensure that the outputted DVs are associated with the correct IVs
+
 For this example, here's a python model (model.py):
 
 //////////////////
@@ -35,8 +37,8 @@ def runModel(IV1,IV2):
 if __name__=='__main__':
         from sys import stdin; from json import loads
         for line in stdin: 
-                print "Line=" + line.strip() #Not required; just for debugging purposes
-                runModel(**loads(line))
+		print "IVs=" + line.strip() #Used to tell the wrapper that this trial is starting
+		runModel(**loads(line))
 
 
 //////////////////
@@ -66,5 +68,3 @@ DV2=9
 Line={"IV1":7,"IV2":2}
 DV1=53
 DV2=9
-
-Note that there is extraneous output (Line=), but that's OK. The system will filter the output and look for only what is needed. Also note that there doesn't need to be any sort of break statement between runs. The system will keep track of which DV vals map to which runs.
