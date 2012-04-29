@@ -1,5 +1,3 @@
-(setf *clean-exit-on-error* nil)
-
 (defmacro with-test-cleanup (&body body)
   `(with-test-cleanup-default ,@body))
 

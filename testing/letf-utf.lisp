@@ -25,3 +25,5 @@
                                   (args)
                                   (setf out (funcall session-builder-fn))))
       out)))
+
+(setf *clean-exit-on-error* nil)
