@@ -25,6 +25,26 @@
    (p-output :accessor p-output :initarg :p-output :initform (make-string-input-stream ""))
    (p-exit-code :accessor p-exit-code :initarg :p-exit-code :initform 0)))
 
+(deftest-hpc test-get-DVs-sleep ()
+  (let ((obj (funcall (compose #'first #'runs #'first #'runProcesses)
+                      (make-test-session-object
+                        :configfilestr (format nil "~{~a~%~}" (list "modelProgram=python" "iv=x" "dv=a"))
+                        :workfilestr (format nil "1"))))
+        (process (make-instance 'dummy-process)))
+    (setf (no-dvs-sleep-time obj) 0)
+    (labels ((test (p-output p-status expected)
+               (setf (p-status process) p-status)
+               (setf (p-output process) p-output)
+               (let ((s (cl-ppcre:create-scanner 
+                          expected
+                          :case-insensitive-mode t 
+                          :single-line-mode t)))
+                 (check (cl-ppcre:scan s (capture-output t (get-DVs obj process)))))))
+      (test (make-string-input-stream "") :running "did not find any DVs for running nonlisp model process.*sleeping")
+      (test (make-string-input-stream "something") :running "^$")
+      (test (make-string-input-stream "") :exited "^$")
+      (test (make-string-input-stream "something") :exited "^$"))))
+
 (deftest-hpc test-nonlisp-dv-parsing ()
   (labels ((test (dvs expected)
              (with-test-cleanup

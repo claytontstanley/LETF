@@ -248,15 +248,15 @@
            ,@body)))
 
 (defvar *clean-exit-on-error* t)
-(defmacro expect (test-form datum &rest arguments)
-  `(unless ,test-form
-     (cond (*clean-exit-on-error*
-             (format *error-output* ,datum ,@arguments)
-             (format *error-output* "~%")
-             #+SBCL (quit :unix-status 1)
-             #+CCL (quit 1))
-           (t
-            (error ,datum ,@arguments)))))
+(defun expect (test-form datum &rest arguments)
+  (unless test-form
+    (cond (*clean-exit-on-error*
+            (apply #'format *error-output* datum arguments)
+            (format *error-output* "~%")
+            #+SBCL (quit :unix-status 1)
+            #+CCL (quit 1))
+          (t
+           (apply #'error datum arguments)))))
 
 (defmacro! fast-concatenate (&rest lst)
   "equivalent to writing (concatenate 'string ...), but ~5x faster"
@@ -1036,7 +1036,7 @@
     the number of instances will be (ceiling (total runs / runs per process))"))
 
 (defclass nonlisp-model-runProcess-class (runProcess-class)
-  ()
+  ((spawned-process-sleep-time :accessor spawned-process-sleep-time :initarg :spawned-process-sleep-time :initform .1))
   (:default-initargs :sleepTime .2)
   (:documentation "class for a single process if we're not short circuiting"))
 
@@ -1075,7 +1075,7 @@
   (push-to-end obj (runs (run-collector obj))))
 
 (defclass nonlisp-model-run-class (run-class) 
-  ()
+  ((no-dvs-sleep-time :accessor no-dvs-sleep-time :initarg :no-dvs-sleep-time :initform 3))
   (:default-initargs :sleepTime 0)
   (:documentation "class for a single run, if not short circuiting"))
 
@@ -1120,6 +1120,9 @@
             :error :output
             #+SBCL :search #+SBCL t
             :wait nil))
+    ; Wait a bit for process to initialize; this helps to ensure that a DV will be on stream for first pass to get-DVs, if the model is fast
+    ; If that is the case, LETF will never sleep in the inner loop of processing DVs from the model
+    (sleep (spawned-process-sleep-time obj))
     process))
 
 ;////helper functions and macros for build-session macro////
@@ -1370,11 +1373,15 @@
   then, remap each line as a dotted pair (key . value)"
   (expect process "should be a process here")
   (mklst appetizers)
-  (let ((currentDVs) (line))
+  (let ((currentDVs) (line) (empty-stream-p t))
     (while (listen (p-output process))
+      (setf empty-stream-p nil)
       (setf line (read-line (p-output process) nil))
       (collect (process-output-str (runProcess obj)) (cons "str" line))
       (aif (line2element line) (push-to-end it currentDVs)))
+    (when (and empty-stream-p (equal (p-status process) :running))
+      (format *error-output* "Did not find any DVs for running nonlisp model process; sleeping for ~a seconds~%" (no-dvs-sleep-time obj))
+      (sleep (no-dvs-sleep-time obj)))
     (append appetizers currentDVs)))
 
 (defmethod get-DVs ((obj lisp-model-run-class) &optional (process nil) (appetizers nil))

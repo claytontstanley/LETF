@@ -12448,6 +12448,7 @@ pos3
 pos4
 pos5
 
+Did not find any DVs for running nonlisp model process; sleeping for 3 seconds
 sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
 sent trial start marker for next trial, before sending all (pos1) DVs left for this trial
@@ -16088,7 +16089,7 @@ STYLE-WARNING: Implicitly creating new generic function STRING-TO-LINES.
 ;     (DEFMACRO ACT-UP::DEFINE-MODULE-FCT (&REST ACT-UP::ARGS) NIL)
 ; --> MULTIPLE-VALUE-PROG1 PROGN PROGN FUNCTION MULTIPLE-VALUE-PROG1 PROGN LET* 
 ; ==>
-;   (LET* ((ACT-UP::ARGS (CDR #:WHOLE1602)))
+;   (LET* ((ACT-UP::ARGS (CDR #:WHOLE1600)))
 ;     (BLOCK ACT-UP::DEFINE-MODULE-FCT NIL))
 ; 
 ; caught STYLE-WARNING:
@@ -17339,7 +17340,7 @@ STYLE-WARNING: Implicitly creating new generic function STRING-TO-LINES.
 ;     (DEFMACRO DEFINE-MODULE-FCT (&REST ARGS) NIL)
 ; --> MULTIPLE-VALUE-PROG1 PROGN PROGN FUNCTION MULTIPLE-VALUE-PROG1 PROGN LET* 
 ; ==>
-;   (LET* ((ARGS (CDR #:WHOLE1858)))
+;   (LET* ((ARGS (CDR #:WHOLE1856)))
 ;     (BLOCK DEFINE-MODULE-FCT NIL))
 ; 
 ; caught STYLE-WARNING:
