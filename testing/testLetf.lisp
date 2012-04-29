@@ -57,7 +57,8 @@
     (test (dvs 'run1 'a 'b 'run2 'b) "failed to send.*(a).*left")
     (test (dvs 'run1 'a) "failed to send.*(b).*failed to send.*(a b)")
     (test (dvs 'run1 'a 'c 'b 'run2 'a 'b) "sent extra dv.*(c.*)")
-    (test (dvs 'run1 'a 'run2 'a 'b) "sent trial start marker for next.*before sending all.*(b).*this")))
+    (test (dvs 'run1 'a 'run2 'a 'b) "sent trial start marker for next.*before sending all.*(b).*this")
+    (check (errors-p (test (dvs 'run2 'before 'run1) ".*")))))
 
 (deftest-hpc test-IV-string-fn ()
   (labels ((test (IV-lst)
