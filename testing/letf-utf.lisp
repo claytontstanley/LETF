@@ -1,16 +1,14 @@
 (defmacro! with-test-cleanup-default (&body body)
   `(let ((,g!configFilePathOrig) 
-         (,g!workFilePathOrig)
-         (,g!ret))
+         (,g!workFilePathOrig))
      (with-pandoric (configFilePath workFilePath) 'args
        (setf ,g!configFilePathOrig configFilePath)
        (setf ,g!workFilePathOrig workFilePath))
-     (setf ,g!ret (progn ,@body))
-     (with-pandoric (configFilePath workFilePath) 'args
-       (setf configFilePath ,g!configFilePathOrig)
-       (setf workFilePath ,g!workFilePathOrig))
-     (args)
-     ,g!ret))
+     (unwind-protect (progn ,@body)
+       (with-pandoric (configFilePath workFilePath) 'args
+         (setf configFilePath ,g!configFilePathOrig)
+         (setf workFilePath ,g!workFilePathOrig))
+       (args))))
 
 (defun make-test-session-object-builder (session-builder-fn)
   (lambda (configFileStr workFileStr)
