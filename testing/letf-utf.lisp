@@ -38,3 +38,8 @@
                   :from-end t
                   :initial-value (apply fn1 args))))
     #'identity))
+
+(defmacro make-default-model (IVs DVs)
+  `(lambda (&key ,@(mapcar #'list IVs))
+     (declare (ignore ,@IVs))
+     ,@(mapcar (lambda (DV) `(format t "~a=0~%" ',DV)) DVs)))
