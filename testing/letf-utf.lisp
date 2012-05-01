@@ -27,7 +27,9 @@
 (setf *clean-exit-on-error* nil)
 
 (defun compose (&rest fns)
-  "Paul Graham's compose, from 'OnLisp'"
+  "Paul Graham's compose, from 'OnLisp'
+  The compose function returns a closure that calls each of the functions from last to first, passing on the result of each function call to the next.
+  For example, (compose #'list #'round #'sqrt) is equivalent to (lambda (x) (list (round (sqrt x))))"
   (if fns
     (let ((fn1 (car (last fns)))
           (fns (butlast fns)))

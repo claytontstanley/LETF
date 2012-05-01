@@ -40,9 +40,17 @@
                           :case-insensitive-mode t 
                           :single-line-mode t)))
                  (check (cl-ppcre:scan s (capture-output t (get-DVs obj process)))))))
+      ; Should only sleep in the case where there is no model output and the process is running.
+      ; To check for this, capture the output from running get-DVs with each configuration of output/no-output running/exited. 
+      ; If sleep was called, then it will be notated on the output captured. Otherwise, the output should be empty.
+      
+      ; Should sleep when no model output and process is running
       (test (make-string-input-stream "") :running "did not find any DVs for running nonlisp model process.*sleeping")
+      ; Should not sleep when model output and process is running
       (test (make-string-input-stream "something") :running "^$")
+      ; Should not sleep when no model output and process is exited 
       (test (make-string-input-stream "") :exited "^$")
+      ; Should not sleep when model output and process is exited 
       (test (make-string-input-stream "something") :exited "^$"))))
 
 (deftest-hpc test-nonlisp-dv-parsing ()
