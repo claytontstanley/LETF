@@ -1036,7 +1036,7 @@
     the number of instances will be (ceiling (total runs / runs per process))"))
 
 (defclass nonlisp-model-runProcess-class (runProcess-class)
-  ((spawned-process-sleep-time :accessor spawned-process-sleep-time :initarg :spawned-process-sleep-time :initform .1))
+  ((spawned-process-sleep-time :accessor spawned-process-sleep-time :initarg :spawned-process-sleep-time :initform .2))
   (:default-initargs :sleepTime .2)
   (:documentation "class for a single process if we're not short circuiting"))
 
@@ -1499,8 +1499,8 @@
         (format *error-output* "Model process crashed with nonzero exit status; p-exit-code=~a~%" (p-exit-code process))
         (print-collector (process-output-str (runProcess obj))))
       (awhen necessaryDVs
-             (format *error-output* "failed to send all ~a DVs left for this trial~%" it)
-             (merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) it) :toHash DVHash))
+        (format *error-output* "failed to send all ~a DVs left for this trial~%" it)
+        (merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) it) :toHash DVHash))
       (collect run-collector DVHash)
       (setf DVHash nil)
       (sleep sleepTime)

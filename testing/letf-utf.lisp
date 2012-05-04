@@ -15,13 +15,13 @@
     "Takes strings for a config file and work file, and builds a session object"
     (let ((out))
       (with-pandoric (configFilePath workFilePath) 'args
-                     (setf configFilePath configFileStr)
-                     (setf workFilePath workFileStr)
-                     ; mock up the file-string function & set the configFilePath/workFilePath to the values normally returned by 'file-string
-                     ; (instead of the path) so that files aren't necessary to build a mm-session object
-                     (with-shadow (file-string #'identity)
-                                  (args)
-                                  (setf out (funcall session-builder-fn))))
+        (setf configFilePath configFileStr)
+        (setf workFilePath workFileStr)
+        ; mock up the file-string function & set the configFilePath/workFilePath to the values normally returned by 'file-string
+        ; (instead of the path) so that files aren't necessary to build a mm-session object
+        (with-shadow (file-string #'identity)
+          (args)
+          (setf out (funcall session-builder-fn))))
       out)))
 
 (setf *clean-exit-on-error* nil)
