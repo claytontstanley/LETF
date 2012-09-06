@@ -186,7 +186,7 @@
        (declare (ignorable ,g!box))
        (symbol-macrolet
          (,@(mapcar #`(,a1 (get-pandoric ,g!box ',a1))
-                    syms))
+              syms))
          ,@body))))
 
 (defmacro plambda (largs pargs% &body body)
@@ -299,7 +299,7 @@
 
 (defun symbol-function-safe (x)
   "equivalent to #'symbol-function, just safer; converts a symbol to the function that the 
-  symbol points to; if it can't convert the symbol, it returns the symbol"
+   symbol points to; if it can't convert the symbol, it returns the symbol"
   (if (and (equal 'symbol (type-of x))
            (fboundp x))
     (symbol-function x)
@@ -575,7 +575,7 @@
 
 (defun lump-brackets (str &key (desigs (list #\[ #\])) (include-brackets t))
   "like get-words, returns a list of the words in str however, all words that are within brackets are lumped together as one word;
-  if there are no brackets in str, then lump-brackets is equivalent to get-words"
+   if there are no brackets in str, then lump-brackets is equivalent to get-words"
   (if (not desigs) (return-from lump-brackets (get-words str)))
   (expect (equal (length desigs) 2) "should be 2 brackets here")
   (let ((out) (in-bracket) (lump))
@@ -647,10 +647,10 @@
 
 (defun traverse (keys hash &key (bool nil) (collapseFn "#'mean"))
   "traverses the 'keys' in the hash table 'hash', and recursively
-  searches the other keys that each 'key' references. During the traversal,
-  checks if keys are present not-present, and builds a list of those keys
-  if bool is t, returns the list of keys that are present; if bool is nil,
-  returns the list of keys that aren't present"
+   searches the other keys that each 'key' references. During the traversal,
+   checks if keys are present not-present, and builds a list of those keys
+   if bool is t, returns the list of keys that are present; if bool is nil,
+   returns the list of keys that aren't present"
   (mklst keys)
   (let* ((words) (str) 
          (traversed (make-hash-table :test #'equalp))
@@ -707,7 +707,7 @@
 
 (defun bracket-expand (str &optional (inside-brackets nil))
   "takes an expression, and expands the ':'s (similar to how matlab references arrays)
-  for example: (bracket-expand \"hello1:5\") -> \"hello1 hello2 hello3 hello4 hello5\"
+   for example: (bracket-expand \"hello1:5\") -> \"hello1 hello2 hello3 hello4 hello5\"
   (bracket-expand \"1:5hello\") -> \"1hello 2hello 3hello 4hello 5hello\""
   (labels ((num-indeces (str direction)
              (expect (or (string-equal direction "fromLeft") (string-equal direction "fromRight") (string-equal direction "both"))
@@ -757,8 +757,8 @@
 
 (defmacro process-matching-lines (&body body)
   "Returns a function that can be used to do some sort of processing on lines in str matched by keys
-  See the two functions below for examples on how currying is used to define different types of processing
-  that can be done on matched lines"
+   See the two functions below for examples on how currying is used to define different types of processing
+   that can be done on matched lines"
   `(lambda (str keys)
      (mklst keys)
      (let ((words) (out) (line) (lines))
@@ -771,15 +771,15 @@
                          (dolist (key keys nil)
                            (if (string-equal key (subseq (first words) 0 (min (length (first words)) (length key))))
                              (return-from index= (length key)))))
-                  (let ((RHS
-                          (bracket-expand 
-                            (string-trim 
-                              (list #\Space #\tab) 
-                              (subseq (make-sentence line) it (length (make-sentence line)))))))
-                    ;Section where currying is used to change the behavior of the function that will be returned
-                    ,(if body 
-                       `(progn ,@body)
-                       `(push-to-end RHS out))))))))) ;default behavior is to push the RHS match onto out, and return out
+             (let ((RHS
+                     (bracket-expand 
+                       (string-trim 
+                         (list #\Space #\tab) 
+                         (subseq (make-sentence line) it (length (make-sentence line)))))))
+               ;Section where currying is used to change the behavior of the function that will be returned
+               ,(if body 
+                  `(progn ,@body)
+                  `(push-to-end RHS out))))))))) ;default behavior is to push the RHS match onto out, and return out
 
 ;Keep track of the line numbers for all of the lines that have been
 ;returned from calling the functions below
@@ -809,7 +809,7 @@
     (dolist (line (get-matching-lines str keys) out)
       (push-to-end
         (car (guard (get-words line) 
-                    (expect (> (length (car it)) 0) "no rhs for line in config file using keys ~a" keys)))
+               (expect (> (length (car it)) 0) "no rhs for line in config file using keys ~a" keys)))
         out))))
 
 (defmacro get-matching-line (&rest lst)
@@ -818,7 +818,7 @@
 
 (defun get-elements (keys hash &key (collapseFns "#'mean") (eval-val-p t))
   "returns the list of elements (key . value) from the hash table 'hash' specified by 'keys'
-  will evaluate each value before putting it in the list"
+   will evaluate each value before putting it in the list"
   (mklst keys)
   (if (not (consp collapseFns)) (setf collapseFns (make-list (length keys) :initial-element collapseFns)))
   (let ((out) (key) (collapseFn))
@@ -827,8 +827,8 @@
       (setf collapseFn (nth i collapseFns))
       (multiple-value-bind (words val) 
         (guard (necessaries key hash :collapseFn collapseFn)
-               (expect (equal (length (car it)) 0)
-                       "necessaries ~a left over when calling get-elements; not allowed to have any necessaries here" (car it)))
+          (expect (equal (length (car it)) 0)
+                  "necessaries ~a left over when calling get-elements; not allowed to have any necessaries here" (car it)))
         (declare (ignore words))
         (push-to-end (cons key (if eval-val-p (eval (read-from-string (first val))) (first val))) out)))))
 
@@ -978,8 +978,8 @@
 
 (defmethod collect :after ((obj collector-class) (lst list))
   "method to fire the print-collector method after the quota has been reached;
-  will collapse the lists in the collector (using collapseHash) before calling print-collector;
-  also fires the collect method on the session-collector object"
+   will collapse the lists in the collector (using collapseHash) before calling print-collector;
+   also fires the collect method on the session-collector object"
   (declare (ignore lst))
   (when (equal (quota obj) (quot obj))
     ;short-circuit to optimize recursion called later
@@ -1009,7 +1009,7 @@
 
 (defmethod collect :after ((obj run-collector-class) (lst list))
   "method will fire the print-collector method after the quota has been reached;
-  also fires the collect method on the collector object"
+   also fires the collect method on the collector object"
   (expect (equal (quot obj) 1) "should only collect once; quot is ~a" (quot obj))
   (expect (equal (quota obj) 1) "quota should be one; quota is ~a" (quota obj))
   (print-collector obj)
@@ -1031,9 +1031,9 @@
    (sleepTime :accessor sleepTime :initarg :sleepTime :initform 0
               :documentation "amount of time to sleep after the runProcess is completed"))
   (:documentation 
-   "class for a single process; if we're short-circuiting (i.e., calling a lisp-native model using an entry function)
-    then there will only be 1 instance of this class; if we're launching the model as a separate process, then
-    the number of instances will be (ceiling (total runs / runs per process))"))
+    "class for a single process; if we're short-circuiting (i.e., calling a lisp-native model using an entry function)
+     then there will only be 1 instance of this class; if we're launching the model as a separate process, then
+     the number of instances will be (ceiling (total runs / runs per process))"))
 
 (defclass nonlisp-model-runProcess-class (runProcess-class)
   ((spawned-process-sleep-time :accessor spawned-process-sleep-time :initarg :spawned-process-sleep-time :initform .1))
@@ -1138,7 +1138,7 @@
                  (find-in-string (char str (+ count 1)) lineDesigs))
           (while (and (< (+ 1 count) (- strLength 1))
                       (find-in-string (char str (+ 1 count)) lineDesigs))
-                 (incf count))
+            (incf count))
           (write-string str out :start count :end (+ 1 count))))
       (if (equal count (- strLength 1))
         (write-string str out :start count :end (+ 1 count))))))
@@ -1215,9 +1215,9 @@
                  (configFileLnLST)
                  (configFileWdLST)
                  (workFilePath (unless (string-equal (get-arg 0) "nil") (get-arg 0))))
-        (setf configFileStr (restructure (file-string configFilePath)))
-        (setf configFileLnLST (get-lines configFileStr))
-        (setf configFileWdLST (mapcar #'get-words configFileLnLST)))
+  (setf configFileStr (restructure (file-string configFilePath)))
+  (setf configFileLnLST (get-lines configFileStr))
+  (setf configFileWdLST (mapcar #'get-words configFileLnLST)))
 
 (args) ;initialize configFile Str/LnLST/WdLST to defaults
 
@@ -1225,15 +1225,15 @@
 ; object-oriented hierarchy and sending constructors to those new pieces
 ; as inputs to the 'build-session macro call 
 (defmacro build-session (&key 
-                          (collector-instance `(make-instance 'collector-class)) 
-                          (work-instance `(make-instance 'work-class))
-                          (session-collector-instance `(make-instance 'session-collector-class))
-                          (process-output-str-instance `(make-instance 'process-output-str-class))
-                          (run-collector-instance `(make-instance 'run-collector-class))
-                          (lisp-model-runProcess-instance `(make-instance 'lisp-model-runProcess-class))
-                          (nonlisp-model-runProcess-instance `(make-instance 'nonlisp-model-runProcess-class))
-                          (lisp-model-run-instance `(make-instance 'lisp-model-run-class))
-                          (nonlisp-model-run-instance `(make-instance 'nonlisp-model-run-class)))
+                         (collector-instance `(make-instance 'collector-class)) 
+                         (work-instance `(make-instance 'work-class))
+                         (session-collector-instance `(make-instance 'session-collector-class))
+                         (process-output-str-instance `(make-instance 'process-output-str-class))
+                         (run-collector-instance `(make-instance 'run-collector-class))
+                         (lisp-model-runProcess-instance `(make-instance 'lisp-model-runProcess-class))
+                         (nonlisp-model-runProcess-instance `(make-instance 'nonlisp-model-runProcess-class))
+                         (lisp-model-run-instance `(make-instance 'lisp-model-run-class))
+                         (nonlisp-model-run-instance `(make-instance 'nonlisp-model-run-class)))
   "generates the code that generates the session object that will be executed"
   (setf collector-instance (append collector-instance
                                    '(:cellElements (get-elements cellKeys IVHash :eval-val-p nil)
@@ -1319,17 +1319,17 @@
                (merge-hash
                  (mapcar #'cons
                          (guard (get-first-word-from-matching-lines configFileWdLST (list "constant=" "iv="))
-                                (expect (equal (length (car it)) (length cell-values))
-                                        "number of cell keys (~d) does not equal number of cell values (~d)" 
-                                        (length (car it)) (length cell-values)))
+                           (expect (equal (length (car it)) (length cell-values))
+                                   "number of cell keys (~d) does not equal number of cell values (~d)" 
+                                   (length (car it)) (length cell-values)))
                          cell-values)
                  :toHash IVHash))
              (add-dependent-elements IVHash configFileWdLST "input=")
              (setf mergedHash (merge-hash (list DVHash IVHash)))
              (if (equal line-index 0) 
                (guard (necessaries IVKeys IVHash)
-                      (expect (not (car it))
-                              "IVs '~a' that are necessary to evaluate the 'input=' lines are not present in the config file" (car it))))
+                 (expect (not (car it))
+                         "IVs '~a' that are necessary to evaluate the 'input=' lines are not present in the config file" (car it))))
              (while (< (incf iteration) iterations)
                (setf quot -1)
                (setf collector ,collector-instance)
@@ -1351,14 +1351,14 @@
              (traversed (with-pandoric (traversed) #'get-matching-lines 
                           (sort (remove-duplicates traversed :test #'equal) #'<))))
            (guard (apply #'+ (mapcar #'(lambda (x) (length (runs x))) (runProcesses session)))
-                  (expect (equal (quota session) (car it))
-                          "number of linesxiterationsxquota in work file (~d) not equal to number of run objects (~d)"	
-                          (quota session) (car it)))
+             (expect (equal (quota session) (car it))
+                     "number of linesxiterationsxquota in work file (~d) not equal to number of run objects (~d)"	
+                     (quota session) (car it)))
            session)))))
 
 (defun line2element (line)
   "converts an output line of text sent by the model to a dotted pair;
-  discards if it's not a valid output line (handles when warning statements are printed to stdout)"
+   discards if it's not a valid output line (handles when warning statements are printed to stdout)"
   (let ((equal-index) (key) (value))
     (setf equal-index (find-in-string line #\=))
     (when (equal (length equal-index) 1)
@@ -1370,7 +1370,7 @@
 
 (defmethod get-DVs ((obj nonlisp-model-run-class) &optional (process nil) (appetizers nil)) 
   "capture all the input lines that the model has sent; 
-  then, remap each line as a dotted pair (key . value)"
+   then, remap each line as a dotted pair (key . value)"
   (expect process "should be a process here")
   (mklst appetizers)
   (let ((currentDVs) (line) (empty-stream-p t))
@@ -1386,7 +1386,7 @@
 
 (defmethod get-DVs ((obj lisp-model-run-class) &optional (process nil) (appetizers nil))
   "capture all the input lines that the model has sent; 
-  then, remap each line as a dotted pair (key . value)"
+   then, remap each line as a dotted pair (key . value)"
   (mklst appetizers)  
   (let ((currentDVs) (fstr) (error-p) (tbl))
     (cond ((equal (entryFnType obj) 'hash)
@@ -1465,42 +1465,42 @@
     (let ((necessaryDVs) (currentDVs) (currentDV) (process-alive-p t) (state 'before))
       (while (and (setf necessaryDVs (necessaries DVKeys DVHash))
                   process-alive-p)
-             (if (not (equal (p-status process) :running))
-               (setf process-alive-p nil))
-             (setf currentDVs (get-DVs obj process appetizers))
-             (setf appetizers nil)
-             (while (and currentDVs (not (eq state 'after)))
-               (setf currentDV (pop currentDVs))
-               (cond ((eq state 'before)
-                      (cond ((start-marker-p currentDV)
-                             (setf state 'during)
-                             (expect (correct-start-marker-p obj currentDV) 
-                                     "unexpected value for start marker; expected/received:~%~a~%~a~%" (get-input-line obj) (cdr currentDV)))
-                            (t
-                             (format *error-output* "sent ~a DV before sending a trial start marker; this DV val will be discarded~%" currentDV))))
-                     ((eq state 'during)
-                      (cond ((member (car currentDV) necessaryDVs :test #'string-equal)
-                             (merge-hash currentDV :toHash DVHash)
-                             (setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'string-equal)))
-                            ((start-marker-p currentDV)
-                             ;log it
-                             (when necessaryDVs
-                               (format *error-output* "sent trial start marker for next trial, before sending all ~a DVs left for this trial~%" necessaryDVs))
-                             (setf state 'after)
-                             ;make sure currentDVs is correct (undo the pop)
-                             (push currentDV currentDVs)
-                             ;merge nils for all necessaryDVs to the dvhash
-                             (merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) necessaryDVs) :toHash DVHash)
-                             ;set necessaryDVs to nil
-                             (setf necessaryDVs nil))
-                            (t
-                             (format *error-output* "sent extra DV ~a for this trial~%" currentDV)))))))
+        (if (not (equal (p-status process) :running))
+          (setf process-alive-p nil))
+        (setf currentDVs (get-DVs obj process appetizers))
+        (setf appetizers nil)
+        (while (and currentDVs (not (eq state 'after)))
+          (setf currentDV (pop currentDVs))
+          (cond ((eq state 'before)
+                 (cond ((start-marker-p currentDV)
+                        (setf state 'during)
+                        (expect (correct-start-marker-p obj currentDV) 
+                                "unexpected value for start marker; expected/received:~%~a~%~a~%" (get-input-line obj) (cdr currentDV)))
+                       (t
+                        (format *error-output* "sent ~a DV before sending a trial start marker; this DV val will be discarded~%" currentDV))))
+                ((eq state 'during)
+                 (cond ((member (car currentDV) necessaryDVs :test #'string-equal)
+                        (merge-hash currentDV :toHash DVHash)
+                        (setf necessaryDVs (remove (car currentDV) necessaryDVs :test #'string-equal)))
+                       ((start-marker-p currentDV)
+                        ;log it
+                        (when necessaryDVs
+                          (format *error-output* "sent trial start marker for next trial, before sending all ~a DVs left for this trial~%" necessaryDVs))
+                        (setf state 'after)
+                        ;make sure currentDVs is correct (undo the pop)
+                        (push currentDV currentDVs)
+                        ;merge nils for all necessaryDVs to the dvhash
+                        (merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) necessaryDVs) :toHash DVHash)
+                        ;set necessaryDVs to nil
+                        (setf necessaryDVs nil))
+                       (t
+                        (format *error-output* "sent extra DV ~a for this trial~%" currentDV)))))))
       (when (aand (p-exit-code process) (> it 0))
         (format *error-output* "Model process crashed with nonzero exit status; p-exit-code=~a~%" (p-exit-code process))
         (print-collector (process-output-str (runProcess obj))))
       (awhen necessaryDVs
-             (format *error-output* "failed to send all ~a DVs left for this trial~%" it)
-             (merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) it) :toHash DVHash))
+        (format *error-output* "failed to send all ~a DVs left for this trial~%" it)
+        (merge-hash (mapcar (lambda (missingDV) (cons missingDV "nil")) it) :toHash DVHash))
       (collect run-collector DVHash)
       (setf DVHash nil)
       (sleep sleepTime)
@@ -1561,7 +1561,7 @@
 
 (defmacro methods (name &body args)
   "shorthand for defining multiple methods that are taking advantage of dynamic dispatching;
-  that is, they all have the same name, they just operate on different classes"
+   that is, they all have the same name, they just operate on different classes"
   ;adding a 'stub method' line to the documentation, if defining an empty stub method
   (mapc (lambda (x) (if (not (cdr x)) (setf (cdr x) `("stub method")))) args)
   `(progn ,@(mapcar (lambda (x) `(defmethod ,name ,@x)) args)))
