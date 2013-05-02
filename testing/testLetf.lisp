@@ -43,7 +43,7 @@
       ; Should only sleep in the case where there is no model output and the process is running.
       ; To check for this, capture the output from running get-DVs with each configuration of output/no-output running/exited. 
       ; If sleep was called, then it will be notated on the output captured. Otherwise, the output should be empty.
-      
+
       ; Should sleep when no model output and process is running
       (test (make-string-input-stream "") :running "did not find any DVs for running nonlisp model process.*sleeping")
       ; Should not sleep when model output and process is running
@@ -64,7 +64,7 @@
                                              (declare (ignore obj input))
                                              (make-instance 'dummy-process 
                                                             :p-output (make-string-input-stream (format nil dvs))))) 
-                              (setf output (capture-output t (wrapper-execute obj))))
+                   (setf output (capture-output t (wrapper-execute obj))))
                  (let ((s (cl-ppcre:create-scanner 
                             expected
                             :case-insensitive-mode t 
@@ -107,26 +107,26 @@
   "Tests that get-matching-lines returns the correct values when parsing the testStr config file
    LHS is the str to look for in the config file
    RHS is the list of all matches to LHS in the config file"
-   (let ((testStr (format nil "aLine= aLineVal~%bLine=bLineVal~%aLine= ALineVal2")))
-     (loop for (LHS RHS) in (list '("aLine=" ("aLineVal" "aLineVal2")) ;multiple matched lines; single matcher
-                                  '("bLine=" ("bLineVal")) ;single matched line; single matcher
-                                  '(("aLine=" "bline=") ("aLineVal" "bLineVal" "aLineVal2")) ;multiple matches lines; multiple matchers
-                                  '("bline=" ("blineval")) ;not case sensitive
-                                  '("notPresent=" ()) ; no match
-                                  )
-           do (check (equalp (get-matching-lines testStr LHS)
-                             RHS)))))
+  (let ((testStr (format nil "aLine= aLineVal~%bLine=bLineVal~%aLine= ALineVal2")))
+    (loop for (LHS RHS) in (list '("aLine=" ("aLineVal" "aLineVal2")) ;multiple matched lines; single matcher
+                                 '("bLine=" ("bLineVal")) ;single matched line; single matcher
+                                 '(("aLine=" "bline=") ("aLineVal" "bLineVal" "aLineVal2")) ;multiple matches lines; multiple matchers
+                                 '("bline=" ("blineval")) ;not case sensitive
+                                 '("notPresent=" ()) ; no match
+                                 )
+          do (check (equalp (get-matching-lines testStr LHS)
+                            RHS)))))
 
 (deftest-hpc test-get-matching-lines-full ()
   "Analogous to test-get-matching-lines, except this one checks that the additional information
    for each match is included (i.e., the LHS for get-matching-lines-full)"
-   (let ((testStr (format nil "aLine=aLineVal~%bLine=bLineVal~%aLine=aLineVal2")))
-     (loop for (LHS return-val) in (list '("aLine=" ( ("aline=" "alineVal") ("aline=" "alineVal2") ))
-                                         '("bLine=" ( ("bline=" "blineVal") ))
-                                         '( ("aLine=" "bLine=") ( ("aline=" "alineVal") ("bline=" "blineVal") ("aline=" "alineVal2") ))
-                                         )
-           do (check (equalp (get-matching-lines-full testStr LHS)
-                             return-val)))))
+  (let ((testStr (format nil "aLine=aLineVal~%bLine=bLineVal~%aLine=aLineVal2")))
+    (loop for (LHS return-val) in (list '("aLine=" ( ("aline=" "alineVal") ("aline=" "alineVal2") ))
+                                        '("bLine=" ( ("bline=" "blineVal") ))
+                                        '( ("aLine=" "bLine=") ( ("aline=" "alineVal") ("bline=" "blineVal") ("aline=" "alineVal2") ))
+                                        )
+          do (check (equalp (get-matching-lines-full testStr LHS)
+                            return-val)))))
 
 (deftest-hpc test-load-and-eval-commands ()
   "Tests that runBeforeLoad, file2load, runWithinLoad, and runAfterLoad commands in the config file get parsed and processed in the correct order"
