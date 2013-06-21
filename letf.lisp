@@ -1036,7 +1036,7 @@
      the number of instances will be (ceiling (total runs / runs per process))"))
 
 (defclass nonlisp-model-runProcess-class (runProcess-class)
-  ((spawned-process-sleep-time :accessor spawned-process-sleep-time :initarg :spawned-process-sleep-time :initform .1))
+  ((spawned-process-sleep-time :accessor spawned-process-sleep-time :initarg :spawned-process-sleep-time :initform .2))
   (:default-initargs :sleepTime .2)
   (:documentation "class for a single process if we're not short circuiting"))
 
